@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="e12e4df7-8a32-46b2-a896-cb8a0c8ced85" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1Z7E4JFzGDBljB4v3NucKjkO11H" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="android.sdk.path" value="$USER_HOME$/Android/Sdk" />
+    <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e12e4df7-8a32-46b2-a896-cb8a0c8ced85" name="Default Changelist" comment="" />
+      <created>1584181542565</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1584181542565</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="528" y="149" width="378" height="575" key="#com.intellij.ide.util.MemberChooser" timestamp="1584183454062">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="528" y="149" width="378" height="575" key="#com.intellij.ide.util.MemberChooser/0.0.1440.900/0.0.1440.900@0.0.1440.900" timestamp="1584183454062" />
+    <state x="564" y="329" width="305" height="216" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1584182983246">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="564" y="329" width="305" height="216" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1440.900/0.0.1440.900@0.0.1440.900" timestamp="1584182983246" />
+    <state x="253" y="95" width="928" height="684" key="Maven.ArtifactSearchDialog" timestamp="1584183148311">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="253" y="95" width="928" height="684" key="Maven.ArtifactSearchDialog/0.0.1440.900/0.0.1440.900@0.0.1440.900" timestamp="1584183148311" />
+  </component>
+</project>
