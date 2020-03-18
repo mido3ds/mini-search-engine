@@ -3,3 +3,8 @@ out
 *.db
 
 .idea
+
+*.lock
+
+node_modules
+built

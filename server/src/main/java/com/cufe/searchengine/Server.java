@@ -71,18 +71,18 @@ public class Server implements CommandLineRunner {
 		}
 	}
 
-	@Bean
-	public WebMvcConfigurer webConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-					.allowedOrigins("*")
-					.allowedMethods("*")
-					.allowedHeaders("Content-Type");
-			}
-		};
-	}
+//	@Bean
+//	public WebMvcConfigurer webConfigurer() {
+//		return new WebMvcConfigurer() {
+//			@Override
+//			public void addCorsMappings(CorsRegistry registry) {
+//				registry.addMapping("/**")
+//					.allowedOrigins("*")
+//					.allowedMethods("*")
+//					.allowedHeaders("Content-Type");
+//			}
+//		};
+//	}
 
 	static class ExitException extends RuntimeException implements ExitCodeGenerator {
 		private static final long serialVersionUID = 1L;
