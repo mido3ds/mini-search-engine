@@ -35,7 +35,7 @@ public class QueryApiController {
 	}
 
 	/**
-	 * GET /query : submit a query
+	 * GET /api/query : submit a query
 	 *
 	 * @param q    string to search for (required)
 	 * @param page page of results to fetch, default 1 (optional)
@@ -44,7 +44,7 @@ public class QueryApiController {
 	@ApiOperation(value = "submit a query", nickname = "query", notes = "", response = QueryResult.class, responseContainer = "List", tags = {})
 	@ApiResponses(value = {
 		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = QueryResult.class, responseContainer = "List")})
-	@RequestMapping(value = "/query",
+	@RequestMapping(value = "/api/query",
 		produces = {"application/json"},
 		method = RequestMethod.GET)
 	ResponseEntity<List<QueryResult>> query(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q, @ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page) {
@@ -54,7 +54,7 @@ public class QueryApiController {
 			queryResults.add(
 				new QueryResult()
 					.title("Wikipedia")
-					.link("www.wikipedia.org")
+					.link("https://www.wikipedia.org")
 					.snippet("Wikipedia is a free online encyclopedia, " +
 						"created and edited by volunteers around the world and hosted " +
 						"by the Wikimedia Foundation.")

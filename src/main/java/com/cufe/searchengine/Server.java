@@ -9,14 +9,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.sql.SQLException;
 import java.util.Objects;
@@ -70,19 +67,6 @@ public class Server implements CommandLineRunner {
 			throw new UncheckedExecutionException(e);
 		}
 	}
-
-//	@Bean
-//	public WebMvcConfigurer webConfigurer() {
-//		return new WebMvcConfigurer() {
-//			@Override
-//			public void addCorsMappings(CorsRegistry registry) {
-//				registry.addMapping("/**")
-//					.allowedOrigins("*")
-//					.allowedMethods("*")
-//					.allowedHeaders("Content-Type");
-//			}
-//		};
-//	}
 
 	static class ExitException extends RuntimeException implements ExitCodeGenerator {
 		private static final long serialVersionUID = 1L;

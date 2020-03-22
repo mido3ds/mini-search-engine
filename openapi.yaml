@@ -3,7 +3,7 @@ info:
   title: Mini Search Engine API
   version: 0.1.0
 paths:
-  /query:
+  /api/query:
     get:
       summary: submit a query
       operationId: query
@@ -28,8 +28,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QueryResult"
-  /complete:
+                  $ref: "#/components/schemas/api/queryResult"
+  /api/complete:
     get:
       summary: get list of completions
       operationId: complete
