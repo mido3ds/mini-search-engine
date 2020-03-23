@@ -2,15 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { render } from 'react-dom'
 import {
     BrowserRouter as Router,
-    Switch, Route, Redirect, useLocation
+    Switch, Route, useLocation, useHistory
 } from "react-router-dom"
+
 import qs from 'qs'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import CssBaseline from '@material-ui/core/CssBaseline'
 
 import { DefaultApi } from './api'
 
-const api = new DefaultApi()
+const API = new DefaultApi()
 
 const SearchResult = ({ r }) => {
+    // TODO wrap in a card
     return (
         <div>
             <a href={r.link}>
@@ -22,58 +27,109 @@ const SearchResult = ({ r }) => {
     )
 }
 
-const QueryPage = () => {
+const SearchPage = () => {
     const [results, setResults] = useState([])
+    const [q, setQ] = useState("")
+    const [p, setP] = useState(1)
+    const [err, setErr] = useState("")
 
-    const { q, p } = qs.parse(useLocation().search, { ignoreQueryPrefix: true })
+    const { search } = useLocation()
 
     useEffect(() => {
-        api.query(q, p).then(resp => {
-            if (resp.status === 200) {
-                setResults(resp.data)
-            } else {
-                console.error(`error in query, resp.status={resp.status}`)
-            }
-        })
-    }, [])
+        const parsed = qs.parse(search, { ignoreQueryPrefix: true })
+        setQ(parsed.q)
+        setP(parsed.p)
+    }, [search])
+
+    useEffect(() => {
+        if (q !== "") {
+            API.query(q, p).then(resp => {
+                if (resp.status === 200) {
+                    setResults(resp.data)
+                    setErr("")
+                } else {
+                    setErr(`error in query, resp.status=${resp.status}`)
+                }
+            })
+        }
+    }, [q, p])
 
     return (
         <div>
-            {results.map((r, i) => <SearchResult r={r} key={i} />)}
+            {err ? <h2>{err}</h2> : results.map((r, i) => <SearchResult r={r} key={i} />)}
         </div>
     )
 }
 
-const HomePage = () => {
+const SearchBar = () => {
+    const [query, setQuery] = useState("")
+    const [disabled, setDisabled] = useState(true)
+    const history = useHistory()
+
+    const onClick = () => {
+        if (query) {
+            history.push(`/search?q=${query}`)
+        }
+    }
+
+    const onKey = (e) => {
+        if (e.key === 'Enter') {
+            onClick()
+            e.preventDefault()
+        }
+    }
+
+    const onInputChange = (event) => {
+        setQuery(event.target.value)
+    }
+
+    useEffect(() => {
+        if (query === "") {
+            setDisabled(true)
+        } else if (disabled) {
+            setDisabled(false)
+        }
+    }, [query])
+
+    // TODO: add completion support
+
     return (
-        // TODO: search bar
-        <Redirect to="/query?q=ad" />
+        <div onKeyPress={onKey}>
+            <h1>Mini Search Engine</h1>
+            <form noValidate autoComplete="off" style={{ display: "flex" }}>
+                <TextField id="search-input" label="" variant="outlined" size="small" onChange={onInputChange} />
+
+                <Button variant="outlined" color="primary" disableElevation onClick={onClick} disabled={disabled}>
+                    Search
+                    </Button>
+            </form>
+            <br />
+        </div>
     )
 }
 
+// TODO: add paging support
+
 const App = () => {
     return (
-        <Router>
-            {/* TODO: HEADER */}
-            <div>HEADER</div>
+        <div>
+            <CssBaseline />
+            <SearchBar />
 
             <Switch>
-                <Route path="/query">
-                    <QueryPage />
-                </Route>
+                <Route exact path="/" />
 
-                <Route path="/">
-                    <HomePage />
+                <Route path="/search">
+                    <SearchPage />
                 </Route>
             </Switch>
-
-            {/* TODO FOOTER */}
-            <div>FOOTER</div>
-        </Router>
+        </div>
     )
 }
 
 render(
-    <App />,
+    <Router>
+        <App />
+    </Router>,
     document.getElementById('app-root')
 )

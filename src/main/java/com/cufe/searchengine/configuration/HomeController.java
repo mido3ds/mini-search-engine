@@ -15,6 +15,11 @@ public class HomeController {
 		return "index.html";
 	}
 
+	@RequestMapping("/search")
+	public String query() {
+		return "redirect:/";
+	}
+
 	@RequestMapping("/swagger")
 	public String swagger() {
 		return "redirect:swagger-ui.html";
