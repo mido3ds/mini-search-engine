@@ -1,36 +1,40 @@
 # mini-search-engine
 Mini Search Engine - Advanced Programming Techniques Course Project - Cairo Uni.
 
-# Install Dependencies
+# Requirements
 
-* maven +3.6.0
-* java +11.0.3
-* javac +11.0.3
-* nodejs +8.11.4
-* yarn +1.21.1
+| Binary | Version  |
+|--------|----------|
+| maven  | `3.6.0`  |
+| java   | `11.0.3` |
+| javac  | `11.0.3` |
+| nodejs | `8.11.4` |
+| yarn   | `1.21.1` |
 
-```
+# Install Other Requirement
+
+``` 
 $ mvn clean install
 $ yarn install
 ```
 
-# Build Web
+# Build Frontend
 
-`$ yarn build`
+`$ yarn build` 
 
 # Run Server
 
-`$ mvn spring-boot:run -Dserver.port=<PORT>` where `<PORT>` is the port to bind to.
+`$ mvn spring-boot:run` 
 
-# Run Crawler
+Default port `server.port` is set in `src/main/resources/application.properties` .
 
-TODO
+> To choose the port, run: 
+> 1. `$ mvn spring-boot:run -Dserver.port=<PORT>` 
+> 1. `$ npx webpack --env.BASE_PATH=localhost:<PORT>` 
+>  
+> where `<PORT>` is the port to bind to.
 
-# Run Server Tests
+# Run Tests
 
 `$ mvn test` 
-
-# Run Web Tests
-
-`$ yarn test`
 
