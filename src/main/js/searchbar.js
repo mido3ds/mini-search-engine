@@ -9,12 +9,6 @@ import { DefaultApi } from './api'
 
 const API = new DefaultApi()
 
-function sleep(delay = 0) {
-    return new Promise(resolve => {
-        setTimeout(resolve, delay);
-    });
-}
-
 export default function SearchBar() {
     const history = useHistory()
     const [disabled, setDisabled] = useState(true)
