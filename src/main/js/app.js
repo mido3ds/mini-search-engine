@@ -20,8 +20,12 @@ const SearchResult = ({ r }) => {
         <div>
             <a href={r.link}>
                 <div>{r.title}</div>
+            </a>
+
+            <a href={r.link}>
                 {r.link}<br />
             </a>
+
             <div>{r.snippet}</div><br />
         </div>
     )
@@ -29,6 +33,9 @@ const SearchResult = ({ r }) => {
 
 const SearchPage = () => {
     const [results, setResults] = useState([])
+    const [currPage, setCurrPage] = useState(1)
+    const [allPages, setAllPages] = useState(1)
+
     const [q, setQ] = useState("")
     const [p, setP] = useState(1)
     const [err, setErr] = useState("")
@@ -43,20 +50,38 @@ const SearchPage = () => {
 
     useEffect(() => {
         if (q !== "") {
-            API.query(q, p).then(resp => {
-                if (resp.status === 200) {
-                    setResults(resp.data)
-                    setErr("")
-                } else {
-                    setErr(`error in query, resp.status=${resp.status}`)
-                }
-            })
+            API.query(q, p)
+                .then(resp => {
+                    if (resp.status === 200) {
+                        setResults(resp.data.results)
+                        setCurrPage(resp.data.currentPage)
+                        setAllPages(resp.data.totalPages)
+
+                        setErr("")
+                    } else {
+                        setErr(`error in query, resp.status=${resp.status}`)
+                    }
+                })
+                .catch(reason => {
+                    setErr(`error in query, reson=${reason}`)
+                })
         }
     }, [q, p])
 
+    const renderErr = () => (
+        <h2>{err}</h2>
+    )
+
+    const renderResult = () => (
+        <div>
+            <p>{currPage}/{allPages}</p>
+            {results.map((r, i) => <SearchResult r={r} key={i} />)}
+        </div>
+    )
+
     return (
         <div>
-            {err ? <h2>{err}</h2> : results.map((r, i) => <SearchResult r={r} key={i} />)}
+            {err ? renderErr() : renderResult()}
         </div>
     )
 }

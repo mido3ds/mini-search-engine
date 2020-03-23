@@ -1,6 +1,7 @@
 package com.cufe.searchengine.api;
 
 import com.cufe.searchengine.model.QueryResult;
+import com.cufe.searchengine.model.ResultPage;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -41,13 +42,13 @@ public class QueryApiController {
 	 * @param page page of results to fetch, default 1 (optional)
 	 * @return successful operation, result could be empty (status code 200)
 	 */
-	@ApiOperation(value = "submit a query", nickname = "query", notes = "", response = QueryResult.class, responseContainer = "List", tags = {})
+	@ApiOperation(value = "submit a query", nickname = "query", notes = "", response = ResultPage.class, tags = {})
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = QueryResult.class, responseContainer = "List")})
+		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = ResultPage.class)})
 	@RequestMapping(value = "/api/query",
 		produces = {"application/json"},
 		method = RequestMethod.GET)
-	ResponseEntity<List<QueryResult>> query(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q, @ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page) {
+	ResponseEntity<ResultPage> query(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q, @ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page) {
 		ArrayList<QueryResult> queryResults = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
@@ -58,9 +59,10 @@ public class QueryApiController {
 					.snippet("Wikipedia is a free online encyclopedia, " +
 						"created and edited by volunteers around the world and hosted " +
 						"by the Wikimedia Foundation.")
+				// TODO
 			);
 		}
 
-		return ResponseEntity.ok(queryResults);
+		return ResponseEntity.ok(new ResultPage().currentPage(page == null ? 1 : page).totalPages(/*TODO*/1).results(queryResults));
 	}
 }

@@ -5,7 +5,7 @@
   "repository": "github.com/mido3ds/mini-search-engine",
   "license": "MIT",
   "scripts": {
-    "build": "npx webpack --env.BASE_PATH=localhost:8080/api",
+    "build": "npx webpack --env.BASE_PATH=localhost:8080",
     "test": "echo TODO"
   },
   "dependencies": {

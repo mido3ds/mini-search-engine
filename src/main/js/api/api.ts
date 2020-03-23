@@ -30,6 +30,31 @@ export interface QueryResult {
      */
     snippet?: string;
 }
+/**
+ * 
+ * @export
+ * @interface ResultPage
+ */
+export interface ResultPage {
+    /**
+     * 
+     * @type {number}
+     * @memberof ResultPage
+     */
+    currentPage?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResultPage
+     */
+    totalPages?: number;
+    /**
+     * 
+     * @type {Array<QueryResult>}
+     * @memberof ResultPage
+     */
+    results?: Array<QueryResult>;
+}
 
 /**
  * DefaultApi - axios parameter creator
@@ -47,15 +72,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         complete(q: string, options: any = {}): RequestArgs {
             // verify required parameter 'q' is not null or undefined
             if (q === null || q === undefined) {
-                throw new RequiredError('q','Required parameter q was null or undefined when calling complete.');
+                throw new RequiredError('q', 'Required parameter q was null or undefined when calling complete.');
             }
-            const localVarPath = `/complete`;
+            const localVarPath = `/api/complete`;
             const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -64,11 +89,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             }
 
 
-    
-            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+
+            localVarUrlObj.query = { ...localVarUrlObj.query, ...localVarQueryParameter, ...options.query };
             // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
             delete localVarUrlObj.search;
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...options.headers};
+            localVarRequestOptions.headers = { ...localVarHeaderParameter, ...options.headers };
 
             return {
                 url: globalImportUrl.format(localVarUrlObj),
@@ -86,15 +111,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         query(q: string, page?: number, options: any = {}): RequestArgs {
             // verify required parameter 'q' is not null or undefined
             if (q === null || q === undefined) {
-                throw new RequiredError('q','Required parameter q was null or undefined when calling query.');
+                throw new RequiredError('q', 'Required parameter q was null or undefined when calling query.');
             }
-            const localVarPath = `/query`;
+            const localVarPath = `/api/query`;
             const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
             let baseOptions;
             if (configuration) {
                 baseOptions = configuration.baseOptions;
             }
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -107,11 +132,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             }
 
 
-    
-            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+
+            localVarUrlObj.query = { ...localVarUrlObj.query, ...localVarQueryParameter, ...options.query };
             // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
             delete localVarUrlObj.search;
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...options.headers};
+            localVarRequestOptions.headers = { ...localVarHeaderParameter, ...options.headers };
 
             return {
                 url: globalImportUrl.format(localVarUrlObj),
@@ -125,7 +150,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
  * DefaultApi - functional programming interface
  * @export
  */
-export const DefaultApiFp = function(configuration?: Configuration) {
+export const DefaultApiFp = function (configuration?: Configuration) {
     return {
         /**
          * 
@@ -137,7 +162,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         complete(q: string, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>> {
             const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).complete(q, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
                 return axios.request(axiosRequestArgs);
             };
         },
@@ -149,10 +174,10 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        query(q: string, page?: number, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<QueryResult>> {
+        query(q: string, page?: number, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultPage> {
             const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).query(q, page, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
                 return axios.request(axiosRequestArgs);
             };
         },
@@ -183,7 +208,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        query(q: string, page?: number, options?: any): AxiosPromise<Array<QueryResult>> {
+        query(q: string, page?: number, options?: any): AxiosPromise<ResultPage> {
             return DefaultApiFp(configuration).query(q, page, options)(axios, basePath);
         },
     };

@@ -26,9 +26,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/api/queryResult"
+                $ref: "#/components/schemas/ResultPage"
   /api/complete:
     get:
       summary: get list of completions
@@ -51,6 +49,18 @@ paths:
                   type: string
 components:
   schemas:
+    ResultPage:
+      type: object
+      title: ResultPage
+      properties:
+        currentPage:
+          type: integer
+        totalPages:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/QueryResult"
     QueryResult:
       type: object
       title: QueryResult
