@@ -1,16 +1,11 @@
+import CssBaseline from '@material-ui/core/CssBaseline'
+import qs from 'qs'
 import React, { useEffect, useState } from 'react'
 import { render } from 'react-dom'
-import {
-    BrowserRouter as Router,
-    Switch, Route, useLocation, useHistory
-} from "react-router-dom"
-
-import qs from 'qs'
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
-import CssBaseline from '@material-ui/core/CssBaseline'
-
+import { BrowserRouter as Router, Route, Switch, useLocation } from "react-router-dom"
 import { DefaultApi } from './api'
+import SearchBar from './searchbar'
+
 
 const API = new DefaultApi()
 
@@ -82,53 +77,6 @@ const SearchPage = () => {
     return (
         <div>
             {err ? renderErr() : renderResult()}
-        </div>
-    )
-}
-
-const SearchBar = () => {
-    const [query, setQuery] = useState("")
-    const [disabled, setDisabled] = useState(true)
-    const history = useHistory()
-
-    const onClick = () => {
-        if (query) {
-            history.push(`/search?q=${query}`)
-        }
-    }
-
-    const onKey = (e) => {
-        if (e.key === 'Enter') {
-            onClick()
-            e.preventDefault()
-        }
-    }
-
-    const onInputChange = (event) => {
-        setQuery(event.target.value)
-    }
-
-    useEffect(() => {
-        if (query === "") {
-            setDisabled(true)
-        } else if (disabled) {
-            setDisabled(false)
-        }
-    }, [query])
-
-    // TODO: add completion support
-
-    return (
-        <div onKeyPress={onKey}>
-            <h1>Mini Search Engine</h1>
-            <form noValidate autoComplete="off" style={{ display: "flex" }}>
-                <TextField id="search-input" label="" variant="outlined" size="small" onChange={onInputChange} />
-
-                <Button variant="outlined" color="primary" disableElevation onClick={onClick} disabled={disabled}>
-                    Search
-                    </Button>
-            </form>
-            <br />
         </div>
     )
 }
