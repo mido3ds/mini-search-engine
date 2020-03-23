@@ -5,6 +5,7 @@ import { render } from 'react-dom'
 import { BrowserRouter as Router, Route, Switch, useLocation } from "react-router-dom"
 import { DefaultApi } from './api'
 import SearchBar from './searchbar'
+import Pagination from '@material-ui/lab/Pagination'
 
 
 const API = new DefaultApi()
@@ -69,8 +70,9 @@ const SearchPage = () => {
 
     const renderResult = () => (
         <div>
-            <p>{currPage}/{allPages}</p>
+            <p>Page {currPage}/{allPages}</p>
             {results.map((r, i) => <SearchResult r={r} key={i} />)}
+            <Pagination count={allPages} shape="rounded" page={currPage} onChange={(_, page) => setP(page)} /><br />
         </div>
     )
 
@@ -80,8 +82,6 @@ const SearchPage = () => {
         </div>
     )
 }
-
-// TODO: add paging support
 
 const App = () => {
     return (

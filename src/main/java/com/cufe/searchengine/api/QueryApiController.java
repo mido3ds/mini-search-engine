@@ -63,6 +63,6 @@ public class QueryApiController {
 			);
 		}
 
-		return ResponseEntity.ok(new ResultPage().currentPage(page == null ? 1 : page).totalPages(/*TODO*/1).results(queryResults));
+		return ResponseEntity.ok(new ResultPage().currentPage(page == null ? 1 : page).totalPages(/*TODO*/10).results(queryResults));
 	}
 }
