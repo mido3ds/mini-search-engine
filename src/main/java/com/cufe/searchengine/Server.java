@@ -56,6 +56,8 @@ public class Server implements CommandLineRunner {
 			Integer.parseInt(Objects.requireNonNull(env.getProperty("crawler.numThreads"))),
 			jdbcTemplate, getSeedSet()
 		);
+
+		new Thread(new Indexer(jdbcTemplate)).start();
 	}
 
 	private List<String> getSeedSet() {
