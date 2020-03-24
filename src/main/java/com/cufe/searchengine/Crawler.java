@@ -40,7 +40,7 @@ public class Crawler implements Runnable {
 			throw new IllegalArgumentException("empty seed set");
 		}
 
-		log.info("creating "+numThreads+" of threads of crawler, with seedSet of size "+seedSet.size());
+		log.info("creating " + numThreads + " of threads of crawler, with seedSet of size " + seedSet.size());
 
 		for (int i = 0; i < numThreads; i++) {
 			new Thread(new Crawler(jdbcTemplate, seedSet), String.valueOf(i)).start();

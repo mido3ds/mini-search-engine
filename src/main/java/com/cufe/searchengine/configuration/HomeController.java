@@ -16,7 +16,7 @@ public class HomeController {
 	}
 
 	@RequestMapping("/search")
-	public String query() {
+	public String search() {
 		return "redirect:/";
 	}
 

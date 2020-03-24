@@ -1,6 +1,8 @@
 package com.cufe.searchengine.api;
 
+import com.cufe.searchengine.QueryProcessor;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -11,7 +13,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +24,11 @@ import java.util.Optional;
 @Api(value = "complete", description = "the complete API")
 public class CompleteApiController {
 	private final NativeWebRequest request;
+	private final QueryProcessor queryProcessor;
 
-	@org.springframework.beans.factory.annotation.Autowired
-	public CompleteApiController(NativeWebRequest request) {
+	@Autowired
+	public CompleteApiController(NativeWebRequest request, QueryProcessor queryProcessor) {
+		this.queryProcessor = queryProcessor;
 		this.request = request;
 	}
 
@@ -46,12 +49,6 @@ public class CompleteApiController {
 		produces = {"application/json"},
 		method = RequestMethod.GET)
 	ResponseEntity<List<String>> complete(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q) {
-		ArrayList<String> strings = new ArrayList<>();
-		strings.add("Did you mean this?");
-		strings.add("no, you probably meant this");
-		strings.add("no?");
-		strings.add("then what did you mean? i can't figure out");
-
-		return ResponseEntity.ok(strings);
+		return ResponseEntity.ok(queryProcessor.suggest(q));
 	}
 }

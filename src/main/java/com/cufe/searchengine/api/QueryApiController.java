@@ -1,8 +1,11 @@
 package com.cufe.searchengine.api;
 
+import com.cufe.searchengine.QueryProcessor;
 import com.cufe.searchengine.model.QueryResult;
 import com.cufe.searchengine.model.ResultPage;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -13,7 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @javax.annotation.Generated(value = "com.cufe.searchengine.codegen.languages.SpringCodegen", date = "2020-03-14T12:05:55.435057+02:00[Africa/Cairo]")
@@ -24,10 +27,12 @@ import java.util.Optional;
 @Api(value = "query", description = "the query API")
 public class QueryApiController {
 	private final NativeWebRequest request;
+	private final QueryProcessor queryProcessor;
 
-	@org.springframework.beans.factory.annotation.Autowired
-	public QueryApiController(NativeWebRequest request) {
+	@Autowired
+	public QueryApiController(NativeWebRequest request, QueryProcessor queryProcessor) {
 		this.request = request;
+		this.queryProcessor = queryProcessor;
 	}
 
 	public Optional<NativeWebRequest> getRequest() {
@@ -48,20 +53,26 @@ public class QueryApiController {
 		produces = {"application/json"},
 		method = RequestMethod.GET)
 	ResponseEntity<ResultPage> query(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q, @ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page) {
-		ArrayList<QueryResult> queryResults = new ArrayList<>();
+		page = page == null ? 1 : page;
 
-		for (int i = 0; i < 10; i++) {
-			queryResults.add(
-				new QueryResult()
-					.title("Wikipedia")
-					.link("https://www.wikipedia.org")
-					.snippet("Wikipedia is a free online encyclopedia, " +
-						"created and edited by volunteers around the world and hosted " +
-						"by the Wikimedia Foundation.")
-				// TODO
-			);
+		List<QueryResult> queryResults = queryProcessor.search(q);
+
+		int pages = (int) Math.ceil(queryResults.size() / 10.0d);
+
+		if (page > pages) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
-		return ResponseEntity.ok(new ResultPage().currentPage(page == null ? 1 : page).totalPages(/*TODO*/10).results(queryResults));
+		List<QueryResult> subList = queryResults.subList(
+			(page - 1) * 10,
+			Math.min(page * 10, queryResults.size())
+		);
+
+		return ResponseEntity.ok(
+			new ResultPage()
+				.currentPage(page)
+				.totalPages(pages)
+				.results(subList)
+		);
 	}
 }
