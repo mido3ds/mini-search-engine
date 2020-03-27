@@ -19,6 +19,7 @@
 	</parent>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
+		<defaultGoal>spring-boot:run</defaultGoal>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

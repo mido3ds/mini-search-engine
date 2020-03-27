@@ -24,12 +24,12 @@ $ yarn install
 
 # Run Server
 
-`$ mvn spring-boot:run` 
+`$ mvn` 
 
 Default port `server.port` is set in `src/main/resources/application.properties` .
 
 > To choose the port, run: 
-> 1. `$ mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=<PORT>"` 
+> 1. `$ mvn -Dspring-boot.run.arguments="--server.port=<PORT>"` 
 > 1. `$ npx webpack --env.BASE_PATH=localhost:<PORT>` 
 >  
 > where `<PORT>` is the port to bind to.
