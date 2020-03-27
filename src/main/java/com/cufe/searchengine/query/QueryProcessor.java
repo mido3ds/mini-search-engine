@@ -1,29 +1,24 @@
-package com.cufe.searchengine;
+package com.cufe.searchengine.query;
 
-import com.cufe.searchengine.model.QueryResult;
+import com.cufe.searchengine.server.model.QueryResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class QueryProcessor {
 	/**
 	 * jdbcTemplate: access sqlite db, shared between all the server classes.
 	 * schema is in `src/main/resources/sqlite_schema.sql`
 	 * and any initial data is in `src/main/resources/populate_db.sql`
 	 */
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	public QueryProcessor(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-
-		if (jdbcTemplate == null) {
-			throw new IllegalArgumentException("jdbcTemplate is null");
-		}
-	}
-
 	/**
-	 * @param query
 	 * @return all search results
 	 */
 	public List<QueryResult> search(String query) {

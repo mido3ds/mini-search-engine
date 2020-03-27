@@ -1,15 +1,10 @@
-package com.cufe.searchengine.configuration;
+package com.cufe.searchengine.server.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
-/**
- * Home redirection to OpenAPI api documentation
- */
 @Controller
-public class HomeController {
-
+public class WebController {
 	@RequestMapping("/")
 	public String index() {
 		return "index.html";
@@ -20,8 +15,8 @@ public class HomeController {
 		return "redirect:/";
 	}
 
-	@RequestMapping("/swagger")
-	public String swagger() {
+	@RequestMapping("/doc")
+	public String doc() {
 		return "redirect:swagger-ui.html";
 	}
 }

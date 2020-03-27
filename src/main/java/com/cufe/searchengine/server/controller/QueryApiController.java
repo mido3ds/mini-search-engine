@@ -1,8 +1,8 @@
-package com.cufe.searchengine.api;
+package com.cufe.searchengine.server.controller;
 
-import com.cufe.searchengine.QueryProcessor;
-import com.cufe.searchengine.model.QueryResult;
-import com.cufe.searchengine.model.ResultPage;
+import com.cufe.searchengine.query.QueryProcessor;
+import com.cufe.searchengine.server.model.QueryResult;
+import com.cufe.searchengine.server.model.ResultPage;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +19,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
-@javax.annotation.Generated(value = "com.cufe.searchengine.codegen.languages.SpringCodegen", date = "2020-03-14T12:05:55.435057+02:00[Africa/Cairo]")
-
 @Controller
-@RequestMapping("${openapi.miniSearchEngine.base-path:}")
 @Validated
 @Api(value = "query", description = "the query API")
 public class QueryApiController {

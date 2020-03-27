@@ -1,4 +1,4 @@
-package com.cufe.searchengine.model;
+package com.cufe.searchengine.server.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;

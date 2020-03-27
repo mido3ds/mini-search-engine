@@ -1,4 +1,4 @@
-package com.cufe.searchengine.configuration;
+package com.cufe.searchengine.db;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.SQLFunctionTemplate;

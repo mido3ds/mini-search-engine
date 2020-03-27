@@ -1,4 +1,4 @@
-package com.cufe.searchengine.configuration;
+package com.cufe.searchengine.db;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +17,10 @@ public class DBConfigurations {
 	@Bean
 	public DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("driverClassName")));
-		dataSource.setUrl(env.getProperty("url"));
+		dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("db.driverClassName")));
+		dataSource.setUrl(env.getProperty("db.url"));
 		dataSource.setUsername(env.getProperty("user"));
-		dataSource.setPassword(env.getProperty("password"));
+		dataSource.setPassword(env.getProperty("db.password"));
 		return dataSource;
 	}
 }

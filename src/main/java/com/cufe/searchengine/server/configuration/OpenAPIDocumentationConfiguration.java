@@ -1,4 +1,4 @@
-package com.cufe.searchengine.configuration;
+package com.cufe.searchengine.server.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +20,7 @@ import javax.servlet.ServletContext;
 
 @Configuration
 @EnableSwagger2
-public class OpenAPIDocumentationConfig {
-
+public class OpenAPIDocumentationConfiguration {
 	ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
 			.title("Mini Search Engine API")
@@ -66,5 +65,4 @@ public class OpenAPIDocumentationConfig {
 				uriComponentsBuilder.path(operationPath.replaceFirst("^" + basePath, "")).build().toString());
 		}
 	}
-
 }
