@@ -8,3 +8,6 @@ out
 
 node_modules
 built
+
+# log files
+*.log
