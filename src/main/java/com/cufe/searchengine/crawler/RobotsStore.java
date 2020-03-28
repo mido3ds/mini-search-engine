@@ -50,7 +50,7 @@ public class RobotsStore {
 					callback.run();
 				} else {
 					cache.put(threadUrl, r, cacheTimeoutMillis);
-					log.info("inserted into cache the robots.txt for "+threadUrl);
+					log.info("inserted into cache the robots.txt for " + threadUrl);
 				}
 			} catch (IOException ignored) {
 				callback.run();
