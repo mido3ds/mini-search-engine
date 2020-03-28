@@ -11,10 +11,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Crawler implements Runnable {
-	private static final String HTTP_URL_PATTERN = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";
+	private static final Pattern HTTP_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b)([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
 	private static final Logger log = LoggerFactory.getLogger(Crawler.class);
 
 	private final JdbcTemplate jdbcTemplate;
@@ -28,7 +29,7 @@ public class Crawler implements Runnable {
 	}
 
 	private static String[] extractURLs(String html) {
-		return Pattern.compile(HTTP_URL_PATTERN)
+		return HTTP_URL_PATTERN
 			.matcher(html)
 			.results()
 			.map(MatchResult::group)
@@ -82,5 +83,10 @@ public class Crawler implements Runnable {
 		}
 
 		return robotsTxt;
+	}
+
+	public static String extractWebsite(String url) {
+		Matcher matcher = HTTP_URL_PATTERN.matcher(url);
+		return matcher.matches()? matcher.group(1):"";
 	}
 }

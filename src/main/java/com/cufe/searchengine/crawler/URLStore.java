@@ -22,11 +22,28 @@ public class URLStore {
 	}
 
 	public boolean add(String url) {
-		return seeds.add(url);
+		synchronized (seeds) {
+			if (seeds.contains(url)) {
+				return false;
+			}
+
+			boolean tmp = seeds.add(url);
+			seeds.notify();
+			return tmp;
+		}
 	}
 
-	public String get() {
-		return seeds.poll();
+	public String poll() {
+		synchronized (seeds) {
+			if (seeds.size() == 0) {
+				try {
+					seeds.wait();
+				} catch (InterruptedException ignored) {
+				}
+			}
+
+			return seeds.poll();
+		}
 	}
 
 	public int size() {

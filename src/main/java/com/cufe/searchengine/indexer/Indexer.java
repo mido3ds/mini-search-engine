@@ -25,7 +25,7 @@ public class Indexer implements Runnable {
 			} catch (InterruptedException ignored) {
 			}
 
-			log.info("woken");
+			log.info("restarted");
 
 			// TODO
 		}
