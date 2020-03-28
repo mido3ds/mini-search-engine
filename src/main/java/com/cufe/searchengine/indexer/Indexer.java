@@ -7,11 +7,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class Indexer implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(Indexer.class);
 
-	private final int SLEEP_TIME_MILLIS;
-	private JdbcTemplate jdbcTemplate;
+	private final int sleepTimeMillis;
+	private final JdbcTemplate jdbcTemplate;
 
 	public Indexer(int sleepTimeMillis, JdbcTemplate jdbcTemplate) {
-		this.SLEEP_TIME_MILLIS = sleepTimeMillis;
+		this.sleepTimeMillis = sleepTimeMillis;
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
@@ -21,7 +21,7 @@ public class Indexer implements Runnable {
 
 		while (true) {
 			try {
-				Thread.sleep(SLEEP_TIME_MILLIS);
+				Thread.sleep(sleepTimeMillis);
 			} catch (InterruptedException ignored) {
 			}
 

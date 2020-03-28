@@ -8,6 +8,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Component
 public class CrawlersRunner implements CommandLineRunner {
 	private static final Logger log = LoggerFactory.getLogger(CrawlersRunner.class);

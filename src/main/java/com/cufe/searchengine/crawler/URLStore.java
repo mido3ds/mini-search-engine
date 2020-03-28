@@ -3,6 +3,7 @@ package com.cufe.searchengine.crawler;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -14,39 +15,45 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class URLStore {
 	private static final Logger log = LoggerFactory.getLogger(URLStore.class);
 
-	private final ConcurrentLinkedQueue<String> seeds;
+	private final ConcurrentLinkedQueue<String> store;
+	@Autowired
+	private RobotsStore robotsStore;
 
 	public URLStore(@Value("${crawler.seedFile}") Resource crawlerSeedResource) throws IOException {
-		seeds = new ConcurrentLinkedQueue<>(StringUtils.resourceToLines(crawlerSeedResource));
-		log.info("seeds.size=" + seeds.size());
+		store = new ConcurrentLinkedQueue<>(StringUtils.resourceToLines(crawlerSeedResource));
+		log.info("seeds.size=" + store.size());
 	}
 
 	public boolean add(String url) {
-		synchronized (seeds) {
-			if (seeds.contains(url)) {
+		synchronized (store) {
+			if (store.contains(url)) {
 				return false;
 			}
 
-			boolean tmp = seeds.add(url);
-			seeds.notify();
+			if (!robotsStore.canRequest(url, () -> store.remove(url))) {
+				return false;
+			}
+
+			boolean tmp = store.add(url);
+			store.notify();
 			return tmp;
 		}
 	}
 
 	public String poll() {
-		synchronized (seeds) {
-			if (seeds.size() == 0) {
+		synchronized (store) {
+			if (store.size() == 0) {
 				try {
-					seeds.wait();
+					store.wait();
 				} catch (InterruptedException ignored) {
 				}
 			}
 
-			return seeds.poll();
+			return store.poll();
 		}
 	}
 
 	public int size() {
-		return seeds.size();
+		return store.size();
 	}
 }

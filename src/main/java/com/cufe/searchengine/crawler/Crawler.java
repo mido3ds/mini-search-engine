@@ -1,7 +1,7 @@
 package com.cufe.searchengine.crawler;
 
+import com.cufe.searchengine.util.HttpPattern;
 import com.cufe.searchengine.util.StringUtils;
-import com.panforge.robotstxt.RobotsTxt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,12 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Crawler implements Runnable {
-	private static final Pattern HTTP_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b)([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
 	private static final Logger log = LoggerFactory.getLogger(Crawler.class);
 
 	private final JdbcTemplate jdbcTemplate;
@@ -28,21 +24,37 @@ public class Crawler implements Runnable {
 		this.urlStore = urlStore;
 	}
 
-	private static String[] extractURLs(String html) {
-		return HTTP_URL_PATTERN
-			.matcher(html)
-			.results()
-			.map(MatchResult::group)
-			.toArray(String[]::new);
-	}
-
 	@Override
 	public void run() {
 		log.info("started");
 
-		// TODO
+		// TODO: end condition
+		while (true) {
+			String url = urlStore.poll();
+			String document = null;
 
-		log.info("ended");
+			try {
+				document = loadURL(url);
+			} catch (Exception e) {
+				log.error("url="+url+",error="+e.getMessage());
+				continue;
+			}
+
+			if (document.length() == 0) {
+				continue;
+			}
+
+			String[] urls = HttpPattern.extractURLs(document);
+			log.info("extracted "+urls.length+" urls from "+url+", document has size="+document.length());
+			for (String u : urls) {
+				urlStore.add(u);
+			}
+
+			// TODO: store document
+			// TODO: apply politeness limits
+		}
+
+//		log.info("ended");
 	}
 
 	private String loadURL(String link) throws IOException {
@@ -63,30 +75,5 @@ public class Crawler implements Runnable {
 		}
 
 		return result;
-	}
-
-	private RobotsTxt loadRobots(String link) throws IOException {
-		InputStream robotsTxtStream = null;
-		RobotsTxt robotsTxt;
-
-		URL url = new URL(link + "/robots.txt");
-		URLConnection urlConnection = url.openConnection();
-		urlConnection.setRequestProperty("User-Agent", userAgent);
-
-		try {
-			robotsTxtStream = urlConnection.getInputStream();
-			robotsTxt = RobotsTxt.read(robotsTxtStream);
-		} finally {
-			if (robotsTxtStream != null) {
-				robotsTxtStream.close();
-			}
-		}
-
-		return robotsTxt;
-	}
-
-	public static String extractWebsite(String url) {
-		Matcher matcher = HTTP_URL_PATTERN.matcher(url);
-		return matcher.matches()? matcher.group(1):"";
 	}
 }
