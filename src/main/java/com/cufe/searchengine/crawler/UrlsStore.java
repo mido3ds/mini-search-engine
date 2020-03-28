@@ -23,7 +23,9 @@ public class UrlsStore {
 	public UrlsStore(@Value("${crawler.seedFile}") Resource crawlerSeedResource) throws IOException {
 		store = new LinkedBlockingQueue<>(StringUtils.resourceToLines(crawlerSeedResource));
 		log.info("seeds.size=" + store.size());
-		// TODO: implement priority for plling urls
+		// TODO: implement priority for pulling urls
+		// TODO: save state periodically
+		// TODO: restore saved state
 	}
 
 	public void add(String url) throws InterruptedException {
