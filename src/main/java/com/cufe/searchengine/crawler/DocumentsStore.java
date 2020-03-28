@@ -22,14 +22,15 @@ public class DocumentsStore {
 
 		new Thread(() -> {
 			log.info("started");
+
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					Document document = store.take();
-					document.store(this.jdbcTemplate);
+					if (document.store(this.jdbcTemplate) != 1) {
+						log.error("couldn't insert docuemnt with url="+document.getUrl());
+						Thread.currentThread().interrupt();
+					}
 				} catch (InterruptedException ignored) {
-					Thread.currentThread().interrupt();
-				} catch (Exception e) {
-					e.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}

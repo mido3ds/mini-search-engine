@@ -37,14 +37,10 @@ public class Document {
 		this.timeMillis = timeMillis;
 	}
 
-	public void store(JdbcTemplate jdbcTemplate) throws Exception {
-		int rows = jdbcTemplate.update("INSERT INTO documents VALUES(?, ?, ?);",
+	public int store(JdbcTemplate jdbcTemplate) {
+		return jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis) VALUES(?, ?, ?);",
 			url,
 			content,
 			timeMillis);
-
-		if (rows != 1) {
-			throw new Exception("storing failed with updated rows="+rows);
-		}
 	}
 }
