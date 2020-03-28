@@ -19,10 +19,11 @@ public class Indexer implements Runnable {
 	public void run() {
 		log.info("started");
 
-		while (true) {
+		while (!Thread.currentThread().isInterrupted()) {
 			try {
 				Thread.sleep(sleepTimeMillis);
 			} catch (InterruptedException ignored) {
+				Thread.currentThread().interrupt();
 			}
 
 			log.info("restarted");

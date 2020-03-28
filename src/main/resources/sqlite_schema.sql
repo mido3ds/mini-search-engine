@@ -1,1 +1,6 @@
--- TODO: write CREATE TABLE code to create tables of db
+CREATE TABLE IF NOT EXISTS documents(
+	url STRING NOT NULL,
+	content STRING NOT NULL,
+	timeMillis INT NOT NULL
+);
+

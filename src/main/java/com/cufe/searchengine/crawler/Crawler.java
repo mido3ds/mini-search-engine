@@ -4,33 +4,40 @@ import com.cufe.searchengine.util.HttpPattern;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+@Component
 public class Crawler implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(Crawler.class);
 
-	private final JdbcTemplate jdbcTemplate;
-	private final String userAgent;
-	private final URLStore urlStore;
-
-	public Crawler(JdbcTemplate jdbcTemplate, String userAgent, URLStore urlStore) {
-		this.jdbcTemplate = jdbcTemplate;
-		this.userAgent = userAgent;
-		this.urlStore = urlStore;
-	}
+	@Value("${crawler.userAgent}")
+	private String userAgent;
+	@Autowired
+	private UrlsStore urlsStore;
+	@Autowired
+	private DocumentsStore documentsStore;
 
 	@Override
 	public void run() {
 		log.info("started");
 
 		// TODO: end condition
-		while (true) {
-			String url = urlStore.poll();
+		while (!Thread.currentThread().isInterrupted()) {
+			String url = null;
+			try {
+				url = urlsStore.poll();
+			} catch (InterruptedException ignored) {
+				Thread.currentThread().interrupt();
+			}
+
 			String document = null;
 
 			try {
@@ -45,16 +52,23 @@ public class Crawler implements Runnable {
 			}
 
 			String[] urls = HttpPattern.extractURLs(document);
-			log.info("extracted "+urls.length+" urls from "+url+", document has size="+document.length());
+			log.info("extracted "+urls.length+" urls from "+url+", document.length="+document.length());
 			for (String u : urls) {
-				urlStore.add(u);
+				try {
+					urlsStore.add(u);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 
-			// TODO: store document
-			// TODO: apply politeness limits
+			try {
+				documentsStore.add(url, document);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
 
-//		log.info("ended");
+		log.info("ended");
 	}
 
 	private String loadURL(String link) throws IOException {
