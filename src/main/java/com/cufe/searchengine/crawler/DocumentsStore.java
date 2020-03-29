@@ -1,18 +1,16 @@
 package com.cufe.searchengine.crawler;
 
-import com.cufe.searchengine.db.DBInitializedEvent;
+import com.cufe.searchengine.db.DBInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 public class DocumentsStore {
@@ -27,7 +25,7 @@ public class DocumentsStore {
 	private long docsCount = 0;
 
 	@EventListener
-	private void handleDBInitialized(DBInitializedEvent event) {
+	private void onDBInitialized(DBInitializer.DBInitializedEvent event) {
 		Integer size = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class);
 		if (size == null) {
 			throw new IllegalStateException("`documents` count shouldn't be null");
@@ -68,5 +66,16 @@ public class DocumentsStore {
 
 	private boolean isFull() {
 		return docsCount >= maxDocuments;
+	}
+
+	public static class CrawlingFinishedEvent extends ApplicationEvent {
+		/**
+		 * Create a new ApplicationEvent.
+		 *
+		 * @param source the object on which the event initially occurred (never {@code null})
+		 */
+		public CrawlingFinishedEvent(Object source) {
+			super(source);
+		}
 	}
 }

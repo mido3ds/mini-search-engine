@@ -1,11 +1,13 @@
 package com.cufe.searchengine.crawler;
 
+import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.util.HttpPattern;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class Crawler implements Runnable {
@@ -88,5 +92,46 @@ public class Crawler implements Runnable {
 		}
 
 		return result;
+	}
+
+	@Component
+	private static class CrawlersRunner {
+		private static final Logger log = LoggerFactory.getLogger(CrawlersRunner.class);
+
+		@Value("${crawler.numThreads}")
+		private int numThreads;
+		@Autowired
+		private Crawler crawler;
+		private List<Thread> threads = new ArrayList<>();
+
+		@EventListener
+		public void onDBInitialized(DBInitializer.DBInitializedEvent event) {
+			log.info("creating " + numThreads + " of threads of crawler");
+
+			for (int i = 0; i < numThreads; i++) {
+				Thread thread = new Thread(crawler, String.valueOf(i));
+				thread.start();
+
+				threads.add(thread);
+			}
+
+			log.info("created "+numThreads+" threads");
+		}
+
+		@EventListener
+		public void onCrawlingFinished(DocumentsStore.CrawlingFinishedEvent event) {
+			if (threads.size() > 0) {
+				log.info("received CrawlingFinishedEvent, interrupting threads");
+
+				for (Thread thread : threads) {
+					thread.interrupt();
+				}
+				threads.clear();
+
+				log.info("interrupted all threads");
+			} else {
+				log.info("received CrawlingFinishedEvent but there is no threads to interrupt");
+			}
+		}
 	}
 }

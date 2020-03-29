@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -60,6 +61,17 @@ public class DBInitializer implements CommandLineRunner {
 				jdbcTemplate.getDataSource()).getConnection(), populateDBResource);
 		} catch (UncategorizedScriptException ignored) {
 			log.warn("empty populate_db.sql, ignoring it");
+		}
+	}
+
+	public static class DBInitializedEvent extends ApplicationEvent {
+		/**
+		 * Create a new ApplicationEvent.
+		 *
+		 * @param source the object on which the event initially occurred (never {@code null})
+		 */
+		public DBInitializedEvent(Object source) {
+			super(source);
 		}
 	}
 }

@@ -8,6 +8,9 @@ import org.hibernate.type.StringType;
 
 import java.sql.Types;
 
+/**
+ * Integration of SQLite with hibernate
+ */
 public class SQLiteDialect extends Dialect {
 	public SQLiteDialect() {
 		registerColumnType(Types.BIT, "integer");
@@ -29,7 +32,6 @@ public class SQLiteDialect extends Dialect {
 		registerColumnType(Types.BINARY, "blob");
 		registerColumnType(Types.VARBINARY, "blob");
 		registerColumnType(Types.LONGVARBINARY, "blob");
-		// registerColumnType(Types.NULL, "null");
 		registerColumnType(Types.BLOB, "blob");
 		registerColumnType(Types.CLOB, "clob");
 		registerColumnType(Types.BOOLEAN, "integer");
@@ -49,7 +51,6 @@ public class SQLiteDialect extends Dialect {
 	}
 
 	public String getIdentityColumnString() {
-		// return "integer primary key autoincrement";
 		return "integer";
 	}
 
@@ -62,10 +63,8 @@ public class SQLiteDialect extends Dialect {
 	}
 
 	protected String getLimitString(String query, boolean hasOffset) {
-		return new StringBuffer(query.length() + 20).
-			append(query).
-			append(hasOffset ? " limit ? offset ?" : " limit ?").
-			toString();
+		return query +
+			(hasOffset ? " limit ? offset ?" : " limit ?");
 	}
 
 	public boolean supportsTemporaryTables() {

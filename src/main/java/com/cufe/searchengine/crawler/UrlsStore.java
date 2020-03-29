@@ -1,6 +1,6 @@
 package com.cufe.searchengine.crawler;
 
-import com.cufe.searchengine.db.DBInitializedEvent;
+import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class UrlsStore {
@@ -36,7 +34,7 @@ public class UrlsStore {
 	private Resource crawlerSeedResource;
 
 	@EventListener
-	public void handleDBInitialized(DBInitializedEvent event) throws IOException {
+	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws IOException {
 		// TODO: implement priority for pulling urls
 
 		List<String> urls = jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class);
@@ -51,26 +49,29 @@ public class UrlsStore {
 
 	@PreDestroy
 	private void onDestroy() {
-		if (store.size() == 0) {
-			log.info("won't save state, it's empty");
-			return;
+		synchronized (store) {
+			if (store.size() == 0) {
+				log.info("won't save state, it's empty");
+				return;
+			}
+
+			log.info("before closing, will save state");
+
+			// flush
+			jdbcTemplate.execute("DELETE FROM urlstore_queue;");
+			log.info("flushed urlstore_queue table");
+
+			// commit
+			StringBuilder sql = new StringBuilder("INSERT INTO urlstore_queue VALUES");
+			for (int i = 0; i < store.size() - 1; i++) {
+				sql.append("(?),");
+			}
+			sql.append("(?);");
+
+			jdbcTemplate.update(sql.toString(), store.toArray());
+
+			log.info("saved " + store.size() + " url/s");
 		}
-
-		log.info("before closing, will save state");
-
-		// flush
-		jdbcTemplate.execute("DELETE FROM urlstore_queue;");
-		log.info("flushed urlstore_queue table");
-
-		// commit
-		StringBuilder sql = new StringBuilder("INSERT INTO urlstore_queue VALUES");
-		for (int i = 0; i < store.size()-1; i++) {
-			sql.append("(?),");
-		}
-		sql.append("(?);");
-		jdbcTemplate.update(sql.toString(), store.toArray());
-
-		log.info("saved "+store.size()+" url/s");
 	}
 
 	public void add(String url) throws InterruptedException {
