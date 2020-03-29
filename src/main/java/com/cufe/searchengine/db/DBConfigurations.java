@@ -19,7 +19,7 @@ public class DBConfigurations {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("db.driverClassName")));
 		dataSource.setUrl(env.getProperty("db.url"));
-		dataSource.setUsername(env.getProperty("user"));
+		dataSource.setUsername(env.getProperty("db.username"));
 		dataSource.setPassword(env.getProperty("db.password"));
 		return dataSource;
 	}

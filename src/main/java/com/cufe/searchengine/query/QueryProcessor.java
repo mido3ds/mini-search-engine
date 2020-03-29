@@ -12,8 +12,8 @@ import java.util.List;
 public class QueryProcessor {
 	/**
 	 * jdbcTemplate: access sqlite db, shared between all the server classes.
-	 * schema is in `src/main/resources/sqlite_schema.sql`
-	 * and any initial data is in `src/main/resources/populate_db.sql`
+	 * schema is in `src/main/resources/schema.sql`
+	 * and any initial data is in `src/main/resources/initial_data.sql`
 	 */
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
