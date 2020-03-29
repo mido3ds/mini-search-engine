@@ -17,7 +17,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 public class DocumentsStore {
 	private final Logger log = LoggerFactory.getLogger(DocumentsStore.class);
-	private final BlockingQueue<Document> store = new LinkedBlockingQueue<>();
 
 	@Autowired
 	private ApplicationEventPublisher publisher;
@@ -59,7 +58,6 @@ public class DocumentsStore {
 	public void add(String url, String doc) throws InterruptedException {
 		Document document = new Document(doc, url, System.currentTimeMillis());
 
-		store.put(document);
 		storeToDB(document);
 		docsCount++;
 
