@@ -8,11 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * ResultPage
- */
-@javax.annotation.Generated(value = "com.cufe.searchengine.codegen.languages.SpringCodegen", date = "2020-03-23T21:49:05.724243+02:00[Africa/Cairo]")
-
 public class ResultPage {
 	@JsonProperty("currentPage")
 	private Integer currentPage;
@@ -29,14 +24,7 @@ public class ResultPage {
 		return this;
 	}
 
-	/**
-	 * Get currentPage
-	 *
-	 * @return currentPage
-	 */
-	@ApiModelProperty(value = "")
-
-
+	@ApiModelProperty()
 	public Integer getCurrentPage() {
 		return currentPage;
 	}
@@ -50,14 +38,7 @@ public class ResultPage {
 		return this;
 	}
 
-	/**
-	 * Get totalPages
-	 *
-	 * @return totalPages
-	 */
-	@ApiModelProperty(value = "")
-
-
+	@ApiModelProperty()
 	public Integer getTotalPages() {
 		return totalPages;
 	}
@@ -79,15 +60,8 @@ public class ResultPage {
 		return this;
 	}
 
-	/**
-	 * Get results
-	 *
-	 * @return results
-	 */
-	@ApiModelProperty(value = "")
-
+	@ApiModelProperty()
 	@Valid
-
 	public List<QueryResult> getResults() {
 		return results;
 	}
@@ -118,14 +92,11 @@ public class ResultPage {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class ResultPage {\n");
-
-		sb.append("    currentPage: ").append(toIndentedString(currentPage)).append("\n");
-		sb.append("    totalPages: ").append(toIndentedString(totalPages)).append("\n");
-		sb.append("    results: ").append(toIndentedString(results)).append("\n");
-		sb.append("}");
-		return sb.toString();
+		return "class ResultPage {\n" +
+			"    currentPage: " + toIndentedString(currentPage) + "\n" +
+			"    totalPages: " + toIndentedString(totalPages) + "\n" +
+			"    results: " + toIndentedString(results) + "\n" +
+			"}";
 	}
 
 	/**

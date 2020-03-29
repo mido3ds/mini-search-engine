@@ -5,11 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Objects;
 
-/**
- * QueryResult
- */
-@javax.annotation.Generated(value = "com.cufe.searchengine.codegen.languages.SpringCodegen", date = "2020-03-14T12:05:55.435057+02:00[Africa/Cairo]")
-
 public class QueryResult {
 	@JsonProperty("title")
 	private String title;
@@ -25,14 +20,7 @@ public class QueryResult {
 		return this;
 	}
 
-	/**
-	 * Get title
-	 *
-	 * @return title
-	 */
-	@ApiModelProperty(value = "")
-
-
+	@ApiModelProperty()
 	public String getTitle() {
 		return title;
 	}
@@ -46,14 +34,7 @@ public class QueryResult {
 		return this;
 	}
 
-	/**
-	 * Get link
-	 *
-	 * @return link
-	 */
-	@ApiModelProperty(value = "")
-
-
+	@ApiModelProperty()
 	public String getLink() {
 		return link;
 	}
@@ -67,14 +48,7 @@ public class QueryResult {
 		return this;
 	}
 
-	/**
-	 * Get snippet
-	 *
-	 * @return snippet
-	 */
-	@ApiModelProperty(value = "")
-
-
+	@ApiModelProperty()
 	public String getSnippet() {
 		return snippet;
 	}
@@ -105,14 +79,11 @@ public class QueryResult {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class QueryResult {\n");
-
-		sb.append("    title: ").append(toIndentedString(title)).append("\n");
-		sb.append("    link: ").append(toIndentedString(link)).append("\n");
-		sb.append("    snippet: ").append(toIndentedString(snippet)).append("\n");
-		sb.append("}");
-		return sb.toString();
+		return "class QueryResult {\n" +
+			"    title: " + toIndentedString(title) + "\n" +
+			"    link: " + toIndentedString(link) + "\n" +
+			"    snippet: " + toIndentedString(snippet) + "\n" +
+			"}";
 	}
 
 	/**
