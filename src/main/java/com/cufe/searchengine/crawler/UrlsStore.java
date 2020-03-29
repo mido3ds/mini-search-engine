@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+// TODO: implement priority for pulling urls
+// TODO: better seed set
+
 @Component
 public class UrlsStore {
 	private static final Logger log = LoggerFactory.getLogger(UrlsStore.class);
@@ -35,8 +38,6 @@ public class UrlsStore {
 
 	@EventListener
 	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws IOException {
-		// TODO: implement priority for pulling urls
-
 		List<String> urls = jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class);
 		if (urls.size() > 0) {
 			log.info("urls loaded from db.size() = " + urls.size());

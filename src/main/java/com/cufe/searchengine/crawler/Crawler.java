@@ -18,6 +18,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: when crawling finishes, restart again from the beginning (from the seed)
+
 @Component
 public class Crawler implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(Crawler.class);
