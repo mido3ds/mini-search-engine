@@ -34,37 +34,33 @@ public class DocumentsStore {
 			throw new IllegalStateException("`documents` count shouldn't be null");
 		}
 		docsCount = size;
+	}
 
-		// commit thread
-		new Thread(() -> {
-			log.info("started");
+	private void storeToDB(Document document) throws InterruptedException {
+		int rows = 0;
 
-			while (!Thread.currentThread().isInterrupted()) {
-				try {
-					Document document = store.take();
-					int rows = 0;
-
-					try {
-						rows = document.store(this.jdbcTemplate);
-					} catch (CannotGetJdbcConnectionException e) {
-						continue;
-					}
-
-					if (rows != 1) {
-						log.error("couldn't insert document with url=" + document.getUrl());
-						Thread.currentThread().interrupt();
-					}
-				} catch (InterruptedException ignored) {
-					Thread.currentThread().interrupt();
-				}
+		while (true) {
+			try {
+				rows = document.store(this.jdbcTemplate);
+			} catch (CannotGetJdbcConnectionException e) {
+				Thread.sleep(100);
+				continue;
 			}
 
-			throw new IllegalStateException("thread stopped, can't continue storing documents");
-		}, "commit").start();
+			break;
+		}
+
+		if (rows != 1) {
+			log.error("couldn't insert document with url=" + document.getUrl());
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	public void add(String url, String doc) throws InterruptedException {
-		store.put(new Document(doc, url, System.currentTimeMillis()));
+		Document document = new Document(doc, url, System.currentTimeMillis());
+
+		store.put(document);
+		storeToDB(document);
 		docsCount++;
 
 		if (isFull()) {

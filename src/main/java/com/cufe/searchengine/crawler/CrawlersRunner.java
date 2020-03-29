@@ -34,11 +34,13 @@ public class CrawlersRunner implements CommandLineRunner {
 	}
 
 	@EventListener
-	public void handleCrawlingFinishedEvent(CrawlingFinishedEvent event) {
+	public synchronized void handleCrawlingFinishedEvent(CrawlingFinishedEvent event) {
 		log.info("received CrawlingFinishedEvent, interrupting threads");
-
 		for (Thread thread : threads) {
 			thread.interrupt();
 		}
+		log.info("interrupted all threads");
+
+		threads.clear();
 	}
 }
