@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,15 +20,21 @@ public class DocumentsStore {
 	private final BlockingQueue<Document> store = new LinkedBlockingQueue<>();
 
 	@Autowired
+	private ApplicationEventPublisher publisher;
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	@Value("${crawler.maxDocuments}")
 	private int maxDocuments;
-	@Value("${crawler.documentsSizeWaitTime}")
-	private int documentsSizeWaitTime;
-	private boolean full = false;
+	private long docsCount = 0;
 
 	@EventListener
 	private void handleDBInitialized(DBInitializedEvent event) {
+		Integer size = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class);
+		if (size == null) {
+			throw new IllegalStateException("`documents` count shouldn't be null");
+		}
+		docsCount = size;
+
 		// commit thread
 		new Thread(() -> {
 			log.info("started");
@@ -54,36 +61,18 @@ public class DocumentsStore {
 
 			throw new IllegalStateException("thread stopped, can't continue storing documents");
 		}, "commit").start();
-
-		// isFull thread
-		new Thread(() -> {
-			log.info("started");
-
-			while (!Thread.currentThread().isInterrupted() && !full) {
-				try {
-					Thread.sleep(documentsSizeWaitTime);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
-
-				Integer size = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class);
-				if (size == null) {
-					throw new IllegalStateException("`documents` count shouldn't be null");
-				}
-
-				full = size >= maxDocuments;
-				if (full) {
-					log.info("full");
-				}
-			}
-		}, "isFull").start();
 	}
 
 	public void add(String url, String doc) throws InterruptedException {
 		store.put(new Document(doc, url, System.currentTimeMillis()));
+		docsCount++;
+
+		if (isFull()) {
+			publisher.publishEvent(new CrawlingFinishedEvent(this));
+		}
 	}
 
-	public boolean isFull() {
-		return full;
+	private boolean isFull() {
+		return docsCount >= maxDocuments;
 	}
 }

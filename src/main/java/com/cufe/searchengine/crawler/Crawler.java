@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class Crawler implements Runnable {
 	public void run() {
 		log.info("started");
 
-		while (!Thread.currentThread().isInterrupted() && !documentsStore.isFull()) {
+		while (!Thread.currentThread().isInterrupted()) {
 			String url = null;
 			try {
 				url = urlsStore.poll();
@@ -36,7 +37,7 @@ public class Crawler implements Runnable {
 				Thread.currentThread().interrupt();
 			}
 
-			String document = null;
+			String document;
 
 			try {
 				document = loadURL(url);
@@ -51,12 +52,12 @@ public class Crawler implements Runnable {
 
 			String[] urls = HttpPattern.extractURLs(document);
 			log.info("extracted " + urls.length + " urls from " + url + ", document.length=" + document.length());
-			for (String u : urls) {
-				try {
+			try {
+				for (String u : urls) {
 					urlsStore.add(u);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
 				}
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 
 			try {
