@@ -37,17 +37,20 @@ public class Indexer implements Runnable {
 			}
 
 			try {
+				int totalWords = 0;
+
 				List<Document> documents = fetchNonIndexedDocs();
 				for (Document document : documents) {
-					KeywordsExtractor
-						.extract(document.getContent())
-						.forEach((w) -> updateKeyword(w, document.getRowID()));
+					List<String> keywords = KeywordsExtractor.extract(document.getContent());
+					updateKeyword(keywords, document.getRowID());
+
+					totalWords += keywords.size();
 				}
 				updateDocsIndexTime(documents);
 
-				log.info("indexed {} documents", documents.size());
+				log.info("indexed {} documents with {} words", documents.size(), totalWords);
 			} catch (Exception e) {
-				log.error("exception = {}", e.getMessage());
+				log.error("exception = {} {}", e.getMessage(), e.getStackTrace());
 			}
 		}
 
@@ -57,11 +60,9 @@ public class Indexer implements Runnable {
 	private void updateDocsIndexTime(List<Document> documents) {
 		StringBuilder builder = new StringBuilder("UPDATE documents SET indexTimeMillis = ? WHERE ROWID in (");
 		for (int i = 0; i < documents.size() - 1; i++) {
-			builder.append(documents.get(i).getRowID());
-			builder.append(",");
+			builder.append(documents.get(i).getRowID()).append(",");
 		}
-		builder.append(documents.get(documents.size()-1).getRowID());
-		builder.append(");");
+		builder.append(documents.get(documents.size()-1).getRowID()).append(");");
 
 		int rows = jdbcTemplate.update(builder.toString(), System.currentTimeMillis());
 		if (rows != documents.size()) {
@@ -71,21 +72,35 @@ public class Indexer implements Runnable {
 		log.info("updated rows={}, docs={}", rows, documents.size());
 	}
 
-	// TODO: optimize
-	private void updateKeyword(String word, long docID) {
-		long l = System.currentTimeMillis();
-
-		jdbcTemplate.update("INSERT OR IGNORE INTO keywords VALUES(?);", word);
-
-		Long wordID = jdbcTemplate.query("SELECT ROWID FROM keywords WHERE word=?;",
-			(row, i) -> row.getLong(1), word).get(0);
-
-		int rows = jdbcTemplate.update("REPLACE INTO keywords_documents(docID, wordID) VALUES(?, ?)", docID, wordID);
-		if (rows != 1) {
-			throw new RuntimeException("couldn't insert "+word+" into keywords_documents");
+	private void updateKeyword(List<String> words, long docID) {
+		if (words.size() == 0) {
+			return;
 		}
 
-		log.info("inserted word: {} took:{}", word, System.currentTimeMillis() - l);
+		StringBuilder builder = new StringBuilder("INSERT OR IGNORE INTO keywords VALUES");
+		for (int i = 0; i < words.size(); i++) {
+			builder.append("(?)");
+
+			if (i != words.size()-1) {
+				builder.append(",");
+			}
+		}
+		builder.append(";\n");
+
+		builder.append("REPLACE INTO keywords_documents(docID, wordID) VALUES");
+		for (int i = 0; i < words.size(); i++) {
+			builder.append("(")
+				.append(docID)
+				.append(",last_insert_rowid()-").append(i)
+				.append(")");
+
+			if (i != words.size()-1) {
+				builder.append(",");
+			}
+		}
+		builder.append(";");
+
+		jdbcTemplate.update(builder.toString(), words.toArray());
 	}
 
 	private List<Document> fetchNonIndexedDocs() {
