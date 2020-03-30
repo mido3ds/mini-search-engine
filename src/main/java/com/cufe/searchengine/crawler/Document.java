@@ -3,14 +3,21 @@ package com.cufe.searchengine.crawler;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class Document {
+	private long rowID;
 	private String content;
 	private String url;
 	private long timeMillis;
+	private long indexTimeMillis;
 
 	public Document(String content, String url, long timeMillis) {
 		this.content = content;
 		this.url = url;
 		this.timeMillis = timeMillis;
+	}
+
+	public Document rowID(long rowID) {
+		this.rowID = rowID;
+		return this;
 	}
 
 	public String getContent() {
@@ -42,5 +49,26 @@ public class Document {
 			url,
 			content,
 			timeMillis);
+	}
+
+	public long getRowID() {
+		return rowID;
+	}
+
+	public void setRowID(long rowID) {
+		this.rowID = rowID;
+	}
+
+	public Document indexTimeMillis(long indexTimeMillis) {
+		this.indexTimeMillis = indexTimeMillis;
+		return this;
+	}
+
+	public long getIndexTimeMillis() {
+		return indexTimeMillis;
+	}
+
+	public void setIndexTimeMillis(long indexTimeMillis) {
+		this.indexTimeMillis = indexTimeMillis;
 	}
 }
