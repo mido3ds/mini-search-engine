@@ -12,3 +12,6 @@ match-sorter : fuzzy searching in completion results
 
 # Crawler
 RobotsTxt : parse robots.txt
+
+# Indexer
+Stemmer from [https://tartarus.org/martin/PorterStemmer/java.txt](https://tartarus.org/martin/PorterStemmer/java.txt) : stem
