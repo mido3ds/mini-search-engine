@@ -1,6 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,11 @@ public class DocumentsStore {
 	}
 
 	public void add(String url, String doc) throws InterruptedException {
+		if (!StringUtils.isHtml(doc)) {
+			log.info("doc at url {} is probably not html, ignore it", url);
+			return;
+		}
+
 		Document document = new Document(doc, url, System.currentTimeMillis());
 
 		storeToDB(document);

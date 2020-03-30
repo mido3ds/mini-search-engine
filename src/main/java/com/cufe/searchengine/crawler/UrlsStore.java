@@ -1,6 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.util.HttpPattern;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,33 +51,37 @@ public class UrlsStore {
 
 	@PreDestroy
 	private void onDestroy() {
-		synchronized (store) {
-			if (store.size() == 0) {
-				log.info("won't save state, it's empty");
-				return;
-			}
+		Object[] storeCopy = store.toArray();
 
-			log.info("before closing, will save state");
-
-			// flush
-			jdbcTemplate.execute("DELETE FROM urlstore_queue;");
-			log.info("flushed urlstore_queue table");
-
-			// commit
-			StringBuilder sql = new StringBuilder("INSERT INTO urlstore_queue VALUES");
-			for (int i = 0; i < store.size() - 1; i++) {
-				sql.append("(?),");
-			}
-			sql.append("(?);");
-
-			jdbcTemplate.update(sql.toString(), store.toArray());
-
-			log.info("saved " + store.size() + " url/s");
+		if (storeCopy.length == 0) {
+			log.info("empty state, no saving");
+			return;
 		}
+
+		log.info("save my state before closing");
+
+		// flush
+		jdbcTemplate.execute("DELETE FROM urlstore_queue;");
+		log.info("flushed urlstore_queue table");
+
+		// commit
+		StringBuilder sql = new StringBuilder("INSERT INTO urlstore_queue VALUES");
+		for (int i = 0; i < storeCopy.length - 1; i++) {
+			sql.append("(?),");
+		}
+		sql.append("(?);");
+		jdbcTemplate.update(sql.toString(), storeCopy);
+
+		log.info("saved {} urls", storeCopy.length);
 	}
 
 	public void add(String url) throws InterruptedException {
 		if (url == null || store.contains(url)) {
+			return;
+		}
+
+		if (!HttpPattern.couldBeHtml(url)) {
+			log.info("url={} is probably not html, ignore it", url);
 			return;
 		}
 

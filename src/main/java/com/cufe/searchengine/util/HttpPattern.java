@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class HttpPattern {
 	private static final Pattern HTTP_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b)([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
+	private static final Pattern NON_HTML_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,4}\\b)([-a-zA-Z0-9@:%_\\+.~#?&//=]*)\\.(css|pdf|xml|js|jpg|png|gif|json)");
 
 	public static String extractWebsite(String url) {
 		// TODO: <BUG> ro.wikipedia.org and en.wikipedia.org must be both wikipedia.org
@@ -19,5 +20,9 @@ public class HttpPattern {
 			.results()
 			.map(MatchResult::group)
 			.toArray(String[]::new);
+	}
+
+	public static boolean couldBeHtml(String url) {
+		return !NON_HTML_URL_PATTERN.matcher(url).matches();
 	}
 }

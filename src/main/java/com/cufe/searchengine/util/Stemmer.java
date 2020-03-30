@@ -62,6 +62,20 @@ class Stemmer {
 		i_end = 0;
 	}
 
+	public static String stem(String s) {
+		if (s == null) {
+			throw new IllegalArgumentException("string must not be null");
+		}
+
+		Stemmer stemmer = new Stemmer();
+
+		char[] charArray = s.toCharArray();
+		stemmer.add(charArray, charArray.length);
+		stemmer.stem();
+
+		return stemmer.toString();
+	}
+
 	/**
 	 * Add a character to the word being stemmed.  When you are finished
 	 * adding characters, you can call stem(void) to stem the word.
@@ -519,19 +533,5 @@ class Stemmer {
 		}
 		i_end = k + 1;
 		i = 0;
-	}
-
-	public static String stem(String s) {
-		if (s == null) {
-			throw new IllegalArgumentException("string must not be null");
-		}
-
-		Stemmer stemmer = new Stemmer();
-
-		char[] charArray = s.toCharArray();
-		stemmer.add(charArray, charArray.length);
-		stemmer.stem();
-
-		return stemmer.toString();
 	}
 }
