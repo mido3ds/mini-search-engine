@@ -39,7 +39,7 @@ package com.cufe.searchengine.util;
  * <p>
  * Original class before formatting: https://tartarus.org/martin/PorterStemmer/java.txt
  */
-class Stemmer {
+public class Stemmer {
 	/**
 	 * unit of size whereby b is increased
 	 */
