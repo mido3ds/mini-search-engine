@@ -6,21 +6,29 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
+// TODO: abstract tables accessing into DocumentsTable
 public class Document {
 	private long rowID;
 	private String content;
 	private String url;
 	private long timeMillis;
 	private long indexTimeMillis;
+	private int counter;
 
 	public Document(String content, String url, long timeMillis) {
 		this.content = content;
 		this.url = url;
 		this.timeMillis = timeMillis;
+		this.counter = -1;
 	}
 
 	public Document rowID(long rowID) {
 		this.rowID = rowID;
+		return this;
+	}
+
+	public Document counter(int counter) {
+		this.counter = counter;
 		return this;
 	}
 
@@ -49,8 +57,14 @@ public class Document {
 	}
 
 	public int store(JdbcTemplate jdbcTemplate) throws Exception {
-		return DBUtils.waitLock(100, () -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis) " +
-			"VALUES(?, ?, ?);", url, content, timeMillis));
+		if (counter == -1) {
+			throw new IllegalStateException("counter is not set");
+		}
+
+		return DBUtils.waitLock(100,
+			() -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis, counter) " +
+				"VALUES(?, ?, ?, ?);", url, content, timeMillis, counter)
+		);
 	}
 
 	public long getRowID() {
@@ -81,5 +95,9 @@ public class Document {
 
 	public String getSnippet(List<String> keywords) {
 		return "Some Snippet TODO"; // TODO
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
 	}
 }

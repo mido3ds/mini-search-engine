@@ -47,7 +47,7 @@ public class QueryProcessor {
 			return queryResults;
 		}
 
-		List<Document> documents = null;
+		List<Document> documents;
 		try {
 			documents = queryDocuments(keywords);
 		} catch (Exception e) {

@@ -112,7 +112,7 @@ public class Indexer implements Runnable {
 	}
 
 	private String getDocQueryString() {
-		return String.format("SELECT content, url, timeMillis, indexTimeMillis, " + "ROWID FROM documents WHERE " +
+		return String.format("SELECT content, url, timeMillis, indexTimeMillis, ROWID FROM documents WHERE " +
 			"indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration);
 	}
 

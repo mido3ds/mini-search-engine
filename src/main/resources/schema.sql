@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS documents(
 	url STRING PRIMARY KEY NOT NULL,
 	content STRING NOT NULL,
 	timeMillis INT NOT NULL,
-	indexTimeMillis INT NOT NULL DEFAULT 0
+	indexTimeMillis INT NOT NULL DEFAULT 0,
+	counter INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS urlstore_queue(

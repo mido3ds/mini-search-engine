@@ -1,5 +1,6 @@
 package com.cufe.searchengine.util;
 
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.regex.MatchResult;
@@ -11,6 +12,7 @@ public class Patterns {
 	private static final Pattern HTML_TITLE = Pattern.compile("<title>(.+)</title>",
 		Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 	private static final Pattern URL_PATTERN = Pattern.compile("(((https?|ftp):)//)(\\S+(:\\S*)?@)?((?!(10|127)(\\.\\d{1,3}){3})(?!(169\\.254|192\\.168)(\\.\\d{1,3}){2})(?!172\\.(1[6-9]|2\\d|3[0-1])(\\.\\d{1,3}){2})([1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(\\.(1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(\\.([1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(([a-z0-9\\u00a1-\\uffff][a-z0-9\\u00a1-\\uffff_-]{0,62})?[a-z0-9\\u00a1-\\uffff]\\.)+([a-z\\u00a1-\\uffff]{2,}\\.?))(:\\d{2,5})?([/?#]\\S*)?", Pattern.CASE_INSENSITIVE);
+	private static final Pattern URL_PATTERN2 = Pattern.compile("http[s]?:\\/\\/(?:[a-z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-f][0-9a-f]))+");
 
 	public static String extractWebsite(String url) {
 		List<String> matches = URL_PATTERN.matcher(url)
@@ -31,6 +33,7 @@ public class Patterns {
 			.map(MatchResult::group)
 			.map(String::trim)
 			.distinct()
+			.filter(s -> URL_PATTERN2.matcher(s).matches())
 			.toArray(String[]::new);
 	}
 

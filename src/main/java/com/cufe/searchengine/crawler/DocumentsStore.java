@@ -1,6 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.util.DBUtils;
 import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
@@ -13,7 +14,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Component
 public class DocumentsStore {
@@ -25,10 +28,12 @@ public class DocumentsStore {
 	private JdbcTemplate jdbcTemplate;
 	@Value("${crawler.maxDocuments}")
 	private int maxDocuments;
+	@Autowired
+	private UrlsStore urlsStore;
 
 	@EventListener
-	private void onDBInitialized(DBInitializer.DBInitializedEvent event) {
-		Integer size = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class);
+	private void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
+		Integer size = DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class));
 		if (size == null) {
 			throw new IllegalStateException("`documents` count shouldn't be null");
 		}
@@ -48,7 +53,9 @@ public class DocumentsStore {
 			return;
 		}
 
-		Document document = new Document(DocumentFilterer.textFromHtml(doc), url, System.currentTimeMillis());
+		Document document = new Document(
+			DocumentFilterer.textFromHtml(doc), url, System.currentTimeMillis()
+		).counter(urlsStore.getCounter());
 
 		try {
 			storeToDB(document);

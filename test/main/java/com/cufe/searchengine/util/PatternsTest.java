@@ -53,7 +53,7 @@ public class PatternsTest {
 			"www.google.com\n" +
 			"htt://www.google.com\n" +
 			"://www.google.com\n" +
-			"http://wikipedia.org";
+			"http://wikipedia.org"+ " https://wikimediafoundation.org/\"><img";
 
 		assertArrayEquals(
 			new String[]{"https://www.google.com", "http://www.google.com", "http://wikipedia.org"},

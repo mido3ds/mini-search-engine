@@ -42,10 +42,14 @@ public class UrlsStore {
 	private long saveStateWaitMillis;
 	@Value("${crawler.seedFile}")
 	private Resource crawlerSeedResource;
+	private int counter = 1;
 
 	@EventListener
 	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
-		List<String> urls = jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class);
+		List<String> urls = DBUtils.waitLock(100,
+			() -> jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class)
+		);
+
 		if (urls.size() > 0) {
 			store.addAll(
 				urls.stream()
@@ -65,35 +69,61 @@ public class UrlsStore {
 			log.info("loaded seeds of size=" + store.size());
 		}
 
-		allUrls.addAll(queryAllUrls());
-		log.info("fetched all urls, size={}", allUrls.size());
+		readCounter();
+		loadAllUrls();
+	}
+
+	private void readCounter() throws Exception {
+		counter = DBUtils.waitLock(100,
+			() -> jdbcTemplate.queryForObject("PRAGMA user_version;", Integer.class));
+		log.info("loaded counter = {}", counter);
 	}
 
 	@EventListener
-	public void onCrawlingFinished(DocumentsStore.CrawlingFinishedEvent event) throws Exception {
+	public synchronized void onCrawlingFinished(DocumentsStore.CrawlingFinishedEvent event) throws Exception {
 		log.info("crawling finished");
 
+		incrementCounter();
+		resetStore();
+		loadAllUrls();
+	}
+
+	private void loadAllUrls() throws Exception {
+		allUrls.clear();
+		log.info("cleared allUrls");
+
+		allUrls.addAll(queryAllUrlsToAvoid());
+		log.info("fetched all urls, size={}", allUrls.size());
+	}
+
+	private void resetStore() throws Exception {
 		store.clear();
 		log.info("cleared store");
 
-		List<String> urls = queryAllUrls();
-		log.info("queried {} urls from db", urls.size());
-
 		store.addAll(
-			urls.stream()
+			queryAllUrlsToReuse().stream()
 				.map(ComparableUrl::new)
 				.collect(Collectors.toList())
 		);
-		log.info("added {} urls to store", urls.size());
-
-		allUrls.clear();
-		log.info("cleared allUrls");
+		log.info("added {} urls to store", store.size());
 	}
 
-	private List<String> queryAllUrls() throws Exception {
-		return DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents;",
+	private void incrementCounter() throws Exception {
+		counter++;
+		DBUtils.waitLock(100, () -> jdbcTemplate.update("PRAGMA user_version = ?;", counter));
+		log.info("incremented counter to {}", counter);
+	}
+
+	private List<String> queryAllUrlsToReuse() throws Exception {
+		return DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents WHERE counter != ?;",
 			(row, i) -> row
-				.getString(1)));
+				.getString(1), counter));
+	}
+
+	private List<String> queryAllUrlsToAvoid() throws Exception {
+		return DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents WHERE counter = ?;",
+			(row, i) -> row
+				.getString(1), counter));
 	}
 
 	@PreDestroy
@@ -158,6 +188,10 @@ public class UrlsStore {
 
 	public int size() {
 		return store.size();
+	}
+
+	public int getCounter() {
+		return counter;
 	}
 
 	private static class ComparableUrl implements Comparable {
