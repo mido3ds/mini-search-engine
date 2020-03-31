@@ -1,9 +1,9 @@
 package com.cufe.searchengine.query;
 
 import com.cufe.searchengine.crawler.Document;
-import com.cufe.searchengine.indexer.KeywordsExtractor;
 import com.cufe.searchengine.server.model.QueryResult;
 import com.cufe.searchengine.util.DBUtils;
+import com.cufe.searchengine.util.DocumentFilterer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class QueryProcessor {
 
 		//		log.info("query after removing phrases = {}", query);
 
-		List<String> keywords = KeywordsExtractor.extractFromQuery(query);
+		List<String> keywords = DocumentFilterer.keywordsFromQuery(query);
 
 		//		log.info("extracted keywords = {}", keywords);
 

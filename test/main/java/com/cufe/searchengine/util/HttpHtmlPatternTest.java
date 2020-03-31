@@ -63,17 +63,19 @@ public class HttpHtmlPatternTest {
 
 	@Test
 	public void couldBeHtml() {
-		assertTrue(HttpHtmlPattern.couldBeHtml("adasd.html"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("adasd.asp"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("adasd"));
-		assertTrue(HttpHtmlPattern.couldBeHtml(""));
-		assertTrue(HttpHtmlPattern.couldBeHtml("adasd.$$$"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("*"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd.html"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd.asp"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd.$$$"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/*"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com"));
+		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/https://www.github.com/"));
 
 		assertFalse(HttpHtmlPattern.couldBeHtml("adasd.jpg"));
-		assertFalse(HttpHtmlPattern.couldBeHtml(".gif"));
-		assertFalse(HttpHtmlPattern.couldBeHtml("adasd.habal"));
-		assertFalse(HttpHtmlPattern.couldBeHtml("adasd.mp4"));
-		assertFalse(HttpHtmlPattern.couldBeHtml("www.google.com/dasd/adasd.css"));
+		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/.gif"));
+		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/adasd.habal"));
+		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/adasd.mp4"));
+		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/om/dasd/adasd.css"));
 	}
 }

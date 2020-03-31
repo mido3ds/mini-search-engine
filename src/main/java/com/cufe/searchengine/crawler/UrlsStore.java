@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 // TODO: implement priority for pulling urls
@@ -72,7 +73,10 @@ public class UrlsStore {
 		Object[] storeCopy = store.stream().distinct().filter(Objects::nonNull).toArray();
 
 		// flush
-		DBUtils.waitLock(100, () -> jdbcTemplate.execute("DELETE FROM urlstore_queue;"));
+		DBUtils.waitLock(100, () -> {
+			jdbcTemplate.execute("DELETE FROM urlstore_queue;");
+			return null;
+		});
 
 		log.info("flushed urlstore_queue table");
 

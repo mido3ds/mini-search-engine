@@ -3,6 +3,7 @@ package com.cufe.searchengine.indexer;
 import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.util.DBUtils;
+import com.cufe.searchengine.util.DocumentFilterer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class Indexer implements Runnable {
 
 				List<Document> documents = fetchNonIndexedDocs();
 				for (Document document : documents) {
-					List<String> keywords = KeywordsExtractor.extractFromHtml(document.getContent());
+					List<String> keywords = DocumentFilterer.keywordsFromHtml(document.getContent());
 					updateKeyword(keywords, document.getRowID());
 
 					totalWords += keywords.size();

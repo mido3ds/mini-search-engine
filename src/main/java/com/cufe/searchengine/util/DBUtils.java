@@ -1,6 +1,8 @@
 package com.cufe.searchengine.util;
 
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 import java.util.concurrent.Callable;
 
@@ -10,28 +12,21 @@ public class DBUtils {
 			try {
 				return callback.call();
 			} catch (CannotGetJdbcConnectionException e) {
-				try {
-					Thread.sleep(timeMillis);
-				} catch (InterruptedException ignored) {
+				sleep(timeMillis);
+			} catch (SQLiteException e) {
+				if (e.getResultCode().equals(SQLiteErrorCode.SQLITE_BUSY)) {
+					sleep(timeMillis);
+				} else {
+					throw e;
 				}
 			}
 		}
 	}
 
-	public static void waitLock(int timeMillis, Runnable callback) {
-		while (true) {
-			try {
-				callback.run();
-			} catch (CannotGetJdbcConnectionException e) {
-				try {
-					Thread.sleep(timeMillis);
-				} catch (InterruptedException ignored) {
-				}
-
-				continue;
-			}
-
-			break;
+	private static void sleep(int timeMillis) {
+		try {
+			Thread.sleep(timeMillis);
+		} catch (InterruptedException ignored) {
 		}
 	}
 }

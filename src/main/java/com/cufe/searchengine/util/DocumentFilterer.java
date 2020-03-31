@@ -1,6 +1,4 @@
-package com.cufe.searchengine.indexer;
-
-import com.cufe.searchengine.util.Stemmer;
+package com.cufe.searchengine.util;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class KeywordsExtractor {
+public class DocumentFilterer {
 	private static final Pattern NON_WORD = Pattern.compile("([^\\w\\s]|\\d)+");
 	private static final Pattern WHITE_SPACE = Pattern.compile("\\s+");
 	private static final Pattern BIG_WORDS = Pattern.compile("([\\w]{15,})");
@@ -22,7 +20,7 @@ public class KeywordsExtractor {
 
 	private String text;
 
-	public KeywordsExtractor(String text) {
+	public DocumentFilterer(String text) {
 		this.text = text;
 	}
 
@@ -32,8 +30,8 @@ public class KeywordsExtractor {
 	 * @param html to extract keywords from
 	 * @return list of keywords with size <= {@code maxKeywords}
 	 */
-	public static List<String> extractFromHtml(String html) {
-		return new KeywordsExtractor(html).toLower()
+	public static List<String> keywordsFromHtml(String html) {
+		return new DocumentFilterer(html).toLower()
 			.filterCSS()
 			.filterHtmlTags()
 			.filterStopWords()
@@ -53,8 +51,8 @@ public class KeywordsExtractor {
 	 * @param query to extract keywords from
 	 * @return list of keywords with size <= {@code maxKeywords}
 	 */
-	public static List<String> extractFromQuery(String query) {
-		return new KeywordsExtractor(query).toLower()
+	public static List<String> keywordsFromQuery(String query) {
+		return new DocumentFilterer(query).toLower()
 			.filterNonText()
 			.filterExcessiveWhitespace()
 			.split()
@@ -64,27 +62,36 @@ public class KeywordsExtractor {
 			.collect(Collectors.toList());
 	}
 
-	private KeywordsExtractor toLower() {
+	public static String textFromHtml(String html) {
+		return new DocumentFilterer(html)
+			.filterCSS()
+			.filterHtmlTags()
+			.filterExcessiveWhitespace()
+			.text
+			.trim();
+	}
+
+	private DocumentFilterer toLower() {
 		text = text.toLowerCase();
 		return this;
 	}
 
-	private KeywordsExtractor filterHtmlTags() {
+	private DocumentFilterer filterHtmlTags() {
 		text = HTML_TAGS.matcher(text).replaceAll("");
 		return this;
 	}
 
-	private KeywordsExtractor filterCSS() {
+	private DocumentFilterer filterCSS() {
 		text = CSS.matcher(text).replaceAll("");
 		return this;
 	}
 
-	private KeywordsExtractor filterNonText() {
+	private DocumentFilterer filterNonText() {
 		text = NON_WORD.matcher(text).replaceAll("");
 		return this;
 	}
 
-	private KeywordsExtractor filterExcessiveWhitespace() {
+	private DocumentFilterer filterExcessiveWhitespace() {
 		text = WHITE_SPACE.matcher(text).replaceAll(" ");
 		return this;
 	}
@@ -93,12 +100,12 @@ public class KeywordsExtractor {
 		return Arrays.stream(text.split("\\s"));
 	}
 
-	private KeywordsExtractor filterStopWords() {
+	private DocumentFilterer filterStopWords() {
 		text = STOP_WORDS.matcher(text).replaceAll("");
 		return this;
 	}
 
-	private KeywordsExtractor filterBigWords() {
+	private DocumentFilterer filterBigWords() {
 		text = BIG_WORDS.matcher(text).replaceAll("");
 		return this;
 	}

@@ -1,6 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class DocumentsStore {
 			return;
 		}
 
-		Document document = new Document(doc, url, System.currentTimeMillis());
+		Document document = new Document(DocumentFilterer.textFromHtml(doc), url, System.currentTimeMillis());
 
 		try {
 			storeToDB(document);
