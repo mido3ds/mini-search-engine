@@ -1,19 +1,17 @@
 package com.cufe.searchengine.query;
 
 import com.cufe.searchengine.crawler.Document;
-import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.indexer.KeywordsExtractor;
 import com.cufe.searchengine.server.model.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class QueryProcessor {
@@ -52,14 +50,17 @@ public class QueryProcessor {
 
 //		log.info("queried documents size = {}", documents.size());
 
-		for (Document document : documents) {
-			queryResults.add(
-				new QueryResult()
-					.title(document.getTitle())
-					.link(document.getUrl())
-					.snippet(document.getSnippet(keywords))
-			);
-		}
+		queryResults.addAll(
+			documents
+				.stream()
+				.map(
+					document -> new QueryResult()
+						.title(document.getTitle())
+						.link(document.getUrl())
+						.snippet(document.getSnippet(keywords))
+				)
+				.collect(Collectors.toList())
+		);
 
 		return ranker.sort(queryResults, documents, keywords);
 	}

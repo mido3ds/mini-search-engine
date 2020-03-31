@@ -77,8 +77,7 @@ public class Document {
 
 	public String getTitle() {
 		String title = HttpHtmlPattern.extractHtmlTitle(this.getContent());
-		title = title.equals("")? this.getUrl():title;
-		return title;
+		return title.equals("") ? this.getUrl() : title;
 	}
 
 	public String getSnippet(List<String> keywords) {
