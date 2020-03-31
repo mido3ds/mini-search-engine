@@ -70,5 +70,5 @@ public class Patterns {
 
 	public static String httpToHttps(String url) {
 		return url.replaceFirst("http://", "https://");
- 	}
+	}
 }

@@ -14,13 +14,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.stream.Collectors;
 
 // TODO: implement priority for pulling urls
 // TODO: better seed set
@@ -29,8 +29,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class UrlsStore {
 	private static final Logger log = LoggerFactory.getLogger(UrlsStore.class);
 
-	private final BlockingQueue<String> store = new LinkedBlockingQueue<>();
+	private final BlockingQueue<ComparableUrl> store = new PriorityBlockingQueue<>();
 	private final Set<String> allUrls = new HashSet<>();
+
 	@Autowired
 	private RobotsStore robotsStore;
 	@Autowired
@@ -46,10 +47,21 @@ public class UrlsStore {
 	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
 		List<String> urls = jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class);
 		if (urls.size() > 0) {
-			log.info("urls loaded from db.size() = " + urls.size());
-			store.addAll(urls);
+			store.addAll(
+				urls.stream()
+					.map(ComparableUrl::new)
+					.collect(Collectors.toList())
+			);
+
+			log.info("urls loaded from db.size() = " + store.size());
 		} else {
-			store.addAll(StringUtils.resourceToLines(crawlerSeedResource));
+			store.addAll(
+				StringUtils.resourceToLines(crawlerSeedResource)
+					.stream()
+					.map(ComparableUrl::new)
+					.collect(Collectors.toList())
+			);
+
 			log.info("loaded seeds of size=" + store.size());
 		}
 
@@ -67,7 +79,11 @@ public class UrlsStore {
 		List<String> urls = queryAllUrls();
 		log.info("queried {} urls from db", urls.size());
 
-		store.addAll(urls);
+		store.addAll(
+			urls.stream()
+				.map(ComparableUrl::new)
+				.collect(Collectors.toList())
+		);
 		log.info("added {} urls to store", urls.size());
 
 		allUrls.clear();
@@ -76,8 +92,8 @@ public class UrlsStore {
 
 	private List<String> queryAllUrls() throws Exception {
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents;",
-				(row, i) -> row
-					.getString(1)));
+			(row, i) -> row
+				.getString(1)));
 	}
 
 	@PreDestroy
@@ -114,8 +130,10 @@ public class UrlsStore {
 			return;
 		}
 
+		ComparableUrl comparableUrl = new ComparableUrl(url);
+
 		// no duplicates
-		if (store.contains(url) || allUrls.contains(url)) {
+		if (store.contains(comparableUrl) || allUrls.contains(url)) {
 			log.warn("duplicate url {}", url);
 			return;
 		}
@@ -125,20 +143,56 @@ public class UrlsStore {
 			return;
 		}
 
-		if (!robotsStore.canRequest(url, () -> store.remove(url))) {
+		if (!robotsStore.canRequest(url, () -> store.remove(comparableUrl))) {
 			return;
 		}
 
-		store.put(url);
+		store.put(comparableUrl);
 	}
 
 	public String poll() throws InterruptedException {
-		String url = store.take();
+		String url = store.take().getUrl();
 		allUrls.add(url);
 		return url;
 	}
 
 	public int size() {
 		return store.size();
+	}
+
+	private static class ComparableUrl implements Comparable {
+		private final String url;
+
+		private ComparableUrl(String url) {
+			this.url = url;
+		}
+
+		@Override
+		public int compareTo(Object o) {
+			if (o instanceof ComparableUrl) {
+				ComparableUrl url2 = (ComparableUrl) o;
+				if (url.equals(url2.url)) {
+					return 0;
+				}
+
+				// TODO
+				return url.compareTo(url2.url);
+			}
+
+			throw new IllegalArgumentException("object must be of ComparableUrl type");
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof ComparableUrl) {
+				return compareTo(obj) == 0;
+			}
+
+			return false;
+		}
+
+		public String getUrl() {
+			return url;
+		}
 	}
 }
