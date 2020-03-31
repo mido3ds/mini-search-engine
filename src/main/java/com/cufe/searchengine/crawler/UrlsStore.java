@@ -15,8 +15,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -28,6 +30,7 @@ public class UrlsStore {
 	private static final Logger log = LoggerFactory.getLogger(UrlsStore.class);
 
 	private final BlockingQueue<String> store = new LinkedBlockingQueue<>();
+	private final Set<String> allUrls = new HashSet<>();
 	@Autowired
 	private RobotsStore robotsStore;
 	@Autowired
@@ -40,7 +43,7 @@ public class UrlsStore {
 	private Resource crawlerSeedResource;
 
 	@EventListener
-	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws IOException {
+	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
 		List<String> urls = jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class);
 		if (urls.size() > 0) {
 			log.info("urls loaded from db.size() = " + urls.size());
@@ -49,6 +52,9 @@ public class UrlsStore {
 			store.addAll(StringUtils.resourceToLines(crawlerSeedResource));
 			log.info("loaded seeds of size=" + store.size());
 		}
+
+		allUrls.addAll(queryAllUrls());
+		log.info("fetched all urls, size={}", allUrls.size());
 	}
 
 	@EventListener
@@ -58,13 +64,17 @@ public class UrlsStore {
 		store.clear();
 		log.info("cleared store");
 
-		List<String> urls = DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents;",
-			(row, i) -> row
-				.getString(1)));
+		List<String> urls = queryAllUrls();
 		log.info("queried {} urls from db", urls.size());
 
 		store.addAll(urls);
 		log.info("added {} urls to store", urls.size());
+	}
+
+	private List<String> queryAllUrls() throws Exception {
+		return DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents;",
+				(row, i) -> row
+					.getString(1)));
 	}
 
 	@PreDestroy
@@ -97,7 +107,13 @@ public class UrlsStore {
 	}
 
 	public void add(String url) throws InterruptedException {
-		if (url == null || store.contains(url)) {
+		if (url == null) {
+			return;
+		}
+
+		// no duplicates
+		if (store.contains(url) || allUrls.contains(url)) {
+			log.warn("duplicate url {}", url);
 			return;
 		}
 
@@ -110,13 +126,13 @@ public class UrlsStore {
 			return;
 		}
 
-		// TODO: ignore duplicate urls
-
 		store.put(url);
 	}
 
 	public String poll() throws InterruptedException {
-		return store.take();
+		String url = store.take();
+		allUrls.add(url);
+		return url;
 	}
 
 	public int size() {
