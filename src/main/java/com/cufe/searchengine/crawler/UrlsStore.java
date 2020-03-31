@@ -69,6 +69,9 @@ public class UrlsStore {
 
 		store.addAll(urls);
 		log.info("added {} urls to store", urls.size());
+
+		allUrls.clear();
+		log.info("cleared allUrls");
 	}
 
 	private List<String> queryAllUrls() throws Exception {
