@@ -46,8 +46,8 @@ public class DBInitializer implements CommandLineRunner {
 		log.info("Creating tables");
 
 		try {
-			ScriptUtils.executeSqlScript(Objects.requireNonNull(
-				jdbcTemplate.getDataSource()).getConnection(), sqliteSchemaResource);
+			ScriptUtils.executeSqlScript(Objects.requireNonNull(jdbcTemplate.getDataSource())
+				.getConnection(), sqliteSchemaResource);
 		} catch (UncategorizedScriptException ignored) {
 			log.warn("empty schema.sql, ignoring it");
 		}
@@ -57,8 +57,8 @@ public class DBInitializer implements CommandLineRunner {
 		log.info("Populating DB with test data");
 
 		try {
-			ScriptUtils.executeSqlScript(Objects.requireNonNull(
-				jdbcTemplate.getDataSource()).getConnection(), populateDBResource);
+			ScriptUtils.executeSqlScript(Objects.requireNonNull(jdbcTemplate.getDataSource())
+				.getConnection(), populateDBResource);
 		} catch (UncategorizedScriptException ignored) {
 			log.warn("empty initial_data.sql, ignoring it");
 		}

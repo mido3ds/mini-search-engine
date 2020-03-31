@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,14 +17,13 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class DocumentsStore {
 	private final Logger log = LoggerFactory.getLogger(DocumentsStore.class);
-
+	private final AtomicLong docsCount = new AtomicLong();
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	@Value("${crawler.maxDocuments}")
 	private int maxDocuments;
-	private final AtomicLong docsCount = new AtomicLong();
 
 	@EventListener
 	private void onDBInitialized(DBInitializer.DBInitializedEvent event) {
@@ -36,29 +34,14 @@ public class DocumentsStore {
 		docsCount.set(size);
 	}
 
-	private void storeToDB(Document document) throws InterruptedException {
-		int rows;
-
-		while (true) {
-			// TODO: avoid locking in a better way
-			try {
-				rows = document.store(this.jdbcTemplate);
-			} catch (CannotGetJdbcConnectionException e) {
-				Thread.sleep(100);
-				log.error(e.getMessage());
-				continue;
-			}
-
-			break;
-		}
-
+	private void storeToDB(Document document) throws Exception {
+		int rows = document.store(this.jdbcTemplate);
 		if (rows != 1) {
 			log.error("couldn't insert document with url=" + document.getUrl());
-			Thread.currentThread().interrupt();
 		}
 	}
 
-	public void add(String url, String doc) throws InterruptedException {
+	public void add(String url, String doc) {
 		if (!StringUtils.isHtml(doc)) {
 			log.info("doc at url {} is probably not html, ignore it", url);
 			return;
@@ -66,7 +49,13 @@ public class DocumentsStore {
 
 		Document document = new Document(doc, url, System.currentTimeMillis());
 
-		storeToDB(document);
+		try {
+			storeToDB(document);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return;
+		}
+
 		docsCount.getAndIncrement();
 
 		if (isFull()) {
@@ -75,7 +64,7 @@ public class DocumentsStore {
 	}
 
 	private boolean isFull() {
-		return docsCount.getAndUpdate(l -> l >= maxDocuments? 0:l) >= maxDocuments;
+		return docsCount.getAndUpdate(l -> l >= maxDocuments ? 0 : l) >= maxDocuments;
 	}
 
 	public static class CrawlingFinishedEvent extends ApplicationEvent {

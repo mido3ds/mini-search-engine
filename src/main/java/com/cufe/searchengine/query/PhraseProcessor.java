@@ -2,6 +2,7 @@ package com.cufe.searchengine.query;
 
 import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.server.model.QueryResult;
+import com.cufe.searchengine.util.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,22 @@ public class PhraseProcessor {
 
 		String query = "SELECT content, url FROM documents WHERE " + reducedLikes.get() + ";";
 
-//		log.info("query {}", query);
+		//		log.info("query {}", query);
 
-		return jdbcTemplate
-			.query(query, (row, i) -> new Document(row.getString(1), row.getString(2), 0))
-			.stream()
-			.map(d -> new QueryResult().title(d.getTitle()).snippet(d.getSnippet(phrases)).link(d.getUrl()))
-			.collect(Collectors.toList());
+		try {
+			return DBUtils.waitLock(100, () -> jdbcTemplate.query(query, (row, i) -> new Document(row.getString(1),
+				row.getString(2), 0))
+				.stream()
+				.map(d -> new QueryResult().title(d.getTitle())
+					.snippet(d.getSnippet(phrases))
+					.link(d.getUrl()))
+				.collect(Collectors.toList()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("returning empty results");
+
+			return new ArrayList<>();
+		}
 	}
 
 	public List<QueryResult> search(String query) {

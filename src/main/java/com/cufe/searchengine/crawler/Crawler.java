@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class Crawler implements Runnable {
@@ -67,12 +63,7 @@ public class Crawler implements Runnable {
 				}
 			}
 
-			try {
-				documentsStore.add(url, document);
-			} catch (InterruptedException ignored) {
-				Thread.currentThread().interrupt();
-				log.warn("interrupted, ignore it");
-			}
+			documentsStore.add(url, document);
 		}
 	}
 

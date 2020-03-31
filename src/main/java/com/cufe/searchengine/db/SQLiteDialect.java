@@ -63,8 +63,7 @@ public class SQLiteDialect extends Dialect {
 	}
 
 	protected String getLimitString(String query, boolean hasOffset) {
-		return query +
-			(hasOffset ? " limit ? offset ?" : " limit ?");
+		return query + (hasOffset ? " limit ? offset ?" : " limit ?");
 	}
 
 	public boolean supportsTemporaryTables() {
@@ -119,9 +118,10 @@ public class SQLiteDialect extends Dialect {
 		throw new UnsupportedOperationException("No drop foreign key syntax supported by SQLiteDialect");
 	}
 
-	public String getAddForeignKeyConstraintString(String constraintName,
-												   String[] foreignKey, String referencedTable, String[] primaryKey,
-												   boolean referencesPrimaryKey) {
+	public String getAddForeignKeyConstraintString(
+		String constraintName, String[] foreignKey, String referencedTable, String[] primaryKey,
+		boolean referencesPrimaryKey
+	) {
 		throw new UnsupportedOperationException("No add foreign key syntax supported by SQLiteDialect");
 	}
 

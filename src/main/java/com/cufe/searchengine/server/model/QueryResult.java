@@ -67,9 +67,7 @@ public class QueryResult {
 			return false;
 		}
 		QueryResult queryResult = (QueryResult) o;
-		return Objects.equals(this.title, queryResult.title) &&
-			Objects.equals(this.link, queryResult.link) &&
-			Objects.equals(this.snippet, queryResult.snippet);
+		return Objects.equals(this.title, queryResult.title) && Objects.equals(this.link, queryResult.link) && Objects.equals(this.snippet, queryResult.snippet);
 	}
 
 	@Override
@@ -79,11 +77,7 @@ public class QueryResult {
 
 	@Override
 	public String toString() {
-		return "class QueryResult {\n" +
-			"    title: " + toIndentedString(title) + "\n" +
-			"    link: " + toIndentedString(link) + "\n" +
-			"    snippet: " + toIndentedString(snippet) + "\n" +
-			"}";
+		return "class QueryResult {\n" + "    title: " + toIndentedString(title) + "\n" + "    link: " + toIndentedString(link) + "\n" + "    snippet: " + toIndentedString(snippet) + "\n" + "}";
 	}
 
 	/**

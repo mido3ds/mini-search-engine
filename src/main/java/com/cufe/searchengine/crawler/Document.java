@@ -1,5 +1,6 @@
 package com.cufe.searchengine.crawler;
 
+import com.cufe.searchengine.util.DBUtils;
 import com.cufe.searchengine.util.HttpHtmlPattern;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -47,11 +48,9 @@ public class Document {
 		this.timeMillis = timeMillis;
 	}
 
-	public int store(JdbcTemplate jdbcTemplate) {
-		return jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis) VALUES(?, ?, ?);",
-			url,
-			content,
-			timeMillis);
+	public int store(JdbcTemplate jdbcTemplate) throws Exception {
+		return DBUtils.waitLock(100, () -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis) " +
+			"VALUES(?, ?, ?);", url, content, timeMillis));
 	}
 
 	public long getRowID() {

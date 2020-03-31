@@ -2,6 +2,7 @@ package com.cufe.searchengine.indexer;
 
 import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.util.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,10 @@ public class Indexer implements Runnable {
 			}
 		}
 
-		log.info("interrupted, closing");
+		throw new RuntimeException("indexer interrupted");
 	}
 
-	private void updateDocsIndexTime(List<Document> documents) {
+	private void updateDocsIndexTime(List<Document> documents) throws Exception {
 		if (documents.size() == 0) {
 			return;
 		}
@@ -66,7 +67,7 @@ public class Indexer implements Runnable {
 		}
 		builder.append(documents.get(documents.size() - 1).getRowID()).append(");");
 
-		int rows = jdbcTemplate.update(builder.toString(), System.currentTimeMillis());
+		int rows = DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), System.currentTimeMillis()));
 		if (rows != documents.size()) {
 			throw new RuntimeException("should have updated " + documents.size());
 		}
@@ -74,7 +75,7 @@ public class Indexer implements Runnable {
 		log.info("updated rows={}, docs={}", rows, documents.size());
 	}
 
-	private void updateKeyword(List<String> words, long docID) {
+	private void updateKeyword(List<String> words, long docID) throws Exception {
 		if (words.size() == 0) {
 			return;
 		}
@@ -91,10 +92,7 @@ public class Indexer implements Runnable {
 
 		builder.append("REPLACE INTO keywords_documents(docID, wordID) VALUES");
 		for (int i = 0; i < words.size(); i++) {
-			builder.append("(")
-				.append(docID)
-				.append(",last_insert_rowid()-").append(i)
-				.append(")");
+			builder.append("(").append(docID).append(",last_insert_rowid()-").append(i).append(")");
 
 			if (i != words.size() - 1) {
 				builder.append(",");
@@ -102,21 +100,19 @@ public class Indexer implements Runnable {
 		}
 		builder.append(";");
 
-		jdbcTemplate.update(builder.toString(), words.toArray());
+		DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), words.toArray()));
 	}
 
-	private List<Document> fetchNonIndexedDocs() {
-		return jdbcTemplate.query(
-			String.format("SELECT content, url, timeMillis, indexTimeMillis, ROWID " +
-				"FROM documents WHERE indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration),
-			(row, i) -> new Document(
-				row.getString(1),
-				row.getString(2),
-				row.getLong(3)
-			)
-				.indexTimeMillis(row.getLong(4))
-				.rowID(row.getLong(5))
-		);
+	private List<Document> fetchNonIndexedDocs() throws Exception {
+		return DBUtils.waitLock(100, () -> jdbcTemplate.query(getDocQueryString(),
+			(row, i) -> new Document(row.getString(1), row
+				.getString(2), row.getLong(3)).indexTimeMillis(row.getLong(4))
+				.rowID(row.getLong(5))));
+	}
+
+	private String getDocQueryString() {
+		return String.format("SELECT content, url, timeMillis, indexTimeMillis, " + "ROWID FROM documents WHERE " +
+			"indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration);
 	}
 
 	@Component

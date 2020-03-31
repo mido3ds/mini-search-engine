@@ -3,6 +3,7 @@ package com.cufe.searchengine.query;
 import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.indexer.KeywordsExtractor;
 import com.cufe.searchengine.server.model.QueryResult;
+import com.cufe.searchengine.util.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,49 +29,47 @@ public class QueryProcessor {
 	 * @return all search results, ranked
 	 */
 	public List<QueryResult> search(String query) {
-//		log.info("received query = {}", query);
+		//		log.info("received query = {}", query);
 
 		ArrayList<QueryResult> queryResults = new ArrayList<>(phraseProcessor.search(query));
 
-//		log.info("queryResults from phraseProcessor .size() = {}", queryResults.size());
+		//		log.info("queryResults from phraseProcessor .size() = {}", queryResults.size());
 
 		query = phraseProcessor.removePhrases(query);
 
-//		log.info("query after removing phrases = {}", query);
+		//		log.info("query after removing phrases = {}", query);
 
 		List<String> keywords = KeywordsExtractor.extractFromQuery(query);
 
-//		log.info("extracted keywords = {}", keywords);
+		//		log.info("extracted keywords = {}", keywords);
 
 		if (keywords.size() == 0) {
 			return queryResults;
 		}
 
-		List<Document> documents = queryDocuments(keywords);
+		List<Document> documents = null;
+		try {
+			documents = queryDocuments(keywords);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("returning empty results");
+			return new ArrayList<>();
+		}
 
-//		log.info("queried documents size = {}", documents.size());
+		//		log.info("queried documents size = {}", documents.size());
 
-		queryResults.addAll(
-			documents
-				.stream()
-				.map(
-					document -> new QueryResult()
-						.title(document.getTitle())
-						.link(document.getUrl())
-						.snippet(document.getSnippet(keywords))
-				)
-				.collect(Collectors.toList())
-		);
+		queryResults.addAll(documents.stream()
+			.map(document -> new QueryResult().title(document.getTitle())
+				.link(document.getUrl())
+				.snippet(document.getSnippet(keywords)))
+			.collect(Collectors.toList()));
 
 		return ranker.sort(queryResults, documents, keywords);
 	}
 
-	private List<Document> queryDocuments(List<String> keywords) {
-		StringBuilder builder = new StringBuilder(
-			"SELECT content, url FROM documents d " +
-				"INNER JOIN keywords_documents kd ON d.ROWID = kd.docID " +
-				"INNER JOIN keywords k ON k.ROWID = kd.wordID AND k.word in ("
-		);
+	private List<Document> queryDocuments(List<String> keywords) throws Exception {
+		StringBuilder builder = new StringBuilder("SELECT content, url FROM documents d " + "INNER JOIN " +
+			"keywords_documents kd ON d.ROWID = kd.docID " + "INNER JOIN " + "keywords k ON k.ROWID = kd.wordID AND k.word in (");
 		for (int i = 0; i < keywords.size(); i++) {
 			builder.append("?");
 			if (i != keywords.size() - 1) {
@@ -79,10 +78,9 @@ public class QueryProcessor {
 		}
 		builder.append(");");
 
-		return jdbcTemplate.query(builder.toString(),
-			(row, i) -> new Document(row.getString(1), row.getString(2), 0),
-			keywords.toArray()
-		);
+		return DBUtils.waitLock(100, () -> jdbcTemplate.query(builder.toString(),
+			(row, i) -> new Document(row.getString(1), row
+				.getString(2), 0), keywords.toArray()));
 	}
 
 	/**

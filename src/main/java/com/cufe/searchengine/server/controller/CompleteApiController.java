@@ -39,13 +39,17 @@ public class CompleteApiController {
 	 * @param q string to search for (required)
 	 * @return successful operation, result could be empty (status code 200)
 	 */
-	@ApiOperation(value = "get list of completions", nickname = "complete", notes = "", response = String.class, responseContainer = "List", tags = {})
+	@ApiOperation(value = "get list of completions", nickname = "complete", notes = "", response = String.class,
+		responseContainer = "List", tags = {})
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = String.class, responseContainer = "List")})
-	@RequestMapping(value = "/api/complete",
-		produces = {"application/json"},
-		method = RequestMethod.GET)
-	ResponseEntity<List<String>> complete(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q) {
+		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = String.class,
+			responseContainer = "List")
+	})
+	@RequestMapping(value = "/api/complete", produces = {"application/json"}, method = RequestMethod.GET)
+	ResponseEntity<List<String>> complete(
+		@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q",
+			required = true) String q
+	) {
 		return ResponseEntity.ok(queryProcessor.suggest(q));
 	}
 }

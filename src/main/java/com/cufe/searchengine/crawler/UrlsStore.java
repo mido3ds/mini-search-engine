@@ -1,6 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.util.DBUtils;
 import com.cufe.searchengine.util.HttpHtmlPattern;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
@@ -14,13 +15,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
 
 // TODO: implement priority for pulling urls
 // TODO: better seed set
@@ -54,13 +52,15 @@ public class UrlsStore {
 	}
 
 	@EventListener
-	public void onCrawlingFinished(DocumentsStore.CrawlingFinishedEvent event) {
+	public void onCrawlingFinished(DocumentsStore.CrawlingFinishedEvent event) throws Exception {
 		log.info("crawling finished");
 
 		store.clear();
 		log.info("cleared store");
 
-		List<String> urls = jdbcTemplate.query("SELECT url FROM documents;", (row, i) -> row.getString(1));
+		List<String> urls = DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents;",
+			(row, i) -> row
+				.getString(1)));
 		log.info("queried {} urls from db", urls.size());
 
 		store.addAll(urls);
@@ -68,15 +68,12 @@ public class UrlsStore {
 	}
 
 	@PreDestroy
-	private void onDestroy() {
-		Object[] storeCopy = store.stream()
-			.distinct()
-			.filter(Objects::nonNull)
-			.toArray();
+	private void onDestroy() throws Exception {
+		Object[] storeCopy = store.stream().distinct().filter(Objects::nonNull).toArray();
 
 		// flush
-		// TODO: wait until db is not locked
-		jdbcTemplate.execute("DELETE FROM urlstore_queue;");
+		DBUtils.waitLock(100, () -> jdbcTemplate.execute("DELETE FROM urlstore_queue;"));
+
 		log.info("flushed urlstore_queue table");
 
 		// commit
@@ -91,7 +88,7 @@ public class UrlsStore {
 			sql.append("(?),");
 		}
 		sql.append("(?);");
-		jdbcTemplate.update(sql.toString(), storeCopy);
+		DBUtils.waitLock(100, () -> jdbcTemplate.update(sql.toString(), storeCopy));
 
 		log.info("saved {} urls", storeCopy.length);
 	}

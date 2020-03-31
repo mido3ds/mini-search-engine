@@ -26,10 +26,9 @@ public class StringUtils {
 	}
 
 	public static List<String> resourceToLines(Resource resource) throws IOException {
-		return new BufferedReader(new InputStreamReader(
-			resource.getInputStream(), StandardCharsets.UTF_8))
-			.lines()
-			.collect(Collectors.toList());
+		return new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)).lines()
+			.collect(Collectors
+				.toList());
 	}
 
 	public static boolean isHtml(String document) {

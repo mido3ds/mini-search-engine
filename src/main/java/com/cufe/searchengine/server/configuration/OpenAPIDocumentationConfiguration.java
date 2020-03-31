@@ -20,8 +20,7 @@ import javax.servlet.ServletContext;
 @EnableSwagger2
 public class OpenAPIDocumentationConfiguration {
 	ApiInfo apiInfo() {
-		return new ApiInfoBuilder()
-			.title("Mini Search Engine API")
+		return new ApiInfoBuilder().title("Mini Search Engine API")
 			.description("Mini Search Engine - Advanced Programming Techniques project")
 			.license("")
 			.licenseUrl("http://unlicense.org")
@@ -32,14 +31,19 @@ public class OpenAPIDocumentationConfiguration {
 	}
 
 	@Bean
-	public Docket customImplementation(ServletContext servletContext, @Value("${openapi.miniSearchEngine.base-path:}") String basePath) {
-		return new Docket(DocumentationType.SWAGGER_2)
-			.select()
-			.apis(RequestHandlerSelectors.basePackage("com.cufe.searchengine.api"))
+	public Docket customImplementation(
+		ServletContext servletContext, @Value("${openapi.miniSearchEngine.base-path:}") String basePath
+	) {
+		return new Docket(DocumentationType.SWAGGER_2).select()
+			.apis(RequestHandlerSelectors.basePackage("com.cufe" +
+				".searchengine" +
+				".api"))
 			.build()
 			.pathProvider(new BasePathAwareRelativePathProvider(servletContext, basePath))
-			.directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
-			.directModelSubstitute(java.time.OffsetDateTime.class, java.util.Date.class)
+			.directModelSubstitute(java.time.LocalDate.class,
+				java.sql.Date.class)
+			.directModelSubstitute(java.time.OffsetDateTime.class,
+				java.util.Date.class)
 			.apiInfo(apiInfo());
 	}
 
@@ -53,14 +57,18 @@ public class OpenAPIDocumentationConfiguration {
 
 		@Override
 		protected String applicationPath() {
-			return Paths.removeAdjacentForwardSlashes(UriComponentsBuilder.fromPath(super.applicationPath()).path(basePath).build().toString());
+			return Paths.removeAdjacentForwardSlashes(UriComponentsBuilder.fromPath(super.applicationPath())
+				.path(basePath)
+				.build()
+				.toString());
 		}
 
 		@Override
 		public String getOperationPath(String operationPath) {
 			UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromPath("/");
-			return Paths.removeAdjacentForwardSlashes(
-				uriComponentsBuilder.path(operationPath.replaceFirst("^" + basePath, "")).build().toString());
+			return Paths.removeAdjacentForwardSlashes(uriComponentsBuilder.path(operationPath.replaceFirst("^" + basePath, ""))
+				.build()
+				.toString());
 		}
 	}
 }

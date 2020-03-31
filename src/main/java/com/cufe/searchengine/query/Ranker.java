@@ -9,7 +9,9 @@ import java.util.List;
 
 @Component
 public class Ranker {
-	public List<QueryResult> sort(ArrayList<QueryResult> queryResults, List<Document> documents, List<String> keywords) {
+	public List<QueryResult> sort(
+		ArrayList<QueryResult> queryResults, List<Document> documents, List<String> keywords
+	) {
 		return queryResults; // TODO
 	}
 }

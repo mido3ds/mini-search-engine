@@ -80,9 +80,9 @@ public class ResultPage {
 			return false;
 		}
 		ResultPage resultPage = (ResultPage) o;
-		return Objects.equals(this.currentPage, resultPage.currentPage) &&
-			Objects.equals(this.totalPages, resultPage.totalPages) &&
-			Objects.equals(this.results, resultPage.results);
+		return Objects.equals(this.currentPage, resultPage.currentPage) && Objects.equals(this.totalPages,
+			resultPage.totalPages) && Objects
+			.equals(this.results, resultPage.results);
 	}
 
 	@Override
@@ -92,11 +92,8 @@ public class ResultPage {
 
 	@Override
 	public String toString() {
-		return "class ResultPage {\n" +
-			"    currentPage: " + toIndentedString(currentPage) + "\n" +
-			"    totalPages: " + toIndentedString(totalPages) + "\n" +
-			"    results: " + toIndentedString(results) + "\n" +
-			"}";
+		return "class ResultPage {\n" + "    currentPage: " + toIndentedString(currentPage) + "\n" + "    totalPages: "
+			+ toIndentedString(totalPages) + "\n" + "    results: " + toIndentedString(results) + "\n" + "}";
 	}
 
 	/**

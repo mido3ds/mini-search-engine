@@ -45,11 +45,15 @@ public class QueryApiController {
 	 */
 	@ApiOperation(value = "submit a query", nickname = "query", notes = "", response = ResultPage.class, tags = {})
 	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = ResultPage.class)})
-	@RequestMapping(value = "/api/query",
-		produces = {"application/json"},
-		method = RequestMethod.GET)
-	ResponseEntity<ResultPage> query(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q, @ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page) {
+		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = ResultPage.class)
+	})
+	@RequestMapping(value = "/api/query", produces = {"application/json"}, method = RequestMethod.GET)
+	ResponseEntity<ResultPage> query(
+		@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q",
+			required = true) String q,
+		@ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page",
+			required = false) Integer page
+	) {
 		page = page == null ? 1 : page;
 
 		List<QueryResult> queryResults = queryProcessor.search(q);
@@ -60,16 +64,8 @@ public class QueryApiController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
-		List<QueryResult> subList = queryResults.subList(
-			(page - 1) * 10,
-			Math.min(page * 10, queryResults.size())
-		);
+		List<QueryResult> subList = queryResults.subList((page - 1) * 10, Math.min(page * 10, queryResults.size()));
 
-		return ResponseEntity.ok(
-			new ResultPage()
-				.currentPage(page)
-				.totalPages(pages)
-				.results(subList)
-		);
+		return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(subList));
 	}
 }
