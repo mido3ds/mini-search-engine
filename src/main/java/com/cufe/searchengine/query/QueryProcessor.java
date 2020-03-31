@@ -1,46 +1,91 @@
 package com.cufe.searchengine.query;
 
+import com.cufe.searchengine.crawler.Document;
+import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.indexer.KeywordsExtractor;
 import com.cufe.searchengine.server.model.QueryResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
 public class QueryProcessor {
-	/**
-	 * jdbcTemplate: access sqlite db, shared between all the server classes.
-	 * schema is in `src/main/resources/schema.sql`
-	 * and any initial data is in `src/main/resources/initial_data.sql`
-	 */
+	private static final Logger log = LoggerFactory.getLogger(QueryProcessor.class);
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	@Autowired
+	private PhraseProcessor phraseProcessor;
+	@Autowired
+	private Ranker ranker;
 
 	/**
-	 * @return all search results
+	 * @return all search results, ranked
 	 */
 	public List<QueryResult> search(String query) {
-		// TODO
-		ArrayList<QueryResult> queryResults = new ArrayList<>();
+//		log.info("received query = {}", query);
 
-		for (int i = 0; i < 97; i++) {
+		ArrayList<QueryResult> queryResults = new ArrayList<>(phraseProcessor.search(query));
+
+//		log.info("queryResults from phraseProcessor .size() = {}", queryResults.size());
+
+		query = phraseProcessor.removePhrases(query);
+
+//		log.info("query after removing phrases = {}", query);
+
+		List<String> keywords = KeywordsExtractor.extractFromQuery(query);
+
+//		log.info("extracted keywords = {}", keywords);
+
+		if (keywords.size() == 0) {
+			return queryResults;
+		}
+
+		List<Document> documents = queryDocuments(keywords);
+
+//		log.info("queried documents size = {}", documents.size());
+
+		for (Document document : documents) {
 			queryResults.add(
 				new QueryResult()
-					.title("Wikipedia")
-					.link("https://www.wikipedia.org")
-					.snippet("Wikipedia is a free online encyclopedia, " +
-						"created and edited by volunteers around the world and hosted " +
-						"by the Wikimedia Foundation.")
+					.title(document.getTitle())
+					.link(document.getUrl())
+					.snippet(document.getSnippet(keywords))
 			);
 		}
 
-		return queryResults;
+		return ranker.sort(queryResults, documents, keywords);
+	}
+
+	private List<Document> queryDocuments(List<String> keywords) {
+		StringBuilder builder = new StringBuilder(
+			"SELECT content, url FROM documents d " +
+				"INNER JOIN keywords_documents kd ON d.ROWID = kd.docID " +
+				"INNER JOIN keywords k ON k.ROWID = kd.wordID AND k.word in ("
+		);
+		for (int i = 0; i < keywords.size(); i++) {
+			builder.append("?");
+			if (i != keywords.size() - 1) {
+				builder.append(",");
+			}
+		}
+		builder.append(");");
+
+		return jdbcTemplate.query(builder.toString(),
+			(row, i) -> new Document(row.getString(1), row.getString(2), 0),
+			keywords.toArray()
+		);
 	}
 
 	/**
-	 * @param query uncomplete query
+	 * @param query uncompleted query
 	 * @return list of suggestions to appear before hitting enter in the search bar
 	 */
 	public List<String> suggest(String query) {
@@ -52,5 +97,11 @@ public class QueryProcessor {
 		strings.add("then what did you mean? i can't figure out");
 
 		return strings;
+	}
+
+	@EventListener
+	public void onDB(DBInitializer.DBInitializedEvent event) {
+		search("hello there world \"fuck you\" again 'fuck aaaaaaaa'")
+			.forEach(q -> log.info(q.toString()));
 	}
 }

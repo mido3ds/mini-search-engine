@@ -1,7 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.util.Cache;
-import com.cufe.searchengine.util.HttpPattern;
+import com.cufe.searchengine.util.HttpHtmlPattern;
 import com.panforge.robotstxt.RobotsTxt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class RobotsStore {
 
 	public boolean canRequest(String url, Runnable callback) {
 		try {
-			url = HttpPattern.extractWebsite(url);
+			url = HttpHtmlPattern.extractWebsite(url);
 			if (url.equals("")) {
 				return false;
 			}

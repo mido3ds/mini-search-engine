@@ -7,10 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
-import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.sqlite.SQLiteException;
 
 import java.util.List;
 
@@ -41,7 +39,7 @@ public class Indexer implements Runnable {
 
 				List<Document> documents = fetchNonIndexedDocs();
 				for (Document document : documents) {
-					List<String> keywords = KeywordsExtractor.extract(document.getContent());
+					List<String> keywords = KeywordsExtractor.extractFromHtml(document.getContent());
 					updateKeyword(keywords, document.getRowID());
 
 					totalWords += keywords.size();
@@ -62,11 +60,11 @@ public class Indexer implements Runnable {
 		for (int i = 0; i < documents.size() - 1; i++) {
 			builder.append(documents.get(i).getRowID()).append(",");
 		}
-		builder.append(documents.get(documents.size()-1).getRowID()).append(");");
+		builder.append(documents.get(documents.size() - 1).getRowID()).append(");");
 
 		int rows = jdbcTemplate.update(builder.toString(), System.currentTimeMillis());
 		if (rows != documents.size()) {
-			throw new RuntimeException("should have updated "+documents.size());
+			throw new RuntimeException("should have updated " + documents.size());
 		}
 
 		log.info("updated rows={}, docs={}", rows, documents.size());
@@ -81,7 +79,7 @@ public class Indexer implements Runnable {
 		for (int i = 0; i < words.size(); i++) {
 			builder.append("(?)");
 
-			if (i != words.size()-1) {
+			if (i != words.size() - 1) {
 				builder.append(",");
 			}
 		}
@@ -94,7 +92,7 @@ public class Indexer implements Runnable {
 				.append(",last_insert_rowid()-").append(i)
 				.append(")");
 
-			if (i != words.size()-1) {
+			if (i != words.size() - 1) {
 				builder.append(",");
 			}
 		}

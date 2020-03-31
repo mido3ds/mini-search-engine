@@ -42,11 +42,13 @@ public class KeywordsExtractor {
 	}
 
 	/**
-	 * @param text to extract keywords from
+	 * extract keywords from html document
+	 *
+	 * @param html to extract keywords from
 	 * @return list of keywords with size <= {@code maxKeywords}
 	 */
-	public static List<String> extract(String text) {
-		return new KeywordsExtractor(text)
+	public static List<String> extractFromHtml(String html) {
+		return new KeywordsExtractor(html)
 			.toLower()
 			.filterCSS()
 			.filterHtmlTags()
@@ -54,6 +56,24 @@ public class KeywordsExtractor {
 			.filterNonText()
 			.filterExcessiveWhitespace()
 			.filterBigWords()
+			.split()
+			.map(Stemmer::stem)
+			.distinct()
+			.filter((s) -> !s.equals("") && !s.equals(" "))
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * extract keywords from search query
+	 *
+	 * @param query to extract keywords from
+	 * @return list of keywords with size <= {@code maxKeywords}
+	 */
+	public static List<String> extractFromQuery(String query) {
+		return new KeywordsExtractor(query)
+			.toLower()
+			.filterNonText()
+			.filterExcessiveWhitespace()
 			.split()
 			.map(Stemmer::stem)
 			.distinct()

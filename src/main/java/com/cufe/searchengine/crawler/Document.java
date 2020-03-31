@@ -1,6 +1,9 @@
 package com.cufe.searchengine.crawler;
 
+import com.cufe.searchengine.util.HttpHtmlPattern;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.List;
 
 public class Document {
 	private long rowID;
@@ -70,5 +73,15 @@ public class Document {
 
 	public void setIndexTimeMillis(long indexTimeMillis) {
 		this.indexTimeMillis = indexTimeMillis;
+	}
+
+	public String getTitle() {
+		String title = HttpHtmlPattern.extractHtmlTitle(this.getContent());
+		title = title.equals("")? this.getUrl():title;
+		return title;
+	}
+
+	public String getSnippet(List<String> keywords) {
+		return "Some Snippet TODO"; // TODO
 	}
 }

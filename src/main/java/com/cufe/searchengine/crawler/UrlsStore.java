@@ -1,7 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
-import com.cufe.searchengine.util.HttpPattern;
+import com.cufe.searchengine.util.HttpHtmlPattern;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,7 @@ public class UrlsStore {
 			return;
 		}
 
-		if (!HttpPattern.couldBeHtml(url)) {
+		if (!HttpHtmlPattern.couldBeHtml(url)) {
 			log.info("url={} is probably not html, ignore it", url);
 			return;
 		}

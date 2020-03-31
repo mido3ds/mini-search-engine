@@ -1,6 +1,5 @@
 package com.cufe.searchengine.db;
 
-import com.cufe.searchengine.indexer.KeywordsExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.jdbc.datasource.init.UncategorizedScriptException;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Objects;
 
 @Component
