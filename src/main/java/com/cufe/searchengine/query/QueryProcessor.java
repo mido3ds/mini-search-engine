@@ -98,10 +98,4 @@ public class QueryProcessor {
 
 		return strings;
 	}
-
-	@EventListener
-	public void onDB(DBInitializer.DBInitializedEvent event) {
-		search("hello there world \"fuck you\" again 'fuck aaaaaaaa'")
-			.forEach(q -> log.info(q.toString()));
-	}
 }
