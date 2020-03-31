@@ -13,6 +13,8 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 @Component
 public class DocumentsStore {
 	private final Logger log = LoggerFactory.getLogger(DocumentsStore.class);
@@ -23,7 +25,7 @@ public class DocumentsStore {
 	private JdbcTemplate jdbcTemplate;
 	@Value("${crawler.maxDocuments}")
 	private int maxDocuments;
-	private long docsCount = 0;
+	private final AtomicLong docsCount = new AtomicLong();
 
 	@EventListener
 	private void onDBInitialized(DBInitializer.DBInitializedEvent event) {
@@ -31,17 +33,19 @@ public class DocumentsStore {
 		if (size == null) {
 			throw new IllegalStateException("`documents` count shouldn't be null");
 		}
-		docsCount = size;
+		docsCount.set(size);
 	}
 
 	private void storeToDB(Document document) throws InterruptedException {
-		int rows = 0;
+		int rows;
 
 		while (true) {
+			// TODO: avoid locking in a better way
 			try {
 				rows = document.store(this.jdbcTemplate);
 			} catch (CannotGetJdbcConnectionException e) {
 				Thread.sleep(100);
+				log.error(e.getMessage());
 				continue;
 			}
 
@@ -63,7 +67,7 @@ public class DocumentsStore {
 		Document document = new Document(doc, url, System.currentTimeMillis());
 
 		storeToDB(document);
-		docsCount++;
+		docsCount.getAndIncrement();
 
 		if (isFull()) {
 			publisher.publishEvent(new CrawlingFinishedEvent(this));
@@ -71,7 +75,7 @@ public class DocumentsStore {
 	}
 
 	private boolean isFull() {
-		return docsCount >= maxDocuments;
+		return docsCount.getAndUpdate(l -> l >= maxDocuments? 0:l) >= maxDocuments;
 	}
 
 	public static class CrawlingFinishedEvent extends ApplicationEvent {

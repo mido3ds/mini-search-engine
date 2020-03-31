@@ -14,9 +14,13 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 // TODO: implement priority for pulling urls
 // TODO: better seed set
@@ -49,22 +53,39 @@ public class UrlsStore {
 		}
 	}
 
+	@EventListener
+	public void onCrawlingFinished(DocumentsStore.CrawlingFinishedEvent event) {
+		log.info("crawling finished");
+
+		store.clear();
+		log.info("cleared store");
+
+		List<String> urls = jdbcTemplate.query("SELECT url FROM documents;", (row, i) -> row.getString(1));
+		log.info("queried {} urls from db", urls.size());
+
+		store.addAll(urls);
+		log.info("added {} urls to store", urls.size());
+	}
+
 	@PreDestroy
 	private void onDestroy() {
-		Object[] storeCopy = store.toArray();
-
-		if (storeCopy.length == 0) {
-			log.info("empty state, no saving");
-			return;
-		}
-
-		log.info("save my state before closing");
+		Object[] storeCopy = store.stream()
+			.distinct()
+			.filter(Objects::nonNull)
+			.toArray();
 
 		// flush
+		// TODO: wait until db is not locked
 		jdbcTemplate.execute("DELETE FROM urlstore_queue;");
 		log.info("flushed urlstore_queue table");
 
 		// commit
+		if (storeCopy.length == 0) {
+			log.info("empty state, no saving");
+			return;
+		}
+		log.info("save my state before closing");
+
 		StringBuilder sql = new StringBuilder("INSERT INTO urlstore_queue VALUES");
 		for (int i = 0; i < storeCopy.length - 1; i++) {
 			sql.append("(?),");

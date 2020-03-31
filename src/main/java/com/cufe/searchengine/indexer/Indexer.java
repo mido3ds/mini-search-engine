@@ -56,6 +56,10 @@ public class Indexer implements Runnable {
 	}
 
 	private void updateDocsIndexTime(List<Document> documents) {
+		if (documents.size() == 0) {
+			return;
+		}
+
 		StringBuilder builder = new StringBuilder("UPDATE documents SET indexTimeMillis = ? WHERE ROWID in (");
 		for (int i = 0; i < documents.size() - 1; i++) {
 			builder.append(documents.get(i).getRowID()).append(",");
