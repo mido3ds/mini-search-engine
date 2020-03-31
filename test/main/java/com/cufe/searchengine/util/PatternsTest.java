@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HttpHtmlPatternTest {
+public class PatternsTest {
 	@Test
 	public void extractHtmlTitle() {
 		String html = "<!doctype html>\n" +
@@ -27,8 +27,8 @@ public class HttpHtmlPatternTest {
 			"<!-- This site is optimized with the Yoast SEO plugin v11.9 - https://yoast.com/wordpress/plugins/seo/ -->\n" +
 			"<meta name=\"description\" content=\"Let’s take a look at the indexing process that search engines use to store information about web pages, enabling them to quickly return relevant, high quality results.\"/>";
 
-		assertEquals("What is Search Engine Indexing &amp; How Does it Work? - DeepCrawl", HttpHtmlPattern.extractHtmlTitle(html));
-		assertEquals("", HttpHtmlPattern.extractHtmlTitle(nonTitle));
+		assertEquals("What is Search Engine Indexing &amp; How Does it Work? - DeepCrawl", Patterns.extractHtmlTitle(html));
+		assertEquals("", Patterns.extractHtmlTitle(nonTitle));
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class HttpHtmlPatternTest {
 		};
 
 		for (String input : inputs) {
-			assertEquals(expected, HttpHtmlPattern.extractWebsite(input));
+			assertEquals(expected, Patterns.extractWebsite(input));
 		}
 	}
 
@@ -57,25 +57,25 @@ public class HttpHtmlPatternTest {
 
 		assertArrayEquals(
 			new String[]{"https://www.google.com", "http://www.google.com", "http://wikipedia.org"},
-			HttpHtmlPattern.extractURLs(full)
+			Patterns.extractURLs(full)
 		);
 	}
 
 	@Test
 	public void couldBeHtml() {
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd.html"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd.asp"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/adasd.$$$"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/*"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com"));
-		assertTrue(HttpHtmlPattern.couldBeHtml("http://www.git.com/https://www.github.com/"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com/adasd.html"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com/adasd.asp"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com/adasd"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com/"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com/adasd.$$$"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com/*"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com"));
+		assertTrue(Patterns.couldBeHtml("http://www.git.com/https://www.github.com/"));
 
-		assertFalse(HttpHtmlPattern.couldBeHtml("adasd.jpg"));
-		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/.gif"));
-		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/adasd.habal"));
-		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/adasd.mp4"));
-		assertFalse(HttpHtmlPattern.couldBeHtml("https://example.com/om/dasd/adasd.css"));
+		assertFalse(Patterns.couldBeHtml("adasd.jpg"));
+		assertFalse(Patterns.couldBeHtml("https://example.com/.gif"));
+		assertFalse(Patterns.couldBeHtml("https://example.com/adasd.habal"));
+		assertFalse(Patterns.couldBeHtml("https://example.com/adasd.mp4"));
+		assertFalse(Patterns.couldBeHtml("https://example.com/om/dasd/adasd.css"));
 	}
 }

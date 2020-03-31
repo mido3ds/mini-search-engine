@@ -1,7 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.util.DBUtils;
-import com.cufe.searchengine.util.HttpHtmlPattern;
+import com.cufe.searchengine.util.Patterns;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
@@ -75,7 +75,7 @@ public class Document {
 	}
 
 	public String getTitle() {
-		String title = HttpHtmlPattern.extractHtmlTitle(this.getContent());
+		String title = Patterns.extractHtmlTitle(this.getContent());
 		return title.equals("") ? this.getUrl() : title;
 	}
 

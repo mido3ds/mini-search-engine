@@ -1,7 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.util.Cache;
-import com.cufe.searchengine.util.HttpHtmlPattern;
+import com.cufe.searchengine.util.Patterns;
 import com.panforge.robotstxt.RobotsTxt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +29,16 @@ public class RobotsStore {
 
 	public boolean canRequest(String url, Runnable callback) {
 		try {
-			url = HttpHtmlPattern.extractWebsite(url);
-			if (url.equals("")) {
-				return false;
-			}
+			url = Patterns.extractWebsite(url);
 		} catch (Exception ignored) {
 			return false;
 		}
+
+		if (url == null || url.equals("")) {
+			return false;
+		}
+
+		url = Patterns.httpToHttps(url);
 
 		RobotsTxt robotsTxt = cache.get(url);
 		if (robotsTxt != null) {
@@ -49,8 +52,10 @@ public class RobotsStore {
 				if (r == null) {
 					callback.run();
 				} else {
-					cache.put(threadUrl, r, cacheTimeoutMillis);
-					log.info("inserted into cache the robots.txt for " + threadUrl);
+					if (cache.get(threadUrl) == null) {
+						cache.put(threadUrl, r, cacheTimeoutMillis);
+						log.info("inserted into cache the robots.txt for " + threadUrl);
+					}
 				}
 			} catch (IOException ignored) {
 				callback.run();

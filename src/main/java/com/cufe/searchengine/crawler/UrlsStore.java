@@ -2,7 +2,7 @@ package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.util.DBUtils;
-import com.cufe.searchengine.util.HttpHtmlPattern;
+import com.cufe.searchengine.util.Patterns;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 // TODO: implement priority for pulling urls
@@ -102,7 +101,7 @@ public class UrlsStore {
 			return;
 		}
 
-		if (!HttpHtmlPattern.couldBeHtml(url)) {
+		if (!Patterns.couldBeHtml(url)) {
 			log.info("url={} is probably not html, ignore it", url);
 			return;
 		}

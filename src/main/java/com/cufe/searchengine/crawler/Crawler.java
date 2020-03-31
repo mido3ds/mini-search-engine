@@ -1,7 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
-import com.cufe.searchengine.util.HttpHtmlPattern;
+import com.cufe.searchengine.util.Patterns;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public class Crawler implements Runnable {
 				continue;
 			}
 
-			String[] urls = HttpHtmlPattern.extractURLs(document);
+			String[] urls = Patterns.extractURLs(document);
 			log.info("extracted " + urls.length + " urls from " + url + ", document.length=" + document.length());
 			for (String u : urls) {
 				try {
