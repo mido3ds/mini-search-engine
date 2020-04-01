@@ -94,14 +94,4 @@ public class PatternsTest {
 		assertArrayEquals(new String[]{"https://wikipedia.org/wiki/Wikipedia:About"},
 			Patterns.extractUrls(test, "https://wikipedia.org/"));
 	}
-
-	@Test
-	// TODO: 1/4/20 just use a library
-	public void testExtractURLsAbsNoProto() {
-		String test = "\t\t<li id=\"footer-places-about\">" +
-			"<a href=\"www.wikipedia.org/wiki/Wikipedia:About\" title=\"Wikipedia:About\">About Wikipedia</a></li>";
-
-		assertArrayEquals(new String[]{"https://www.wikipedia.org/wiki/Wikipedia:About"},
-			Patterns.extractUrls(test, "https://wikipedia.org/"));
-	}
 }

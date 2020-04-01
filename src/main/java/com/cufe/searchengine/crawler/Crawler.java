@@ -52,7 +52,7 @@ public class Crawler implements Runnable {
 				continue;
 			}
 
-			String[] urls = Patterns.extractUrls(document, Patterns.httpToHttps(Patterns.extractWebsite(url)));
+			String[] urls = Patterns.extractUrls(document, url);
 			log.info("extracted " + urls.length + " urls from " + url + ", document.length=" + document.length());
 			for (String u : urls) {
 				try {
