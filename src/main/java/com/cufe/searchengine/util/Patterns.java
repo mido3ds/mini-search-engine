@@ -1,6 +1,7 @@
 package com.cufe.searchengine.util;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -12,6 +13,8 @@ public class Patterns {
 		Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 	private static final Pattern URL_PATTERN = Pattern.compile("(((https?|ftp):)//)(\\S+(:\\S*)?@)?((?!(10|127)(\\.\\d{1,3}){3})(?!(169\\.254|192\\.168)(\\.\\d{1,3}){2})(?!172\\.(1[6-9]|2\\d|3[0-1])(\\.\\d{1,3}){2})([1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(\\.(1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(\\.([1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(([a-z0-9\\u00a1-\\uffff][a-z0-9\\u00a1-\\uffff_-]{0,62})?[a-z0-9\\u00a1-\\uffff]\\.)+([a-z\\u00a1-\\uffff]{2,}\\.?))(:\\d{2,5})?([/?#]\\S*)?", Pattern.CASE_INSENSITIVE);
 	private static final Pattern URL_PATTERN2 = Pattern.compile("http[s]?:\\/\\/(?:[a-z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-f][0-9a-f]))+");
+	private static final Pattern HREF_PATTERN = Pattern.compile("href *= *\"([^\"]+)\"",
+		Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
 	public static String extractWebsite(String url) {
 		List<String> matches = URL_PATTERN.matcher(url)
@@ -26,15 +29,20 @@ public class Patterns {
 		return port == null ? "" : port.equals(":80") ? "" : port;
 	}
 
-	// TODO: <BUG> see tests
-	// TODO: extract relative urls and make them absolute
-	public static String[] extractURLs(String html) {
-		return URL_PATTERN.matcher(html)
+	public static String[] extractUrls(String html, String baseUrl) {
+		return HREF_PATTERN.matcher(html)
 			.results()
-			.map(MatchResult::group)
+			.map(s -> s.group(1))
+			.map(s -> {
+				if (!s.startsWith("http")) {
+					return baseUrl+s;
+				}
+				return s;
+			})
+			.filter(s -> URL_PATTERN.matcher(s).matches())
+			.filter(Patterns::couldBeHtml)
 			.map(String::trim)
 			.distinct()
-			.filter(s -> URL_PATTERN2.matcher(s).matches())
 			.toArray(String[]::new);
 	}
 

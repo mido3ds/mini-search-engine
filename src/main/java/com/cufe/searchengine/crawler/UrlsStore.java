@@ -149,7 +149,11 @@ public class UrlsStore {
 
 	@PreDestroy
 	private void onDestroy() throws Exception {
-		Object[] storeCopy = store.stream().distinct().filter(Objects::nonNull).toArray();
+		String[] storeCopy = store.stream()
+			.distinct()
+			.filter(Objects::nonNull)
+			.map(ComparableUrl::getUrl)
+			.toArray(String[]::new);
 
 		// flush
 		DBUtils.waitLock(100, () -> {
@@ -189,11 +193,6 @@ public class UrlsStore {
 			return;
 		}
 
-		if (!Patterns.couldBeHtml(url)) {
-			log.info("url={} is probably not html, ignore it", url);
-			return;
-		}
-
 		if (!robotsStore.canRequest(url, () -> store.remove(comparableUrl))) {
 			return;
 		}
@@ -230,12 +229,20 @@ public class UrlsStore {
 		private final String normalizedUrl;
 
 		private ComparableUrl(String url) {
+			if (url == null) {
+				throw new IllegalArgumentException("null url");
+			}
+
 			this.url = url;
 			this.normalizedUrl = Patterns.httpToHttps(Patterns.extractWebsite(url));
 		}
 
 		@Override
 		public boolean equals(Object obj) {
+			if (obj == null) {
+				return false;
+			}
+
 			if (obj instanceof ComparableUrl) {
 				ComparableUrl comparableUrl = (ComparableUrl) obj;
 				return url.equals(comparableUrl.url);
@@ -250,6 +257,10 @@ public class UrlsStore {
 
 		@Override
 		public int compareTo(ComparableUrl url2) {
+			if (url2 == null) {
+				return 1;
+			}
+
 			if (this.equals(url2)) {
 				return 0;
 			}
@@ -257,8 +268,15 @@ public class UrlsStore {
 			return Math.toIntExact(-(getTime() - url2.getTime()));
 		}
 
+		@Override
+		public String toString() {
+			return url;
+		}
+
 		private Long getTime() {
-			return websiteLastTime.getOrDefault(normalizedUrl, Long.MAX_VALUE);
+			return Optional
+				.ofNullable(websiteLastTime.putIfAbsent(normalizedUrl, System.currentTimeMillis()))
+				.orElse(System.currentTimeMillis());
 		}
 	}
 }

@@ -47,21 +47,6 @@ public class PatternsTest {
 	}
 
 	@Test
-	public void extractURLs() {
-		String full = "https://www.google.com\n" +
-			"http://www.google.com\n" +
-			"www.google.com\n" +
-			"htt://www.google.com\n" +
-			"://www.google.com\n" +
-			"http://wikipedia.org" + " https://wikimediafoundation.org/\"><img";
-
-		assertArrayEquals(
-			new String[]{"https://www.google.com", "http://www.google.com", "http://wikipedia.org"},
-			Patterns.extractURLs(full)
-		);
-	}
-
-	@Test
 	public void couldBeHtml() {
 		assertTrue(Patterns.couldBeHtml("http://www.git.com/adasd.html"));
 		assertTrue(Patterns.couldBeHtml("http://www.git.com/adasd.asp"));
@@ -85,26 +70,38 @@ public class PatternsTest {
 			"<a href=\"https://foundation.wikimedia.org/wiki/Privacy_policy\" class=\"extiw\" " +
 			"title=\"wmf:Privacy policy\">Privacy policy</a></li>";
 
-		assertArrayEquals(new String[]{"https://foundation.wikimedia.org/wiki/Privacy_policy"}, Patterns.extractURLs(test));
+		assertArrayEquals(new String[]{"https://foundation.wikimedia.org/wiki/Privacy_policy"},
+			Patterns.extractUrls(test, ""));
 	}
 
 	@Test
 	public void testExtractURLsMultiple() {
 		String test = "<li id=\"footer-places-privacy\">" +
-			"<a href=\"https://foundation.wikimedia.org/wiki/Privacy_policy\" class=\"extiw\" " +
+			"<a href=\"https://foundation.wikimedia.org/wiki/Privacy_policy\"> class=\"extiw\" " +
 			"title=\"wmf:Privacy policy\">Privacy policy</a></li>" +
-			"<li id=\"footer-places-developers\"><a href=\"https://www.mediawiki.org/wiki/Special:" +
-			"MyLanguage/How_to_contribute\">Developers</a></li>";
+			"<li id=\"footer-places-developers\"><a href=\"https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute\">Developers</a></li>";
 
 		assertArrayEquals(new String[]{"https://foundation.wikimedia.org/wiki/Privacy_policy",
-			"https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute"}, Patterns.extractURLs(test));
+				"https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute"},
+			Patterns.extractUrls(test, ""));
 	}
 
 	@Test
 	public void testExtractURLsRelative() {
 		String test = "\t\t<li id=\"footer-places-about\">" +
-			"<a href=\"/wiki/Wikipedia:About\" title=\"Wikipedia:About\">About Wikipedia</a></li>";
+			"<a href=\"wiki/Wikipedia:About\" title=\"Wikipedia:About\">About Wikipedia</a></li>";
 
-		assertArrayEquals(new String[]{"https://wikipedia.org/wiki/Wikipedia:About"}, Patterns.extractURLs(test));
+		assertArrayEquals(new String[]{"https://wikipedia.org/wiki/Wikipedia:About"},
+			Patterns.extractUrls(test, "https://wikipedia.org/"));
+	}
+
+	@Test
+	// TODO: 1/4/20 just use a library
+	public void testExtractURLsAbsNoProto() {
+		String test = "\t\t<li id=\"footer-places-about\">" +
+			"<a href=\"www.wikipedia.org/wiki/Wikipedia:About\" title=\"Wikipedia:About\">About Wikipedia</a></li>";
+
+		assertArrayEquals(new String[]{"https://www.wikipedia.org/wiki/Wikipedia:About"},
+			Patterns.extractUrls(test, "https://wikipedia.org/"));
 	}
 }
