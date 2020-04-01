@@ -27,6 +27,7 @@ public class Patterns {
 		return port == null ? "" : port.equals(":80") ? "" : port;
 	}
 
+	// TODO: test with https://en.wikipedia.org/wiki/List_of_science_magazines
 	public static String[] extractURLs(String html) {
 		return URL_PATTERN.matcher(html)
 			.results()

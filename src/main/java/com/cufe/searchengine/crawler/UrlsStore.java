@@ -21,8 +21,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.stream.Collectors;
 
-// TODO: better seed set
-
 @Component
 public class UrlsStore {
 	private static final Logger log = LoggerFactory.getLogger(UrlsStore.class);
@@ -31,6 +29,8 @@ public class UrlsStore {
 	private final Set<String> allUrls = new HashSet<>();
 	private static final Map<String, Long> websiteLastTime = new HashMap<>();
 
+	@Value("${crawler.seedFile}")
+	private Resource crawlerSeedResource;
 	@Autowired
 	private RobotsStore robotsStore;
 	@Autowired
@@ -39,8 +39,6 @@ public class UrlsStore {
 	private DocumentsStore documentsStore;
 	@Value("${crawler.urlsStore.saveStateWaitMillis}")
 	private long saveStateWaitMillis;
-	@Value("${crawler.seedFile}")
-	private Resource crawlerSeedResource;
 	private int counter = 1;
 
 	@EventListener
@@ -58,14 +56,16 @@ public class UrlsStore {
 
 			log.info("urls loaded from db.size() = " + store.size());
 		} else {
+			List<ComparableUrl> list = StringUtils.resourceToLines(crawlerSeedResource)
+				.stream()
+				.map(ComparableUrl::new)
+				.collect(Collectors.toList());
+
 			store.addAll(
-				StringUtils.resourceToLines(crawlerSeedResource)
-					.stream()
-					.map(ComparableUrl::new)
-					.collect(Collectors.toList())
+				list
 			);
 
-			log.info("loaded seeds of size=" + store.size());
+			log.info("loaded seeds of size=" + list.size());
 		}
 
 		readCounter();

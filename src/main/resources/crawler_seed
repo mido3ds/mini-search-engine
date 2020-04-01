@@ -1,1 +1,11 @@
-https://en.wikipedia.org/wiki/Web_crawler
+## lines starting with # are ignored
+
+# The biggest list of links to wikipedia ever
+https://en.wikipedia.org/wiki/Wikipedia:Featured_articles
+
+# To get to scientific content
+https://en.wikipedia.org/wiki/List_of_science_magazines
+
+https://www.reuters.com/
+https://edition.cnn.com/
+https://www.bbc.co.uk/

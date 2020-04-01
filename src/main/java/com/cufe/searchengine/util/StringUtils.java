@@ -5,11 +5,13 @@ import org.springframework.core.io.Resource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StringUtils {
-	private static final Pattern HTML_PATTERN = Pattern.compile("<!DOCTYPE html>|<head>|<body>|</body>|</head>");
+	private static final Pattern HTML_PATTERN = Pattern.compile("<!DOCTYPE html>|<head>|<body>|</body>|</head>",
+		Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
 	public static String streamToString(InputStream stream) throws IOException {
 		char[] buffer = new char[1024];
@@ -26,9 +28,13 @@ public class StringUtils {
 	}
 
 	public static List<String> resourceToLines(Resource resource) throws IOException {
-		return new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)).lines()
-			.collect(Collectors
-				.toList());
+		return new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))
+			.lines()
+			.map(String::trim)
+			.distinct()
+			.filter(s -> !s.equals(""))
+			.filter(s -> !s.startsWith("#"))
+			.collect(Collectors.toList());
 	}
 
 	public static boolean isHtml(String document) {
