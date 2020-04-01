@@ -14,15 +14,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.stream.Collectors;
 
-// TODO: implement priority for pulling urls
 // TODO: better seed set
 
 @Component
@@ -31,6 +29,7 @@ public class UrlsStore {
 
 	private final BlockingQueue<ComparableUrl> store = new PriorityBlockingQueue<>();
 	private final Set<String> allUrls = new HashSet<>();
+	private static final Map<String, Long> websiteLastTime = new HashMap<>();
 
 	@Autowired
 	private RobotsStore robotsStore;
@@ -71,6 +70,19 @@ public class UrlsStore {
 
 		readCounter();
 		loadAllUrls();
+		fillWebsiteLastTime();
+	}
+
+	private void fillWebsiteLastTime() throws Exception {
+		websiteLastTime.clear();
+
+		DBUtils.waitLock(100,
+			() -> jdbcTemplate.query(
+				"SELECT url, timeMillis FROM documents;", this::mapRowWebSiteLastTime
+			)
+		);
+
+		log.info("loaded into websiteLastTime {} items", websiteLastTime.size());
 	}
 
 	private void readCounter() throws Exception {
@@ -86,6 +98,15 @@ public class UrlsStore {
 		incrementCounter();
 		resetStore();
 		loadAllUrls();
+	}
+
+	@EventListener
+	public void onDocumentStoredEvent(DocumentsStore.DocumentStoredEvent event) {
+		long time = event.getTimeMillis();
+		String website = Patterns.httpToHttps(Patterns.extractWebsite(event.getUrl()));
+
+		websiteLastTime.computeIfPresent(website, (s, time0) -> Math.max(time0, time));
+		websiteLastTime.putIfAbsent(website, time);
 	}
 
 	private void loadAllUrls() throws Exception {
@@ -194,32 +215,30 @@ public class UrlsStore {
 		return counter;
 	}
 
-	private static class ComparableUrl implements Comparable {
+	private Void mapRowWebSiteLastTime(ResultSet r, int i) throws SQLException {
+		long time = r.getLong(2);
+		String website = Patterns.httpToHttps(Patterns.extractWebsite(r.getString(1)));
+
+		websiteLastTime.computeIfPresent(website, (s, time0) -> Math.max(time0, time));
+		websiteLastTime.putIfAbsent(website, time);
+
+		return null;
+	}
+
+	private static class ComparableUrl implements Comparable<ComparableUrl> {
 		private final String url;
+		private final String normalizedUrl;
 
 		private ComparableUrl(String url) {
 			this.url = url;
-		}
-
-		@Override
-		public int compareTo(Object o) {
-			if (o instanceof ComparableUrl) {
-				ComparableUrl url2 = (ComparableUrl) o;
-				if (url.equals(url2.url)) {
-					return 0;
-				}
-
-				// TODO
-				return url.compareTo(url2.url);
-			}
-
-			throw new IllegalArgumentException("object must be of ComparableUrl type");
+			this.normalizedUrl = Patterns.httpToHttps(Patterns.extractWebsite(url));
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof ComparableUrl) {
-				return compareTo(obj) == 0;
+				ComparableUrl comparableUrl = (ComparableUrl) obj;
+				return url.equals(comparableUrl.url);
 			}
 
 			return false;
@@ -227,6 +246,19 @@ public class UrlsStore {
 
 		public String getUrl() {
 			return url;
+		}
+
+		@Override
+		public int compareTo(ComparableUrl url2) {
+			if (this.equals(url2)) {
+				return 0;
+			}
+
+			return Math.toIntExact(-(getTime() - url2.getTime()));
+		}
+
+		private Long getTime() {
+			return websiteLastTime.getOrDefault(normalizedUrl, Long.MAX_VALUE);
 		}
 	}
 }

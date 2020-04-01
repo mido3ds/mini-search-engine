@@ -14,9 +14,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 @Component
 public class DocumentsStore {
@@ -65,6 +63,7 @@ public class DocumentsStore {
 		}
 
 		docsCount.getAndIncrement();
+		publisher.publishEvent(new DocumentStoredEvent(this, document.getUrl(), document.getTimeMillis()));
 
 		if (isFull()) {
 			publisher.publishEvent(new CrawlingFinishedEvent(this));
@@ -83,6 +82,25 @@ public class DocumentsStore {
 		 */
 		public CrawlingFinishedEvent(Object source) {
 			super(source);
+		}
+	}
+
+	public static class DocumentStoredEvent extends ApplicationEvent {
+		private final String url;
+		private final long timeMillis;
+
+		public DocumentStoredEvent(Object source, String url, long timeMillis) {
+			super(source);
+			this.url = url;
+			this.timeMillis = timeMillis;
+		}
+
+		public long getTimeMillis() {
+			return timeMillis;
+		}
+
+		public String getUrl() {
+			return url;
 		}
 	}
 }
