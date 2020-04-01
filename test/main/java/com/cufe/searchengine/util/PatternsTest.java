@@ -53,7 +53,7 @@ public class PatternsTest {
 			"www.google.com\n" +
 			"htt://www.google.com\n" +
 			"://www.google.com\n" +
-			"http://wikipedia.org"+ " https://wikimediafoundation.org/\"><img";
+			"http://wikipedia.org" + " https://wikimediafoundation.org/\"><img";
 
 		assertArrayEquals(
 			new String[]{"https://www.google.com", "http://www.google.com", "http://wikipedia.org"},
@@ -77,5 +77,34 @@ public class PatternsTest {
 		assertFalse(Patterns.couldBeHtml("https://example.com/adasd.habal"));
 		assertFalse(Patterns.couldBeHtml("https://example.com/adasd.mp4"));
 		assertFalse(Patterns.couldBeHtml("https://example.com/om/dasd/adasd.css"));
+	}
+
+	@Test
+	public void testExtractURLsSimple() {
+		String test = "<li id=\"footer-places-privacy\">" +
+			"<a href=\"https://foundation.wikimedia.org/wiki/Privacy_policy\" class=\"extiw\" " +
+			"title=\"wmf:Privacy policy\">Privacy policy</a></li>";
+
+		assertArrayEquals(new String[]{"https://foundation.wikimedia.org/wiki/Privacy_policy"}, Patterns.extractURLs(test));
+	}
+
+	@Test
+	public void testExtractURLsMultiple() {
+		String test = "<li id=\"footer-places-privacy\">" +
+			"<a href=\"https://foundation.wikimedia.org/wiki/Privacy_policy\" class=\"extiw\" " +
+			"title=\"wmf:Privacy policy\">Privacy policy</a></li>" +
+			"<li id=\"footer-places-developers\"><a href=\"https://www.mediawiki.org/wiki/Special:" +
+			"MyLanguage/How_to_contribute\">Developers</a></li>";
+
+		assertArrayEquals(new String[]{"https://foundation.wikimedia.org/wiki/Privacy_policy",
+			"https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute"}, Patterns.extractURLs(test));
+	}
+
+	@Test
+	public void testExtractURLsRelative() {
+		String test = "\t\t<li id=\"footer-places-about\">" +
+			"<a href=\"/wiki/Wikipedia:About\" title=\"Wikipedia:About\">About Wikipedia</a></li>";
+
+		assertArrayEquals(new String[]{"https://wikipedia.org/wiki/Wikipedia:About"}, Patterns.extractURLs(test));
 	}
 }

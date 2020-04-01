@@ -1,6 +1,5 @@
 package com.cufe.searchengine.util;
 
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.regex.MatchResult;
@@ -27,7 +26,8 @@ public class Patterns {
 		return port == null ? "" : port.equals(":80") ? "" : port;
 	}
 
-	// TODO: test with https://en.wikipedia.org/wiki/List_of_science_magazines
+	// TODO: <BUG> see tests
+	// TODO: extract relative urls and make them absolute
 	public static String[] extractURLs(String html) {
 		return URL_PATTERN.matcher(html)
 			.results()
