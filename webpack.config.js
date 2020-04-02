@@ -1,12 +1,16 @@
 const webpack = require("webpack");
+const path = require("path");
 
 module.exports = env => ({
-  entry: './src/main/js/app.js',
   mode: 'development',
   devtool: 'source-map',
+  entry: {
+    index: path.join(__dirname, 'src/main/js/pages/index/index.js'),
+    search: path.join(__dirname, 'src/main/js/pages/search/index.js')
+  },
   output: {
-    path: __dirname,
-    filename: './src/main/resources/static/built/bundle.js'
+    path: path.join(__dirname, 'src/main/resources/static/built'),
+    filename: '[name].js'
   },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx']

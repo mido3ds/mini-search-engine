@@ -12,7 +12,7 @@ public class WebController {
 
 	@RequestMapping("/search")
 	public String search() {
-		return "redirect:/";
+		return "search.html";
 	}
 
 	@RequestMapping("/doc")

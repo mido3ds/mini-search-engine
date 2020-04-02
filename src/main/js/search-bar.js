@@ -1,16 +1,14 @@
 import Button from '@material-ui/core/Button'
-import matchSorter from 'match-sorter'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
+import matchSorter from 'match-sorter'
 import React, { useEffect, useState } from 'react'
-import { useHistory } from "react-router-dom"
 import { DefaultApi } from './api'
 
 const API = new DefaultApi()
 
-export default function SearchBar() {
-    const history = useHistory()
+const SearchBar = () => {
     const [disabled, setDisabled] = useState(true)
     const [query, setQuery] = useState("")
     const [open, setOpen] = useState(false)
@@ -44,7 +42,7 @@ export default function SearchBar() {
 
     const onClick = () => {
         if (query) {
-            history.push(`/search?q=${query}`)
+            window.location = `/search?q=${query}`
         }
     }
 
@@ -122,3 +120,5 @@ export default function SearchBar() {
         </div>
     )
 }
+
+export default SearchBar;
