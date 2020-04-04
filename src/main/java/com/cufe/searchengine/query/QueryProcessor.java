@@ -63,11 +63,11 @@ public class QueryProcessor {
 				.snippet(document.getSnippet(keywords)))
 			.collect(Collectors.toList()));
 
-		return ranker.sort(queryResults, documents, keywords);
+		return queryResults;
 	}
 
 	private List<Document> queryDocuments(List<String> keywords) throws Exception {
-		return documentsTable.selectContentUrl(keywords);
+		return documentsTable.selectContentUrlSorted(keywords);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class QueryProcessor {
 	 * @return list of suggestions to appear before hitting enter in the search bar
 	 */
 	public List<String> suggest(String query) {
-		// TODO
+		// TODO: autocomplete
 		ArrayList<String> strings = new ArrayList<>();
 		strings.add("Did you mean this?");
 		strings.add("no, you probably meant this");

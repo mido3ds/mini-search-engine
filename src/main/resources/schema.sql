@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS documents(
 	indexTimeMillis INT NOT NULL DEFAULT 0,
 	counter INT NOT NULL
 );
+-- TODO: add rank
 
 CREATE TABLE IF NOT EXISTS urlstore_queue(
 	url STRING PRIMARY KEY NOT NULL

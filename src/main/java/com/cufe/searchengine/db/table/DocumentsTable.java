@@ -91,6 +91,8 @@ public class DocumentsTable {
 	}
 
 	public List<QueryResult> selectContentUrlLikePhrases(List<String> phrases) throws Exception {
+		// TODO: sort with rank
+		// TODO: limit by page
 		Optional<String> reducedLikes = phrases.stream()
 			.map(String::toLowerCase)
 			.distinct()
@@ -112,7 +114,9 @@ public class DocumentsTable {
 			.collect(Collectors.toList()));
 	}
 
-	public List<Document> selectContentUrl(List<String> keywords) throws Exception {
+	public List<Document> selectContentUrlSorted(List<String> keywords) throws Exception {
+		// TODO: sort with rank
+		// TODO: limit by page
 		StringBuilder builder = new StringBuilder("SELECT content, url FROM documents d " + "INNER JOIN " +
 			"keywords_documents kd ON d.ROWID = kd.docID " + "INNER JOIN " + "keywords k ON k.ROWID = kd.wordID AND k.word in (");
 		for (int i = 0; i < keywords.size(); i++) {
