@@ -1,13 +1,12 @@
 package com.cufe.searchengine.query;
 
 import com.cufe.searchengine.crawler.Document;
+import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.server.model.QueryResult;
-import com.cufe.searchengine.util.DBUtils;
 import com.cufe.searchengine.util.DocumentFilterer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class QueryProcessor {
 	private static final Logger log = LoggerFactory.getLogger(QueryProcessor.class);
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private DocumentsTable documentsTable;
 	@Autowired
 	private PhraseProcessor phraseProcessor;
 	@Autowired
@@ -68,19 +67,7 @@ public class QueryProcessor {
 	}
 
 	private List<Document> queryDocuments(List<String> keywords) throws Exception {
-		StringBuilder builder = new StringBuilder("SELECT content, url FROM documents d " + "INNER JOIN " +
-			"keywords_documents kd ON d.ROWID = kd.docID " + "INNER JOIN " + "keywords k ON k.ROWID = kd.wordID AND k.word in (");
-		for (int i = 0; i < keywords.size(); i++) {
-			builder.append("?");
-			if (i != keywords.size() - 1) {
-				builder.append(",");
-			}
-		}
-		builder.append(");");
-
-		return DBUtils.waitLock(100, () -> jdbcTemplate.query(builder.toString(),
-			(row, i) -> new Document(row.getString(1), row
-				.getString(2), 0), keywords.toArray()));
+		return documentsTable.selectContentUrl(keywords);
 	}
 
 	/**

@@ -1,18 +1,14 @@
 package com.cufe.searchengine.query;
 
-import com.cufe.searchengine.crawler.Document;
+import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.server.model.QueryResult;
-import com.cufe.searchengine.util.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -23,31 +19,11 @@ public class PhraseProcessor {
 	private static final Pattern QUOTES = Pattern.compile("(?:'(.+)')|(?:\"(.+)\")");
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private DocumentsTable documentsTable;
 
 	private List<QueryResult> search(List<String> phrases) {
-		Optional<String> reducedLikes = phrases.stream()
-			.map(String::toLowerCase)
-			.distinct()
-			.map(p -> MessageFormat.format("content LIKE \"%{0}%\"", p))
-			.reduce((s, s2) -> MessageFormat.format("{0} OR {1}", s, s2));
-
-		if (!reducedLikes.isPresent()) {
-			return new ArrayList<>();
-		}
-
-		String query = "SELECT content, url FROM documents WHERE " + reducedLikes.get() + ";";
-
-		//		log.info("query {}", query);
-
 		try {
-			return DBUtils.waitLock(100, () -> jdbcTemplate.query(query, (row, i) -> new Document(row.getString(1),
-				row.getString(2), 0))
-				.stream()
-				.map(d -> new QueryResult().title(d.getTitle())
-					.snippet(d.getSnippet(phrases))
-					.link(d.getUrl()))
-				.collect(Collectors.toList()));
+			return documentsTable.selectContentUrlLikePhrases(phrases);
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("returning empty results");

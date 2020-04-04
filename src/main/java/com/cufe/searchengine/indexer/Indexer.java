@@ -2,14 +2,14 @@ package com.cufe.searchengine.indexer;
 
 import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.db.DBInitializer;
-import com.cufe.searchengine.util.DBUtils;
+import com.cufe.searchengine.db.table.DocumentsTable;
+import com.cufe.searchengine.db.table.KeywordsTable;
 import com.cufe.searchengine.util.DocumentFilterer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,7 +23,9 @@ public class Indexer implements Runnable {
 	@Value("${indexer.maxDocumentsPerIteration}")
 	private int maxDocumentsPerIteration;
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private DocumentsTable documentsTable;
+	@Autowired
+	private KeywordsTable keywordsTable;
 
 	@Override
 	public void run() {
@@ -62,58 +64,22 @@ public class Indexer implements Runnable {
 			return;
 		}
 
-		StringBuilder builder = new StringBuilder("UPDATE documents SET indexTimeMillis = ? WHERE ROWID in (");
-		for (int i = 0; i < documents.size() - 1; i++) {
-			builder.append(documents.get(i).getRowID()).append(",");
-		}
-		builder.append(documents.get(documents.size() - 1).getRowID()).append(");");
-
-		int rows = DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), System.currentTimeMillis()));
-		if (rows != documents.size()) {
-			throw new RuntimeException("should have updated " + documents.size());
-		}
+		int rows = documentsTable.updateIndexTime(documents);
 
 		log.info("updated rows={}, docs={}", rows, documents.size());
 	}
+
 
 	private void updateKeyword(List<String> words, long docID) throws Exception {
 		if (words.size() == 0) {
 			return;
 		}
 
-		StringBuilder builder = new StringBuilder("INSERT OR IGNORE INTO keywords VALUES");
-		for (int i = 0; i < words.size(); i++) {
-			builder.append("(?)");
-
-			if (i != words.size() - 1) {
-				builder.append(",");
-			}
-		}
-		builder.append(";\n");
-
-		builder.append("REPLACE INTO keywords_documents(docID, wordID) VALUES");
-		for (int i = 0; i < words.size(); i++) {
-			builder.append("(").append(docID).append(",last_insert_rowid()-").append(i).append(")");
-
-			if (i != words.size() - 1) {
-				builder.append(",");
-			}
-		}
-		builder.append(";");
-
-		DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), words.toArray()));
+		keywordsTable.insertOrIgnore(words, docID);
 	}
 
 	private List<Document> fetchNonIndexedDocs() throws Exception {
-		return DBUtils.waitLock(100, () -> jdbcTemplate.query(getDocQueryString(),
-			(row, i) -> new Document(row.getString(1), row
-				.getString(2), row.getLong(3)).indexTimeMillis(row.getLong(4))
-				.rowID(row.getLong(5))));
-	}
-
-	private String getDocQueryString() {
-		return String.format("SELECT content, url, timeMillis, indexTimeMillis, ROWID FROM documents WHERE " +
-			"indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration);
+		return documentsTable.selectAll(maxDocumentsPerIteration);
 	}
 
 	@Component

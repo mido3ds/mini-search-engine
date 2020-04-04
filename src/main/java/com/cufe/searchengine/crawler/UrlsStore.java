@@ -1,7 +1,8 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
-import com.cufe.searchengine.util.DBUtils;
+import com.cufe.searchengine.db.table.DocumentsTable;
+import com.cufe.searchengine.db.table.UrlStoreQueueTable;
 import com.cufe.searchengine.util.Patterns;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -32,18 +32,15 @@ public class UrlsStore {
 	@Autowired
 	private RobotsStore robotsStore;
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	@Autowired
-	private DocumentsStore documentsStore;
-	@Value("${crawler.urlsStore.saveStateWaitMillis}")
-	private long saveStateWaitMillis;
+	private UrlStoreQueueTable urlStoreQueueTable;
 	private int counter = 1;
+
+	@Autowired
+	private DocumentsTable documentsTable;
 
 	@EventListener
 	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
-		List<String> urls = DBUtils.waitLock(100,
-			() -> jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class)
-		);
+		List<String> urls = documentsTable.selectUrls();
 
 		if (urls.size() > 0) {
 			store.addAll(
@@ -74,18 +71,13 @@ public class UrlsStore {
 	private void fillWebsiteLastTime() throws Exception {
 		websiteLastTime.clear();
 
-		DBUtils.waitLock(100,
-			() -> jdbcTemplate.query(
-				"SELECT url, timeMillis FROM documents;", this::mapRowWebSiteLastTime
-			)
-		);
+		documentsTable.selectUrlTime(this::mapRowWebSiteLastTime);
 
 		log.info("loaded into websiteLastTime {} items", websiteLastTime.size());
 	}
 
 	private void readCounter() throws Exception {
-		counter = DBUtils.waitLock(100,
-			() -> jdbcTemplate.queryForObject("PRAGMA user_version;", Integer.class));
+		counter = documentsTable.getPragmaUserVersion();
 		log.info("loaded counter = {}", counter);
 	}
 
@@ -129,20 +121,16 @@ public class UrlsStore {
 
 	private void incrementCounter() throws Exception {
 		counter++;
-		DBUtils.waitLock(100, () -> jdbcTemplate.update("PRAGMA user_version = ?;", counter));
+		documentsTable.setPragmaUserVersion(counter);
 		log.info("incremented counter to {}", counter);
 	}
 
 	private List<String> queryAllUrlsToReuse() throws Exception {
-		return DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents WHERE counter != ?;",
-			(row, i) -> row
-				.getString(1), counter));
+		return documentsTable.selectUrlsNotThisCounter(counter);
 	}
 
 	private List<String> queryAllUrlsToAvoid() throws Exception {
-		return DBUtils.waitLock(100, () -> jdbcTemplate.query("SELECT url FROM documents WHERE counter = ?;",
-			(row, i) -> row
-				.getString(1), counter));
+		return documentsTable.selectUrlsThisCounter(counter);
 	}
 
 	@PreDestroy
@@ -154,10 +142,7 @@ public class UrlsStore {
 			.toArray(String[]::new);
 
 		// flush
-		DBUtils.waitLock(100, () -> {
-			jdbcTemplate.execute("DELETE FROM urlstore_queue;");
-			return null;
-		});
+		urlStoreQueueTable.clean();
 
 		log.info("flushed urlstore_queue table");
 
@@ -168,12 +153,7 @@ public class UrlsStore {
 		}
 		log.info("save my state before closing");
 
-		StringBuilder sql = new StringBuilder("INSERT INTO urlstore_queue VALUES");
-		for (int i = 0; i < storeCopy.length - 1; i++) {
-			sql.append("(?),");
-		}
-		sql.append("(?);");
-		DBUtils.waitLock(100, () -> jdbcTemplate.update(sql.toString(), storeCopy));
+		urlStoreQueueTable.insert(storeCopy);
 
 		log.info("saved {} urls", storeCopy.length);
 	}

@@ -1,13 +1,10 @@
 package com.cufe.searchengine.crawler;
 
-import com.cufe.searchengine.util.DBUtils;
 import com.cufe.searchengine.util.Patterns;
 import com.cufe.searchengine.util.SnippetExtractor;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
-// TODO: abstract tables accessing into DocumentsTable
 public class Document {
 	private long rowID;
 	private String content;
@@ -57,17 +54,6 @@ public class Document {
 		this.timeMillis = timeMillis;
 	}
 
-	public int store(JdbcTemplate jdbcTemplate) throws Exception {
-		if (counter == -1) {
-			throw new IllegalStateException("counter is not set");
-		}
-
-		return DBUtils.waitLock(100,
-			() -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis, counter) " +
-				"VALUES(?, ?, ?, ?);", url, content, timeMillis, counter)
-		);
-	}
-
 	public long getRowID() {
 		return rowID;
 	}
@@ -96,6 +82,10 @@ public class Document {
 
 	public String getSnippet(List<String> keywords) {
 		return SnippetExtractor.extract(content, keywords);
+	}
+
+	public int getCounter() {
+		return counter;
 	}
 
 	public void setCounter(int counter) {

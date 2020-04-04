@@ -1,7 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
-import com.cufe.searchengine.util.DBUtils;
+import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.StringUtils;
 import org.slf4j.Logger;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,7 +22,7 @@ public class DocumentsStore {
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private DocumentsTable documentsTable;
 	@Value("${crawler.maxDocuments}")
 	private int maxDocuments;
 	@Autowired
@@ -31,7 +30,7 @@ public class DocumentsStore {
 
 	@EventListener
 	private void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
-		Integer size = DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class));
+		Integer size = documentsTable.size();
 		if (size == null) {
 			throw new IllegalStateException("`documents` count shouldn't be null");
 		}
@@ -39,10 +38,7 @@ public class DocumentsStore {
 	}
 
 	private void storeToDB(Document document) throws Exception {
-		int rows = document.store(this.jdbcTemplate);
-		if (rows != 1) {
-			log.error("couldn't insert document with url=" + document.getUrl());
-		}
+		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), document.getCounter());
 	}
 
 	public void add(String url, String doc) {
