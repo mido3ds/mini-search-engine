@@ -24,11 +24,9 @@ import java.util.stream.Collectors;
 @Component
 public class UrlsStore {
 	private static final Logger log = LoggerFactory.getLogger(UrlsStore.class);
-
+	private static final Map<String, Long> websiteLastTime = new HashMap<>();
 	private final BlockingQueue<ComparableUrl> store = new PriorityBlockingQueue<>();
 	private final Set<String> allUrls = new HashSet<>();
-	private static final Map<String, Long> websiteLastTime = new HashMap<>();
-
 	@Value("${crawler.seedFile}")
 	private Resource crawlerSeedResource;
 	@Autowired

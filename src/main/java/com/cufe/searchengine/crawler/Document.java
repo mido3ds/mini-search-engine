@@ -2,6 +2,7 @@ package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.util.DBUtils;
 import com.cufe.searchengine.util.Patterns;
+import com.cufe.searchengine.util.SnippetExtractor;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
@@ -94,7 +95,7 @@ public class Document {
 	}
 
 	public String getSnippet(List<String> keywords) {
-		return "Some Snippet TODO"; // TODO
+		return SnippetExtractor.extract(content, keywords);
 	}
 
 	public void setCounter(int counter) {
