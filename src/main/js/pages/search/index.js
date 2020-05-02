@@ -41,7 +41,7 @@ const Results = () => {
                     }
                 })
                 .catch(reason => {
-                    setErr(`error in query, reson=${reason}`)
+                    setErr(`error in query, reason=${reason}`)
                 })
         }
     }, [q, p])
