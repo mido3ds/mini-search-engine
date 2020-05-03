@@ -243,7 +243,17 @@ public class UrlsStore {
 				return 0;
 			}
 
-			return Math.toIntExact(-(getTime() - url2.getTime()));
+			return toInt(-(getTime() - url2.getTime()));
+		}
+
+		private int toInt(long l) {
+			if (l > 0) {
+				return 1;
+			} else if (l < 0) {
+				return -1;
+			}
+			
+			return 0;
 		}
 
 		@Override
