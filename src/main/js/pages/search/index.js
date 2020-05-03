@@ -37,11 +37,11 @@ const Results = () => {
 
                         setErr("")
                     } else {
-                        setErr(`error in query, resp.status=${resp.status}`)
+                        setErr("No Matching Results")
                     }
                 })
-                .catch(reason => {
-                    setErr(`error in query, reason=${reason}`)
+                .catch(error => {
+                    setErr("No Matching Results")
                 })
         }
     }, [q, p])
