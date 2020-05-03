@@ -9,10 +9,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Ranker implements Runnable {
-	private static final Logger log = LoggerFactory.getLogger(Ranker.class);
+public class PopularityRanker implements Runnable {
+	private static final Logger log = LoggerFactory.getLogger(PopularityRanker.class);
 
-	@Value("${ranker.waitTimeMillis}")
+	@Value("${popularityRanker.waitTimeMillis}")
 	private long waitTimeMillis;
 
 	@Override
@@ -25,20 +25,20 @@ public class Ranker implements Runnable {
 			} catch (InterruptedException ignored) {
 			}
 
-			// TODO: calculate rank and reassign it
+			// TODO: calculate pagerank and insert to db
 		}
 	}
 
 	@Component
-	private static class RankerRunner {
+	private static class PopularityRankerRunner {
 		@Autowired
-		private Ranker ranker;
+		private PopularityRanker popularityRanker;
 
 		@EventListener
 		public void onDBInitialized(DBInitializer.DBInitializedEvent event) {
 			log.info("received DBInitialized event");
 
-			new Thread(ranker, "ranker").start();
+			new Thread(popularityRanker, "popularity_ranker").start();
 		}
 	}
 }

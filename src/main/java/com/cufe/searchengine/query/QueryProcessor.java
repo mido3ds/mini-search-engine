@@ -22,7 +22,7 @@ public class QueryProcessor {
 	@Autowired
 	private PhraseProcessor phraseProcessor;
 	@Autowired
-	private Ranker ranker;
+	private PopularityRanker popularityRanker;
 
 	/**
 	 * @return all search results, ranked
