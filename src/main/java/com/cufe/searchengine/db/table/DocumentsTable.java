@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Hashtable;
 
 @Component
 public class DocumentsTable {
@@ -130,5 +131,29 @@ public class DocumentsTable {
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(builder.toString(),
 			(row, i) -> new Document(row.getString(1), row
 				.getString(2), 0), keywords.toArray()));
+	}
+
+	public Integer selectURLRank(String url) throws Exception {
+		String query = "SELECT rank FROM documents WHERE url = '" + url + "';";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class));
+	}
+
+	public Hashtable<String, Integer> selectAllURLRanks() throws Exception {
+		Hashtable<String, Integer> urlRanks = new Hashtable<String, Integer>();
+		List<String> urls = selectUrls();
+		for (String url : urls) {
+			urlRanks.put(url, selectURLRank(url));
+		}
+		return urlRanks;
+	}
+
+	public void updateAllURLRanks(Hashtable<String, Integer> urlRanks) throws Exception {
+		urlRanks.forEach((k, v) -> {
+			try {
+				DBUtils.waitLock(100, () -> jdbcTemplate.update("UPDATE documents SET rank = (?) WHERE url = (?);", v, k));
+			} catch (Exception e) {
+				throw new RuntimeException("URL rank update failed");
+			}
+		});
 	}
 }
