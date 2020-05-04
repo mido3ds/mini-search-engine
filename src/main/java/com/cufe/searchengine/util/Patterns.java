@@ -27,13 +27,17 @@ public class Patterns {
 		return port == null ? "" : port.equals(":80") ? "" : port;
 	}
 
-	public static String[] extractUrls(String html, String baseUrl) {
+	public static String[] extractUrls(String html, String url) {
+		String baseUrl = extractWebsite(url);
+		baseUrl = baseUrl.equals("")? url:baseUrl;
+		final String finalBaseUrl = baseUrl;
+
 		return HREF_PATTERN.matcher(html)
 			.results()
 			.map(s -> s.group(1))
 			.map(s -> {
 				if (!s.startsWith("http")) {
-					return baseUrl + s;
+					return finalBaseUrl + s;
 				}
 				return s;
 			})
