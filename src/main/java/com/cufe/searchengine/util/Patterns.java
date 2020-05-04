@@ -37,7 +37,7 @@ public class Patterns {
 			.map(s -> s.group(1))
 			.map(s -> {
 				if (!s.startsWith("http")) {
-					return finalBaseUrl + s;
+					return finalBaseUrl + "/" + s;
 				}
 				return s;
 			})
