@@ -14,7 +14,7 @@ Mini Search Engine - Advanced Programming Techniques Course Project - Cairo Uni.
 # Install Other Requirement
 
 ``` 
-$ mvn clean install
+$ mvn clean compile
 $ yarn install
 ```
 
