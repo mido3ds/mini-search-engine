@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -90,8 +91,9 @@ public class UrlsStore {
 		loadAllUrls();
 	}
 
+	@Async
 	@EventListener
-	public void onDocumentStoredEvent(DocumentsStore.DocumentStoredEvent event) {
+	public synchronized void onDocumentStoredEvent(DocumentsStore.DocumentStoredEvent event) {
 		long time = event.getTimeMillis();
 		String website = Patterns.httpToHttps(Patterns.extractWebsite(event.getUrl()));
 
