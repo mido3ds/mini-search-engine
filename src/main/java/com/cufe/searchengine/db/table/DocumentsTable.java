@@ -134,8 +134,8 @@ public class DocumentsTable {
 	}
 
 	public Float selectURLRank(String url) throws Exception {
-		String query = "SELECT rank FROM documents WHERE url = '" + url + "';";
-		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Float.class));
+		String query = "SELECT rank FROM documents WHERE url = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Float.class, url));
 	}
 
 	public Hashtable<String, Float> selectAllURLRanks() throws Exception {
