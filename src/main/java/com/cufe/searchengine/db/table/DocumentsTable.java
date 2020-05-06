@@ -133,13 +133,13 @@ public class DocumentsTable {
 				.getString(2), 0), keywords.toArray()));
 	}
 
-	public Integer selectURLRank(String url) throws Exception {
+	public Float selectURLRank(String url) throws Exception {
 		String query = "SELECT rank FROM documents WHERE url = '" + url + "';";
-		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class));
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Float.class));
 	}
 
-	public Hashtable<String, Integer> selectAllURLRanks() throws Exception {
-		Hashtable<String, Integer> urlRanks = new Hashtable<String, Integer>();
+	public Hashtable<String, Float> selectAllURLRanks() throws Exception {
+		Hashtable<String, Float> urlRanks = new Hashtable<String, Float>();
 		List<String> urls = selectUrls();
 		for (String url : urls) {
 			urlRanks.put(url, selectURLRank(url));
@@ -147,7 +147,7 @@ public class DocumentsTable {
 		return urlRanks;
 	}
 
-	public void updateAllURLRanks(Hashtable<String, Integer> urlRanks) throws Exception {
+	public void updateAllURLRanks(Hashtable<String, Float> urlRanks) throws Exception {
 		urlRanks.forEach((k, v) -> {
 			try {
 				DBUtils.waitLock(100, () -> jdbcTemplate.update("UPDATE documents SET rank = (?) WHERE url = (?);", v, k));
