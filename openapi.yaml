@@ -22,11 +22,13 @@ paths:
             type: integer
       responses:
         "200":
-          description: successful operation, result could be empty
+          description: successful operation, result mustn't be empty
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResultPage"
+        "404":
+          description: no results
   /api/complete:
     get:
       summary: get list of completions
@@ -40,13 +42,74 @@ paths:
             type: string
       responses:
         "200":
-          description: successful operation, result could be empty
+          description: successful operation, result mustn't be empty
           content:
             application/json:
               schema:
                 type: array
                 items:
                   type: string
+        "404":
+          description: no results
+  /api/image/query:
+    get:
+      summary: get list of urls to images that are associated with given search terms
+      operationId: imageQuery
+      parameters:
+        - name: q
+          in: query
+          description: string to search for
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: page of results to fetch, default 1
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation, result mustn't be empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultPage"
+        "404":
+          description: no results
+  /api/trends:
+    get:
+      summary: get list of 10 most searched persons of given country.
+      operationId: trends
+      parameters:
+        - name: country 
+          in: query
+          description: country alpha-3 code (ISO 3166) all capital
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation, result mustn't be empty
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "404":
+          description: invalid country code
+  /api/stats:
+    get:
+      summary: performance analysis and statistics
+      operationId: performanceStats
+      responses:
+        "200":
+          description: statistics and analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats'
 components:
   schemas:
     ResultPage:
@@ -71,3 +134,8 @@ components:
           type: string
         snippet:
           type: string
+    Stats:
+      type: object
+      title: Stats
+    #   properties:
+        # TODO: add properties

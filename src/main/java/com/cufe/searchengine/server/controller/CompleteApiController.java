@@ -41,10 +41,10 @@ public class CompleteApiController {
 	 */
 	@ApiOperation(value = "get list of completions", nickname = "complete", notes = "", response = String.class,
 		responseContainer = "List", tags = {})
-	@ApiResponses(value = {
-		@ApiResponse(code = 200, message = "successful operation, result could be empty", response = String.class,
-			responseContainer = "List")
-	})
+	@ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "successful operation, result mustn't be empty", response = String.class,
+			responseContainer = "List"),
+        @ApiResponse(code = 404, message = "no results") })
 	@RequestMapping(value = "/api/complete", produces = {"application/json"}, method = RequestMethod.GET)
 	ResponseEntity<List<String>> complete(
 		@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q",

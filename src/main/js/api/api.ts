@@ -102,6 +102,78 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary get list of urls to images that are associated with given search terms
+         * @param {string} q string to search for
+         * @param {number} [page] page of results to fetch, default 1
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        imageQuery(q: string, page?: number, options: any = {}): RequestArgs {
+            // verify required parameter 'q' is not null or undefined
+            if (q === null || q === undefined) {
+                throw new RequiredError('q', 'Required parameter q was null or undefined when calling imageQuery.');
+            }
+            const localVarPath = `/api/image/query`;
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+
+
+            localVarUrlObj.query = { ...localVarUrlObj.query, ...localVarQueryParameter, ...options.query };
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = { ...localVarHeaderParameter, ...options.headers };
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary performance analysis and statistics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        performanceStats(options: any = {}): RequestArgs {
+            const localVarPath = `/api/stats`;
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+
+            localVarUrlObj.query = { ...localVarUrlObj.query, ...localVarQueryParameter, ...options.query };
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = { ...localVarHeaderParameter, ...options.headers };
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary submit a query
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -143,6 +215,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary get list of 10 most searched persons of given country.
+         * @param {string} country country alpha-3 code (ISO 3166) all capital
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        trends(country: string, options: any = {}): RequestArgs {
+            // verify required parameter 'country' is not null or undefined
+            if (country === null || country === undefined) {
+                throw new RequiredError('country', 'Required parameter country was null or undefined when calling trends.');
+            }
+            const localVarPath = `/api/trends`;
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (country !== undefined) {
+                localVarQueryParameter['country'] = country;
+            }
+
+
+
+            localVarUrlObj.query = { ...localVarUrlObj.query, ...localVarQueryParameter, ...options.query };
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = { ...localVarHeaderParameter, ...options.headers };
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -168,6 +278,34 @@ export const DefaultApiFp = function (configuration?: Configuration) {
         },
         /**
          * 
+         * @summary get list of urls to images that are associated with given search terms
+         * @param {string} q string to search for
+         * @param {number} [page] page of results to fetch, default 1
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        imageQuery(q: string, page?: number, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultPage> {
+            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).imageQuery(q, page, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary performance analysis and statistics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        performanceStats(options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<object> {
+            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).performanceStats(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary submit a query
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -176,6 +314,20 @@ export const DefaultApiFp = function (configuration?: Configuration) {
          */
         query(q: string, page?: number, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultPage> {
             const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).query(q, page, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary get list of 10 most searched persons of given country.
+         * @param {string} country country alpha-3 code (ISO 3166) all capital
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        trends(country: string, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>> {
+            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).trends(country, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
                 return axios.request(axiosRequestArgs);
@@ -202,6 +354,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary get list of urls to images that are associated with given search terms
+         * @param {string} q string to search for
+         * @param {number} [page] page of results to fetch, default 1
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        imageQuery(q: string, page?: number, options?: any): AxiosPromise<ResultPage> {
+            return DefaultApiFp(configuration).imageQuery(q, page, options)(axios, basePath);
+        },
+        /**
+         * 
+         * @summary performance analysis and statistics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        performanceStats(options?: any): AxiosPromise<object> {
+            return DefaultApiFp(configuration).performanceStats(options)(axios, basePath);
+        },
+        /**
+         * 
          * @summary submit a query
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -210,6 +382,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         query(q: string, page?: number, options?: any): AxiosPromise<ResultPage> {
             return DefaultApiFp(configuration).query(q, page, options)(axios, basePath);
+        },
+        /**
+         * 
+         * @summary get list of 10 most searched persons of given country.
+         * @param {string} country country alpha-3 code (ISO 3166) all capital
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        trends(country: string, options?: any): AxiosPromise<Array<string>> {
+            return DefaultApiFp(configuration).trends(country, options)(axios, basePath);
         },
     };
 };
@@ -235,6 +417,30 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
+     * @summary get list of urls to images that are associated with given search terms
+     * @param {string} q string to search for
+     * @param {number} [page] page of results to fetch, default 1
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public imageQuery(q: string, page?: number, options?: any) {
+        return DefaultApiFp(this.configuration).imageQuery(q, page, options)(this.axios, this.basePath);
+    }
+
+    /**
+     * 
+     * @summary performance analysis and statistics
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public performanceStats(options?: any) {
+        return DefaultApiFp(this.configuration).performanceStats(options)(this.axios, this.basePath);
+    }
+
+    /**
+     * 
      * @summary submit a query
      * @param {string} q string to search for
      * @param {number} [page] page of results to fetch, default 1
@@ -246,6 +452,17 @@ export class DefaultApi extends BaseAPI {
         return DefaultApiFp(this.configuration).query(q, page, options)(this.axios, this.basePath);
     }
 
+    /**
+     * 
+     * @summary get list of 10 most searched persons of given country.
+     * @param {string} country country alpha-3 code (ISO 3166) all capital
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public trends(country: string, options?: any) {
+        return DefaultApiFp(this.configuration).trends(country, options)(this.axios, this.basePath);
+    }
 }
 
 
