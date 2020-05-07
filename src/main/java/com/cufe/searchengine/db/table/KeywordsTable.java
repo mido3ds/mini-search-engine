@@ -9,11 +9,12 @@ import java.util.List;
 
 @Component
 public class KeywordsTable {
+//	private static final Logger log = LoggerFactory.getLogger(KeywordsTable.class);
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	public void insertOrIgnore(List<String> words, long docID) throws Exception {
-		StringBuilder builder = new StringBuilder("INSERT OR IGNORE INTO keywords VALUES");
+		final StringBuilder builder = new StringBuilder("INSERT OR IGNORE INTO keywords VALUES");
 		for (int i = 0; i < words.size(); i++) {
 			builder.append("(?)");
 
@@ -21,18 +22,39 @@ public class KeywordsTable {
 				builder.append(",");
 			}
 		}
-		builder.append(";\n");
-
-		builder.append("REPLACE INTO keywords_documents(docID, wordID) VALUES");
-		for (int i = 0; i < words.size(); i++) {
-			builder.append("(").append(docID).append(",last_insert_rowid()-").append(i).append(")");
-
-			if (i != words.size() - 1) {
-				builder.append(",");
-			}
-		}
 		builder.append(";");
 
-		DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), words.toArray()));
+		Integer numRows = DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), words.toArray()));
+//		log.info("numRows = " + numRows);
+
+		final StringBuilder builder2 = new StringBuilder("SELECT ROWID FROM keywords WHERE word in (");
+		for (int i = 0; i < words.size(); i++) {
+			builder2.append("?");
+
+			if (i != words.size() - 1) {
+				builder2.append(",");
+			}
+		}
+		builder2.append(");");
+
+		List<Integer> rowids = DBUtils.waitLock(
+				100, () -> jdbcTemplate.query(builder2.toString(),
+						(row, i) -> row.getInt(1), words.toArray())
+		);
+//		log.info("rowids.size() = " + rowids.size());
+
+		final StringBuilder builder3 = new StringBuilder();
+		builder3.append("REPLACE INTO keywords_documents(docID, wordID) VALUES");
+		for (int i = 0; i < rowids.size(); i++) {
+			builder3.append("(").append(docID).append(",").append(rowids.get(i)).append(")");
+
+			if (i != rowids.size() - 1) {
+				builder3.append(",");
+			}
+		}
+		builder3.append(";");
+
+		numRows = DBUtils.waitLock(100, () -> jdbcTemplate.update(builder3.toString()));
+//		log.info("numRows = " + numRows);
 	}
 }
