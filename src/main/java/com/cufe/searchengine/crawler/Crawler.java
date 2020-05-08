@@ -3,6 +3,7 @@ package com.cufe.searchengine.crawler;
 import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.util.Patterns;
 import com.cufe.searchengine.util.StringUtils;
+import com.cufe.searchengine.db.table.OutgoingURLsTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ public class Crawler implements Runnable {
 	private UrlsStore urlsStore;
 	@Autowired
 	private DocumentsStore documentsStore;
+	@Autowired
+	private OutgoingURLsTable outgoingURLsTable;
 
 	@Override
 	public void run() {
@@ -60,6 +63,11 @@ public class Crawler implements Runnable {
 				} catch (InterruptedException ignored) {
 					Thread.currentThread().interrupt();
 					log.warn("interrupted, ignore it");
+				}
+				try {
+					outgoingURLsTable.insertLink(url, u);
+				} catch (Exception e) {
+					log.error("can't add url link [" + e.getMessage() + "]");
 				}
 			}
 
