@@ -86,8 +86,6 @@ public class DocumentsTable {
 	}
 
 	public List<QueryResult> selectContentUrlLikePhrases(List<String> phrases) throws Exception {
-		// TODO: sort with rank
-		// TODO: limit by page
 		Optional<String> reducedLikes = phrases.stream()
 			.map(String::toLowerCase)
 			.distinct()
@@ -110,8 +108,6 @@ public class DocumentsTable {
 	}
 
 	public List<Document> selectContentUrlSorted(List<String> keywords) throws Exception {
-		// TODO: sort with rank
-		// TODO: limit by page
 		StringBuilder builder = new StringBuilder("SELECT content, url FROM documents d " + "INNER JOIN " +
 			"keywords_documents kd ON d.ROWID = kd.docID " + "INNER JOIN " + "keywords k ON k.ROWID = kd.wordID AND k.word in (");
 		for (int i = 0; i < keywords.size(); i++) {
@@ -132,9 +128,9 @@ public class DocumentsTable {
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Float.class, url));
 	}
 
-	public List<String> selectUrls() {
-		// TODO
-		return new ArrayList<>();
+	public List<String> selectUrls() throws Exception {
+		String query = "SELECT url FROM documents;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class));
 	}
 
 	public Hashtable<String, Float> selectAllURLRanks() throws Exception {

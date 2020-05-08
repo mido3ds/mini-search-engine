@@ -18,7 +18,7 @@ public class OutgoingURLsTable {
     }
 
     public List<String> selectUrls() throws Exception {
-        String query = "SELECT url FROM urlstore_queue;";
+		String query = "SELECT url FROM documents;";
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class));
 	}
 
