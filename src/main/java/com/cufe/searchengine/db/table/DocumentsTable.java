@@ -44,12 +44,6 @@ public class DocumentsTable {
 		);
 	}
 
-	public List<String> selectUrls() throws Exception {
-		return DBUtils.waitLock(100,
-			() -> jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class)
-		);
-	}
-
 	public int getPragmaUserVersion() throws Exception {
 		return DBUtils.waitLock(100,
 			() -> jdbcTemplate.queryForObject("PRAGMA user_version;", Integer.class));
@@ -136,6 +130,11 @@ public class DocumentsTable {
 	public Float selectURLRank(String url) throws Exception {
 		String query = "SELECT rank FROM documents WHERE url = ?;";
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Float.class, url));
+	}
+
+	public List<String> selectUrls() {
+		// TODO
+		return new ArrayList<>();
 	}
 
 	public Hashtable<String, Float> selectAllURLRanks() throws Exception {

@@ -41,7 +41,7 @@ public class UrlsStore {
 
 	@EventListener
 	public void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
-		List<String> urls = documentsTable.selectUrls();
+		List<String> urls = urlStoreQueueTable.selectUrls();
 
 		if (urls.size() > 0) {
 			store.addAll(

@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UrlStoreQueueTable {
 	@Autowired
@@ -24,5 +26,11 @@ public class UrlStoreQueueTable {
 			jdbcTemplate.execute("DELETE FROM urlstore_queue;");
 			return null;
 		});
+	}
+
+	public List<String> selectUrls() throws Exception {
+		return DBUtils.waitLock(100,
+				() -> jdbcTemplate.queryForList("SELECT url FROM urlstore_queue;", String.class)
+		);
 	}
 }
