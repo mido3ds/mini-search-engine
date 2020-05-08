@@ -23,8 +23,8 @@ public class OutgoingURLsTable {
 	}
 
 	public List<String> selectIncomingURLs(String url) throws Exception {
-        String query = "SELECT srcURL FROM outgoing_urls WHERE outURL = '" + url + "';";
-		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class));
+        String query = "SELECT srcURL FROM outgoing_urls WHERE outURL = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class, url));
 	}
 
     public Hashtable<String, List<String>> selectAllIncomingURLs() throws Exception {
@@ -37,8 +37,8 @@ public class OutgoingURLsTable {
 	}
 
     public Integer getOutgoingCount(String url) throws Exception {
-        String query = "SELECT COUNT(*) FROM outgoing_urls WHERE srcURL = '" + url + "';";
-		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class));
+        String query = "SELECT COUNT(*) FROM outgoing_urls WHERE srcURL = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class, url));
 	}
 
     public Hashtable<String, Integer> getAllOutgoingCount() throws Exception {
