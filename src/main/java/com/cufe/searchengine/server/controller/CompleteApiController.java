@@ -13,6 +13,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +51,17 @@ public class CompleteApiController {
 		@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q",
 			required = true) String q
 	) {
-		return ResponseEntity.ok(queryProcessor.suggest(q));
+		if ("1".equals(System.getenv("MOCK"))) {
+			ArrayList<String> list = new ArrayList<>();
+			list.add("Did you mean this?");
+			list.add("or that?");
+			list.add("ok, maybe you meant this");
+			list.add("this is also a suggestion");
+			list.add("why didn't you like my suggestions ಠ_ಠ");
+
+			return ResponseEntity.ok(list);
+		} else {
+			return ResponseEntity.ok(queryProcessor.suggest(q));
+		}
 	}
 }

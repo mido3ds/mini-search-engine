@@ -20,7 +20,10 @@ $ yarn install
 
 # Build Frontend
 
-`$ yarn build` 
+`$ yarn build`
+
+> To run dev server of the frontend at port 8081, run:
+> `$ yarn start`
 
 # Run Server
 
@@ -33,6 +36,9 @@ Default port `server.port` is set in `src/main/resources/application.properties`
 > 1. `$ npx webpack --env.BASE_PATH=localhost:<PORT>` 
 >  
 > where `<PORT>` is the port to bind to.
+
+> To run server as mock (results are fixed and are not real) for frontend experimenting, run:
+> `$ env MOCK=1 mvn`
 
 # Run Tests
 

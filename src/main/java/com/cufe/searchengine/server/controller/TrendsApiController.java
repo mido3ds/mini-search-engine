@@ -16,6 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,23 @@ public class TrendsApiController {
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<List<String>> trends(@NotNull @ApiParam(value = "country alpha-3 code (ISO 3166) all capital", required = true) @Valid @RequestParam(value = "country", required = true) String country) {
-        // TODO
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		if ("1".equals(System.getenv("MOCK"))) {
+			ArrayList<String> persons = new ArrayList<>();
+			persons.add("Mahmoud Adas");
+			persons.add("Mahmoud Othman Adas");
+			persons.add("Shrek");
+			persons.add("Mahmoud Adas Again");
+			persons.add("Maybe Mahmoud Osman Adas");
+			persons.add("Adas Adas");
+			persons.add("Yup, it's 3ds ᕕ( ᐛ )ᕗ");
+			persons.add("Of course adas is the most trndy, what did you expect?");
+			persons.add("No not adas again");
+			persons.add("Adas (✿\u2060´ ꒳ ` )");
+
+			return ResponseEntity.ok(persons);
+		} else {
+			// TODO
+			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		}
     }
 }
