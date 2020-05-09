@@ -11,3 +11,5 @@ built
 
 # log files
 *.log
+
+*.db-journal

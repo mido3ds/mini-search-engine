@@ -1,5 +1,6 @@
 const webpack = require("webpack");
 const path = require("path");
+const fs_extra = require("fs-extra");
 
 module.exports = env => ({
   mode: 'development',
@@ -11,6 +12,21 @@ module.exports = env => ({
   output: {
     path: path.join(__dirname, 'src/main/resources/static/built'),
     filename: '[name].js'
+  },
+  devServer: {
+    publicPath: '/built',
+    contentBase: path.join(__dirname, 'src/main/resources/templates'),
+    port: 8081,
+    hot: true,
+    after: (app, server, compiler) => {
+      fs_extra.copySync(path.join(__dirname, 'src/main/resources/static/built'), path.join(__dirname, 'built'))
+    },
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/$/, to: '/index.html' },
+        { from: /search/, to: '/search.html' },
+      ]
+    }
   },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx']

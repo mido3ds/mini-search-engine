@@ -5,6 +5,14 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 import matchSorter from 'match-sorter'
 import React, { useEffect, useState } from 'react'
 import { DefaultApi } from './api'
+// Bootstrap
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import Container from 'react-bootstrap/Container';
+import Row       from 'react-bootstrap/Row';
+import Col       from 'react-bootstrap/Col';
+import button from 'react-bootstrap/Button';
+
+
 
 const API = new DefaultApi()
 
@@ -67,6 +75,8 @@ const SearchBar = () => {
     }, [query])
 
     return (
+        <Container >
+        <Row>
         <div onKeyPress={onKey}>
             <h1>Mini Search Engine</h1>
             <form noValidate autoComplete="off" style={{ display: "flex" }}>
@@ -115,9 +125,13 @@ const SearchBar = () => {
                     disableElevation onClick={onClick} disabled={disabled} style={{ marginLeft: "10px" }}>
                     Search
                 </Button>
+
+                <Button type="button" className="btn btn-secondary">Primary</Button>
             </form>
             <br />
         </div>
+        </Row>
+        </Container>
     )
 }
 
