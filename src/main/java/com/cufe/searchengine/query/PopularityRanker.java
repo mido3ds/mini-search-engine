@@ -75,7 +75,11 @@ public class PopularityRanker implements Runnable {
 					Float rank = (float) 0.0;
 					String currentURL = (String) urlKeys.nextElement();
 					for (String url : incomingURLs.get(currentURL)) {
-						rank += urlRanks.get(url) / outgoingURLNum.get(url);
+						try {
+							rank += urlRanks.get(url) / outgoingURLNum.get(url);
+						} catch (NullPointerException e) {
+							continue;
+						}
 					}
 					newURLRanks.put(currentURL, rank);
 				} 
