@@ -6,7 +6,6 @@ import { useLocation } from "../../use-location"
 import { DefaultApi } from '../../api'
 import SearchBar from '../../search-bar'
 import SearchResult from '../../search-result'
-
 const API = new DefaultApi()
 
 const Results = () => {
