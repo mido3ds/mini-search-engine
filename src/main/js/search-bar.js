@@ -4,7 +4,6 @@ import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import matchSorter from 'match-sorter'
 import SettingsVoiceRoundedIcon from '@material-ui/icons/SettingsVoiceRounded';
-import PhotoCameraRoundedIcon from '@material-ui/icons/PhotoCameraRounded';
 import SearchRoundedIcon from '@material-ui/icons/SearchRounded';
 import React, { useEffect, useState } from 'react'
 import { DefaultApi } from './api'
@@ -20,6 +19,7 @@ const API = new DefaultApi()
 const SearchBar = () => {
     const [disabled, setDisabled] = useState(true)
     const [searchCursor, setSearchCursor] = useState("not-allowed")
+    const [micDisabled, setMicDisabled] = useState("disabled")
     const [query, setQuery] = useState("")
     const [open, setOpen] = useState(false)
     const [options, setOptions] = useState([])
@@ -54,6 +54,17 @@ const SearchBar = () => {
         if (query) {
             window.location = `/search?q=${query}`
         }
+    }
+
+    const onVoiceClick = (e) => {
+
+        if (micDisabled === "disabled")
+            //Recording
+            setMicDisabled("primary")
+        else
+            //Not recording
+            setMicDisabled("disabled")
+
     }
 
     const onKey = (e) => {
@@ -97,9 +108,7 @@ const SearchBar = () => {
                         if (reason === "select-option") {
                             onClick()
                         }else{
-                            
                             if (query === "") {
-                                console.log("ev")
                                 setSearchCursor ("not-allowed")
                             } else if (searchCursor === "not-allowed") {
                                 setSearchCursor("pointer")
@@ -147,10 +156,14 @@ const SearchBar = () => {
                     Search
                 </Button> */}
                 
-                <SettingsVoiceRoundedIcon color="primary" 
-                fontSize = "large" />
+                <SettingsVoiceRoundedIcon 
+                color= {micDisabled}
+                fontSize = "large" 
+                onClick={onVoiceClick}
+                />
                 {/* <PhotoCameraRoundedIcon color="primary" 
                 fontSize = "large" /> */}
+                
                 <SearchRoundedIcon 
                 onClick={onClick}
                 disabled={disabled}
