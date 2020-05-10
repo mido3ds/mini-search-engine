@@ -19,10 +19,12 @@ const API = new DefaultApi()
 
 const SearchBar = () => {
     const [disabled, setDisabled] = useState(true)
+    const [searchCursor, setSearchCursor] = useState("not-allowed")
     const [query, setQuery] = useState("")
     const [open, setOpen] = useState(false)
     const [options, setOptions] = useState([])
     const [loading, setLoading] = useState(false)
+
     useEffect(() => {
         let active = true
 
@@ -68,9 +70,11 @@ const SearchBar = () => {
     useEffect(() => {
         if (query === "") {
             setDisabled(true)
+            setSearchCursor ("not-allowed")
             setOptions([])
         } else if (disabled) {
             setDisabled(false)
+            setSearchCursor("pointer")
         }
     }, [query])
 
@@ -92,10 +96,19 @@ const SearchBar = () => {
                     onClose={(_, reason) => {
                         if (reason === "select-option") {
                             onClick()
+                        }else{
+                            
+                            if (query === "") {
+                                console.log("ev")
+                                setSearchCursor ("not-allowed")
+                            } else if (searchCursor === "not-allowed") {
+                                setSearchCursor("pointer")
+                            }
                         }
                         setOpen(false)
                     }}
-                    // disableClearable = {true}
+                    //Added this because the clear button is not clearing the query (ie the textField)
+                    disableClearable = {true}
                     autoSelect={true}
                     getOptionSelected={(option, value) => option === value}
                     filterOptions={(options, { inputValue }) => matchSorter(options, inputValue)}
@@ -143,7 +156,8 @@ const SearchBar = () => {
                 disabled={disabled}
                 color="primary" 
                 fontSize = "large"
-                className = "srch"
+                // className = "srch"
+                style = {{cursor: searchCursor}}
                  />
                 
             </form>
@@ -156,5 +170,9 @@ const SearchBar = () => {
     )
 }
 
+// const srch = {
+    
+    
+// };
 
 export default SearchBar;
