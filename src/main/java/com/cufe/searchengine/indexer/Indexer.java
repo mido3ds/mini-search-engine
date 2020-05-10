@@ -44,6 +44,7 @@ public class Indexer implements Runnable {
 				List<Document> documents = fetchNonIndexedDocs();
 				for (Document document : documents) {
 					List<String> keywords = DocumentFilterer.keywordsFromHtml(document.getContent());
+					documentsTable.updateURLWordCount(document.getUrl(), keywords.size());
 					Map<String, Integer> keywordFreq = getWordFrequency(keywords);
 					updateKeyword(keywordFreq, document.getRowID());
 

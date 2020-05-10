@@ -151,4 +151,8 @@ public class DocumentsTable {
 			}
 		});
 	}
+
+	public void updateURLWordCount(String url, Integer count) throws Exception {
+		DBUtils.waitLock(100, () -> jdbcTemplate.update("UPDATE documents SET wordCount = (?) WHERE url = (?);", count, url));
+	}
 }
