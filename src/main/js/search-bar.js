@@ -10,9 +10,9 @@ import { DefaultApi } from './api'
 import Container from 'react-bootstrap/Container';
 import Row       from 'react-bootstrap/Row';
 import Col       from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import {Button, Form, FormControl, Navbar} from 'react-bootstrap';
 
-
+import '../App.css';
 
 const API = new DefaultApi()
 
@@ -22,7 +22,6 @@ const SearchBar = () => {
     const [open, setOpen] = useState(false)
     const [options, setOptions] = useState([])
     const [loading, setLoading] = useState(false)
-
     useEffect(() => {
         let active = true
 
@@ -75,14 +74,16 @@ const SearchBar = () => {
     }, [query])
 
     return (
-        <Container >
-        <Row>
-        <div onKeyPress={onKey}>
-            <h1>Mini Search Engine</h1>
+    <div className = "bg" >
+    <Container style={{display: 'flex', justifyContent: 'center'}} >
+    
+    <div onKeyPress={onKey} style={{marginTop: '200px'}} >
+            <h1 className = "lbl">Mini Search Engine</h1>
+            <Navbar  className = "nav" bg="light" >
             <form noValidate autoComplete="off" style={{ display: "flex" }}>
                 <Autocomplete
                     id="autocomplete"
-                    style={{ width: 300 }}
+                    style={{ width: 800 }}
                     open={open}
                     onOpen={() => {
                         setOpen(true)
@@ -91,9 +92,9 @@ const SearchBar = () => {
                         if (reason === "select-option") {
                             onClick()
                         }
-
                         setOpen(false)
                     }}
+                    // disableClearable = {true}
                     autoSelect={true}
                     getOptionSelected={(option, value) => option === value}
                     filterOptions={(options, { inputValue }) => matchSorter(options, inputValue)}
@@ -103,6 +104,7 @@ const SearchBar = () => {
                     freeSolo
                     renderInput={params => (
                         <TextField
+                            
                             {...params}
                             size="small"
                             id="search-input"
@@ -121,18 +123,26 @@ const SearchBar = () => {
                     )}
                 />
 
-                <Button variant="outlined" color="primary"
-                    disableElevation onClick={onClick} disabled={disabled} style={{ marginLeft: "10px" }}>
+                <Button 
+                    variant="outline-info" 
+                    // color="primary"
+                    // disableElevation
+                    onClick={onClick}
+                    disabled={disabled} 
+                    style={{ marginLeft: "10px"}}>
                     Search
                 </Button>
 
-                <Button type="button" className="btn btn-secondary">Primary</Button>
+              
             </form>
             <br />
+            </Navbar>
         </div>
-        </Row>
-        </Container>
+   
+    </Container>
+    </div>
     )
 }
+
 
 export default SearchBar;
