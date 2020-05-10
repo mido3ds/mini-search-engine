@@ -16,6 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,16 +57,35 @@ public class QueryApiController {
 	) {
 		page = page == null ? 1 : page;
 
-		List<QueryResult> queryResults = queryProcessor.search(q);
+		if ("1".equals(System.getenv("MOCK"))) {
+			int pages = 10;
 
-		int pages = (int) Math.ceil(queryResults.size() / 10.0d);
+			if (page > pages) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			}
 
-		if (page > pages) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			ArrayList<QueryResult> queryResults = new ArrayList<>();
+			for (int i = 0; i < 10; i++) {
+				queryResults.add(new QueryResult()
+						.title("Wikipedia").link("https://www.wikipedia.org")
+						.snippet("<em>Wikipedia</em> is a free online encyclopedia, " +
+								"created and edited by volunteers around the world and hosted by the " +
+								"Wikimedia Foundation."));
+			}
+
+			return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(queryResults));
+		} else {
+			List<QueryResult> queryResults = queryProcessor.search(q);
+
+			int pages = (int) Math.ceil(queryResults.size() / 10.0d);
+
+			if (page > pages) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			}
+
+			List<QueryResult> subList = queryResults.subList((page - 1) * 10, Math.min(page * 10, queryResults.size()));
+
+			return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(subList));
 		}
-
-		List<QueryResult> subList = queryResults.subList((page - 1) * 10, Math.min(page * 10, queryResults.size()));
-
-		return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(subList));
 	}
 }

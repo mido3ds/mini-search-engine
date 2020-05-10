@@ -16,6 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,53 @@ public class ImageQueryApiController {
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<ResultPage> imageQuery(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q,@ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page) {
-		// TODO
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		if ("1".equals(System.getenv("MOCK"))) {
+			ArrayList<QueryResult> queryResults = new ArrayList<>();
+			queryResults.add(new QueryResult()
+					.title("Child Portrait Artist | Family Portraits | Custom Child Painitngs ...")
+					.link("https://kzart.com/wp-content/uploads/2019/05/Child-Portrait-Artist-Surrey-1-a.jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("Child Portrait Artist | Family Portraits | Custom Child Painitngs ...")
+					.link("https://kzart.com/wp-content/uploads/2019/05/Child-Portrait-Artist-Surrey-7-a.jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("What is Butterfly Lighting and How to Use it in Portrait ...")
+					.link("https://bidunart.com/wp-content/uploads/2020/01/Portrait382-1280x640.jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("How to Do Hard Light Portraits | Profoto (CN)")
+					.link("https://cdn.profoto.com/cdn/0521660/contentassets/b61cf60b567f46ac9a274c3f87a5bcb1/portrait_technique_0014.jpg?width=1280&quality=75&format=jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("What is Fine Art Portrait Photography? | Bidun Art")
+					.link("https://bidunart.com/wp-content/uploads/2019/11/Femaleportraits357a-1-1280x640.jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("15 Most Beautiful Cars Available Today - Best-Looking 2020 Models")
+					.link("https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/mostbeauty-1584578506.jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("Disney Cars")
+					.link("https://lumiere-a.akamaihd.net/v1/images/r_carsfranchise_cars3_postbluray_mobile_10d32ee1.jpeg")
+			);
+			queryResults.add(new QueryResult()
+					.title("Class of 2021: The New and Redesigned Cars, Trucks and SUVs ...")
+					.link("https://www.kbb.com/articles/wp-content/uploads/2019/12/2021-ford-mustang-mach-e-front-16-9-700x500.jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("Audi RS6 Avant/RS7")
+					.link("https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/2020-audi-rs7-112-1569274021.jpg")
+			);
+			queryResults.add(new QueryResult()
+					.title("Aston Martin DBS Superleggera")
+					.link("https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/2019-aston-martin-dbs-superleggera-mmp-1545071883.jpg")
+			);
+
+			return ResponseEntity.ok(new ResultPage().currentPage(1).totalPages(10).results(queryResults));
+		} else {
+			// TODO
+			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+		}
     }
 }
