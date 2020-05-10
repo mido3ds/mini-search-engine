@@ -37,5 +37,9 @@
     margin-bottom: 10px;
     font-family: 'Aguafina Script';
     font-size: 90px;
-    
+
+}
+
+.srch{
+    cursor: not-allowed;
 }

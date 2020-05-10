@@ -3,15 +3,16 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import matchSorter from 'match-sorter'
+import SettingsVoiceRoundedIcon from '@material-ui/icons/SettingsVoiceRounded';
+import PhotoCameraRoundedIcon from '@material-ui/icons/PhotoCameraRounded';
+import SearchRoundedIcon from '@material-ui/icons/SearchRounded';
 import React, { useEffect, useState } from 'react'
 import { DefaultApi } from './api'
 // Bootstrap
-// import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Row       from 'react-bootstrap/Row';
 import Col       from 'react-bootstrap/Col';
 import {Button, Form, FormControl, Navbar} from 'react-bootstrap';
-
 import '../App.css';
 
 const API = new DefaultApi()
@@ -123,7 +124,7 @@ const SearchBar = () => {
                     )}
                 />
 
-                <Button 
+                {/* <Button 
                     variant="outline-info" 
                     // color="primary"
                     // disableElevation
@@ -131,9 +132,20 @@ const SearchBar = () => {
                     disabled={disabled} 
                     style={{ marginLeft: "10px"}}>
                     Search
-                </Button>
-
-              
+                </Button> */}
+                
+                <SettingsVoiceRoundedIcon color="primary" 
+                fontSize = "large" />
+                {/* <PhotoCameraRoundedIcon color="primary" 
+                fontSize = "large" /> */}
+                <SearchRoundedIcon 
+                onClick={onClick}
+                disabled={disabled}
+                color="primary" 
+                fontSize = "large"
+                className = "srch"
+                 />
+                
             </form>
             <br />
             </Navbar>
