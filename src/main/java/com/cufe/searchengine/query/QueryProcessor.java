@@ -22,7 +22,7 @@ public class QueryProcessor {
 	@Autowired
 	private PhraseProcessor phraseProcessor;
 	@Autowired
-	private PopularityRanker popularityRanker;
+	private RelevanceRanker relevanceRanker;
 
 	/**
 	 * @return all search results, ranked
@@ -43,7 +43,7 @@ public class QueryProcessor {
 		//		log.info("extracted keywords = {}", keywords);
 
 		if (keywords.size() == 0) {
-			return queryResults;
+			return relevanceRanker.rank(queryResults);
 		}
 
 		List<Document> documents;
@@ -63,7 +63,7 @@ public class QueryProcessor {
 				.snippet(document.getSnippet(keywords)))
 			.collect(Collectors.toList()));
 
-		return queryResults;
+		return relevanceRanker.rank(queryResults);
 	}
 
 	private List<Document> queryDocuments(List<String> keywords) throws Exception {
