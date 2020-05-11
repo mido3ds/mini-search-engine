@@ -6,6 +6,8 @@ import { useLocation } from "../../use-location"
 import { DefaultApi } from '../../api'
 import SearchBar from '../../search-bar'
 import SearchResult from '../../search-result'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const API = new DefaultApi()
 
 const Results = () => {
