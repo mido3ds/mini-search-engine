@@ -7,7 +7,8 @@ module.exports = env => ({
   devtool: 'source-map',
   entry: {
     index: path.join(__dirname, 'src/main/js/pages/index/index.js'),
-    search: path.join(__dirname, 'src/main/js/pages/search/index.js')
+    search: path.join(__dirname, 'src/main/js/pages/search/index.js'),
+    images: path.join(__dirname, 'src/main/js/pages/images/index.js')
   },
   output: {
     path: path.join(__dirname, 'src/main/resources/static/built'),
@@ -25,6 +26,7 @@ module.exports = env => ({
       rewrites: [
         { from: /^\/$/, to: '/index.html' },
         { from: /search/, to: '/search.html' },
+        { from: /images/, to: '/images.html' },
       ]
     }
   },

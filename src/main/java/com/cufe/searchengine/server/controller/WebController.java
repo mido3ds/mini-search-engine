@@ -15,6 +15,11 @@ public class WebController {
 		return "search.html";
 	}
 
+	@RequestMapping("/images")
+	public String images() {
+		return "images.html";
+	}
+
 	@RequestMapping("/doc")
 	public String doc() {
 		return "redirect:swagger-ui.html";
