@@ -114,7 +114,7 @@ const SearchBar = ({
                     setMicDisabled("disabled")
                     stopListening();
                     console.log("World!"); 
-                }, 200);
+                }, 250);
                 
             } 
 
@@ -210,6 +210,7 @@ const SearchBar = ({
                     color="primary" 
                     fontSize = "large" 
                     onClick = {showQ}
+                    style = {{cursor: searchCursor}}
                 />
                 
                 <SearchRoundedIcon 
