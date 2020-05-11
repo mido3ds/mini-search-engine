@@ -48,7 +48,7 @@ public class DocumentsStore {
 		}
 
 		Document document = new Document(
-			DocumentFilterer.textFromHtml(doc), url, System.currentTimeMillis()
+			DocumentFilterer.textFromHtml(doc), url, System.currentTimeMillis(), 0, 1
 		).counter(urlsStore.getCounter());
 
 		try {

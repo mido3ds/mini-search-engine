@@ -57,7 +57,6 @@ public class DocumentFilterer {
 			.filterExcessiveWhitespace()
 			.split()
 			.map(Stemmer::stem)
-			.distinct()
 			.filter((s) -> !s.equals("") && !s.equals(" "))
 			.collect(Collectors.toList());
 	}

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS documents(
 	timeMillis INT NOT NULL,
 	indexTimeMillis INT NOT NULL DEFAULT 0,
 	counter INT NOT NULL,
+	wordCount INT NOT NULL DEFAULT 1,
 	rank FLOAT NOT NULL DEFAULT 0
 );
 

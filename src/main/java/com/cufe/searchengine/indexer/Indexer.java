@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.*;
 
 @Component
 public class Indexer implements Runnable {
@@ -44,7 +44,9 @@ public class Indexer implements Runnable {
 				List<Document> documents = fetchNonIndexedDocs();
 				for (Document document : documents) {
 					List<String> keywords = DocumentFilterer.keywordsFromHtml(document.getContent());
-					updateKeyword(keywords, document.getRowID());
+					documentsTable.updateURLWordCount(document.getUrl(), keywords.size());
+					Map<String, Integer> keywordFreq = getWordFrequency(keywords);
+					updateKeyword(keywordFreq, document.getRowID());
 
 					totalWords += keywords.size();
 				}
@@ -70,16 +72,25 @@ public class Indexer implements Runnable {
 	}
 
 
-	private void updateKeyword(List<String> words, long docID) throws Exception {
-		if (words.size() == 0) {
+	private void updateKeyword(Map<String, Integer> keywordFreq, long docID) throws Exception {
+		if (keywordFreq.size() == 0) {
 			return;
 		}
 
-		keywordsTable.insertOrIgnore(words, docID);
+		keywordsTable.insertOrIgnore(keywordFreq, docID);
 	}
 
 	private List<Document> fetchNonIndexedDocs() throws Exception {
 		return documentsTable.selectAll(maxDocumentsPerIteration);
+	}
+
+	private Map<String, Integer> getWordFrequency(List<String> words) throws Exception {
+		Map<String, Integer> wordFreq = new HashMap<String, Integer>(); 
+        for (String word : words) { 
+            Integer count = wordFreq.get(word); 
+            wordFreq.put(word, (count == null) ? 1 : count + 1); 
+        }
+		return wordFreq;
 	}
 
 	@Component

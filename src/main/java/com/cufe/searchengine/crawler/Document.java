@@ -12,12 +12,16 @@ public class Document {
 	private long timeMillis;
 	private long indexTimeMillis;
 	private int counter;
+	private float rank;
+	private int wordCount;
 
-	public Document(String content, String url, long timeMillis) {
+	public Document(String content, String url, long timeMillis, float rank, int wordCount) {
 		this.content = content;
 		this.url = url;
 		this.timeMillis = timeMillis;
 		this.counter = -1;
+		this.rank = rank;
+		this.wordCount = wordCount;
 	}
 
 	public Document rowID(long rowID) {
@@ -73,6 +77,22 @@ public class Document {
 
 	public void setIndexTimeMillis(long indexTimeMillis) {
 		this.indexTimeMillis = indexTimeMillis;
+	}
+
+	public int getWordCount() {
+		return wordCount;
+	}
+
+	public void setWordCount(int wordCount) {
+		this.wordCount = wordCount;
+	}
+
+	public float getRank() {
+		return rank;
+	}
+
+	public void setRank(float rank) {
+		this.rank = rank;
 	}
 
 	public String getTitle() {

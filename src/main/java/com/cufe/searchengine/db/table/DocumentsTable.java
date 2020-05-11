@@ -78,11 +78,11 @@ public class DocumentsTable {
 	}
 
 	public List<Document> selectAll(int maxDocumentsPerIteration) throws Exception {
-		return DBUtils.waitLock(100, () -> jdbcTemplate.query(String.format("SELECT content, url, timeMillis, indexTimeMillis, ROWID FROM documents WHERE " +
-				"indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration),
+		return DBUtils.waitLock(100, () -> jdbcTemplate.query(String.format("SELECT content, url, timeMillis, rank, wordCount, indexTimeMillis, ROWID " +
+				"FROM documents WHERE indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration),
 			(row, i) -> new Document(row.getString(1), row
-				.getString(2), row.getLong(3)).indexTimeMillis(row.getLong(4))
-				.rowID(row.getLong(5))));
+				.getString(2), row.getLong(3), row.getFloat(4), row.getInt(5)).indexTimeMillis(row.getLong(6))
+				.rowID(row.getLong(7))));
 	}
 
 	public List<QueryResult> selectContentUrlLikePhrases(List<String> phrases) throws Exception {
@@ -96,10 +96,10 @@ public class DocumentsTable {
 			return new ArrayList<>();
 		}
 
-		String query = "SELECT content, url FROM documents WHERE " + reducedLikes.get() + ";";
+		String query = "SELECT content, url rank, wordCount FROM documents WHERE " + reducedLikes.get() + ";";
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(query, (row, i) -> new Document(row.getString(1),
-			row.getString(2), 0))
+			row.getString(2), 0, row.getFloat(3), row.getInt(4)))
 			.stream()
 			.map(d -> new QueryResult().title(d.getTitle())
 				.snippet(d.getSnippet(phrases))
@@ -108,7 +108,7 @@ public class DocumentsTable {
 	}
 
 	public List<Document> selectContentUrlSorted(List<String> keywords) throws Exception {
-		StringBuilder builder = new StringBuilder("SELECT content, url FROM documents d " + "INNER JOIN " +
+		StringBuilder builder = new StringBuilder("SELECT content, url, rank, wordCount FROM documents d " + "INNER JOIN " +
 			"keywords_documents kd ON d.ROWID = kd.docID " + "INNER JOIN " + "keywords k ON k.ROWID = kd.wordID AND k.word in (");
 		for (int i = 0; i < keywords.size(); i++) {
 			builder.append("?");
@@ -120,7 +120,7 @@ public class DocumentsTable {
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(builder.toString(),
 			(row, i) -> new Document(row.getString(1), row
-				.getString(2), 0), keywords.toArray()));
+				.getString(2), 0, row.getFloat(3), row.getInt(4)), keywords.toArray()));
 	}
 
 	public Float selectURLRank(String url) throws Exception {
@@ -150,5 +150,14 @@ public class DocumentsTable {
 				throw new RuntimeException("URL rank update failed");
 			}
 		});
+	}
+
+	public void updateURLWordCount(String url, Integer count) throws Exception {
+		DBUtils.waitLock(100, () -> jdbcTemplate.update("UPDATE documents SET wordCount = (?) WHERE url = (?);", count, url));
+	}
+
+	public Integer selectWordCount(String url) throws Exception {
+		String query = "SELECT wordCount FROM documents WHERE url = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class, url));
 	}
 }
