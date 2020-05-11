@@ -155,4 +155,9 @@ public class DocumentsTable {
 	public void updateURLWordCount(String url, Integer count) throws Exception {
 		DBUtils.waitLock(100, () -> jdbcTemplate.update("UPDATE documents SET wordCount = (?) WHERE url = (?);", count, url));
 	}
+
+	public Integer selectWordCount(String url) throws Exception {
+		String query = "SELECT wordCount FROM documents WHERE url = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class, url));
+	}
 }

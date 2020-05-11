@@ -43,7 +43,13 @@ public class QueryProcessor {
 		//		log.info("extracted keywords = {}", keywords);
 
 		if (keywords.size() == 0) {
-			return relevanceRanker.rank(queryResults);
+			try {
+				return relevanceRanker.rank(queryResults, keywords);
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.error("query ranking failed");
+				return queryResults;
+			}
 		}
 
 		List<Document> documents;
@@ -63,7 +69,13 @@ public class QueryProcessor {
 				.snippet(document.getSnippet(keywords)))
 			.collect(Collectors.toList()));
 
-		return relevanceRanker.rank(queryResults);
+		try {
+			return relevanceRanker.rank(queryResults, keywords);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("query ranking failed");
+			return queryResults;
+		}
 	}
 
 	private List<Document> queryDocuments(List<String> keywords) throws Exception {

@@ -58,4 +58,16 @@ public class KeywordsTable {
 		numRows = DBUtils.waitLock(100, () -> jdbcTemplate.update(builder3.toString()));
 //		log.info("numRows = " + numRows);
 	}
+
+	public Integer selectCountbyWord(String keyword) throws Exception {
+		String query = "SELECT COUNT(*) FROM documents d INNER JOIN keywords_documents kd ON d.ROWID = kd.docID " + 
+					"INNER JOIN keywords k ON k.ROWID = kd.wordID WHERE word = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class, keyword));
+	}
+
+	public Integer selectWordCount(String url, String keyword) throws Exception {
+		String query = "SELECT count FROM documents d INNER JOIN keywords_documents kd ON d.ROWID = kd.docID " + 
+					"INNER JOIN keywords k ON k.ROWID = kd.wordID WHERE url = ? AND word = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class, url, keyword));
+	}
 }
