@@ -5,6 +5,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 import matchSorter from 'match-sorter'
 import SettingsVoiceRoundedIcon from '@material-ui/icons/SettingsVoiceRounded';
 import SearchRoundedIcon from '@material-ui/icons/SearchRounded';
+import PhotoLibraryRoundedIcon from '@material-ui/icons/PhotoLibraryRounded';
 import React, { useEffect, useState } from 'react'
 import { DefaultApi } from './api'
 // Bootstrap
@@ -24,7 +25,7 @@ const propTypes = {
     resetTranscript: PropTypes.func,
     startListening : PropTypes.func,
     stopListening: PropTypes.func,
-    // lang: PropTypes.string,
+    listening : PropTypes.bool,
     browserSupportsSpeechRecognition: PropTypes.bool
   }
 
@@ -34,14 +35,13 @@ const SearchBar = ({
     resetTranscript,
     stopListening,
     browserSupportsSpeechRecognition,
-    startListening
-    // lang
+    startListening,
+    listening
     }) => {
     const [disabled, setDisabled] = useState(true)
     const [searchCursor, setSearchCursor] = useState("not-allowed")
     const [micDisabled, setMicDisabled] = useState("disabled")
     const [query, setQuery] = useState("")
-    const [value, setValue] = useState("")
     const [open, setOpen] = useState(false)
     const [options, setOptions] = useState([])
     const [loading, setLoading] = useState(false)
@@ -49,9 +49,6 @@ const SearchBar = ({
     if (!browserSupportsSpeechRecognition) {
         return null;
       }
-    // var myLang = mySpeechRecognition.lang;
-    // lang = 'en-US';
-    
     
     useEffect(() => {
         let active = true
@@ -76,12 +73,7 @@ const SearchBar = ({
             setOptions([])
         }
     }, [open])
-
-    // useEffect(() => {
-    //     if (query !== "") {
-    //         setValue(query)
-    //     }
-    // }, [value])
+    
 
     const onClick = () => {
         if (query) {
@@ -106,19 +98,24 @@ const SearchBar = ({
         if (micDisabled === "disabled")
             //Recording
             {
-                // resetTranscript()
+                resetTranscript()
                 startListening()
-                console.log()
                 setMicDisabled("primary")
             }
         else
             //Not recording
-            {
-                setQuery (transcript)
-                setMicDisabled("disabled") 
-                console.log(query)
-                setValue(query)
-                stopListening()
+            {   
+                setTimeout(() => {  
+                    let newQ = query;
+                    if (query !== "" && query[query.length-1] !== ' ' && transcript !== "")
+                        newQ += ' ';
+                    newQ = newQ + transcript;
+                    setQuery (newQ)
+                    setMicDisabled("disabled")
+                    stopListening();
+                    console.log("World!"); 
+                }, 200);
+                
             } 
 
     }
@@ -134,6 +131,9 @@ const SearchBar = ({
         setQuery(event.target.value)
     }
 
+    const showQ = ()=>{
+        console.log(query)
+    }
     
     return (
     <div style = {bg} >
@@ -144,8 +144,14 @@ const SearchBar = ({
             <Navbar  style = {nav} bg="light" >
             <form noValidate autoComplete="off" style={{ display: "flex" }}>
                 <Autocomplete
+                    //INFO
                     id="autocomplete"
+                    //Added this because the clear button is not clearing the query (ie the textField)
+                    disableClearable = {true}
+                    autoSelect={true}
+                    //Style
                     style={{ width: 800 }}
+                    //Methods
                     open={open}
                     onOpen={() => {
                         setOpen(true)
@@ -162,15 +168,14 @@ const SearchBar = ({
                         }
                         setOpen(false)
                     }}
-                    //Added this because the clear button is not clearing the query (ie the textField)
-                    disableClearable = {true}
-                    autoSelect={true}
+                    //Options
                     getOptionSelected={(option, value) => option === value}
                     filterOptions={(options, { inputValue }) => matchSorter(options, inputValue)}
                     getOptionLabel={option => option}
                     options={options}
+                    //Loading
                     loading={loading}
-                    freeSolo
+                    freeSolo = {true}
                     value={query}
                     renderInput={params => (
                         <TextField
@@ -182,7 +187,6 @@ const SearchBar = ({
                             onChange={onInputChange}
                             variant="outlined"
                             label="Search"
-                               
                             InputProps={{
                                 ...params.InputProps,
                                 endAdornment: ( 
@@ -195,35 +199,24 @@ const SearchBar = ({
                         />
                     )}
                 />
-
-                {/* <Button 
-                    variant="outline-info" 
-                    // color="primary"
-                    // disableElevation
-                    onClick={onClick}
-                    disabled={disabled} 
-                    style={{ marginLeft: "10px"}}>
-                    Search
-                </Button> */}
-                
                 <SettingsVoiceRoundedIcon 
-                
-                color= {micDisabled}
-                style = {{cursor: "pointer", marginLeft:"10px"}}
-                fontSize = "large" 
-                onClick={onVoiceClick}
+                    color= {micDisabled}
+                    style = {{cursor: "pointer", marginLeft:"10px"}}
+                    fontSize = "large" 
+                    onClick={onVoiceClick}
                 />
 
-                {/* <PhotoCameraRoundedIcon color="primary" 
-                fontSize = "large" /> */}
+                <PhotoLibraryRoundedIcon
+                    color="primary" 
+                    fontSize = "large" 
+                    onClick = {showQ}
+                />
                 
                 <SearchRoundedIcon 
-                onClick={onClick}
-                // disabled={disabled}
-                color="primary" 
-                fontSize = "large"
-                // className = "srch"
-                style = {{cursor: searchCursor}}
+                    onClick={onClick}
+                    color="primary" 
+                    fontSize = "large"
+                    style = {{cursor: searchCursor}}
                  />
                 
             </form>
@@ -277,6 +270,4 @@ const SearchBar = ({
     
 
     SearchBar.propTypes = propTypes;
-// export default SearchBar;
 export default SpeechRecognition(voiceOptions)(SearchBar)
-// export default SpeechRecognition(SearchBar)
