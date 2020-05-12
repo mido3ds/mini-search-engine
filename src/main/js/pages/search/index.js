@@ -4,9 +4,10 @@ import React, { useEffect, useState } from 'react'
 import { render } from 'react-dom'
 import { useLocation } from "../../use-location"
 import { DefaultApi } from '../../api'
-import SearchBar from '../../search-bar'
+import CommonSearchBar from '../../common-search-bar'
 import SearchResult from '../../search-result'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Container from 'react-bootstrap/Container';
 
 const API = new DefaultApi()
 
@@ -53,19 +54,39 @@ const Results = () => {
         )
     } else {
         return (
-            <div>
-                <p>Page {currPage}/{allPages}</p>
-                {results.map((r, i) => <SearchResult r={r} key={i} />)}
-                <Pagination count={allPages} shape="rounded" page={currPage} onChange={(_, page) => setP(page)} /><br />
+            <div >
+                    
+                    {results.map((r, i) => <SearchResult r={r} key={i} />)}
+                    <Pagination
+                    count={allPages}
+                    color="primary"  
+                    shape="rounded" 
+                    page={currPage} 
+                    onChange={(_, page) => setP(page)} 
+                    style = {pageStyle}
+                    />
+                
             </div>
         )
     }
 }
 
+const pageStyle = {
+    // marginRight: "600px",
+    marginTop: "30px",
+    marginBottom: "20px",
+    // marginLeft: "200px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+}
+
 const Index = () => (
-    <div>
-        <SearchBar />
-        <Results />
+    <div style={{backgroundColor : "#F8FBFF"}}>
+        {/* <SearchBar /> */}
+        <CommonSearchBar />
+        <Results 
+        />
     </div>
 )
 

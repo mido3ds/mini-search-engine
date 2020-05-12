@@ -30,7 +30,7 @@ const propTypes = {
   }
 
 
-const SearchBar = ({
+const CommonSearchBar = ({
     transcript,
     resetTranscript,
     stopListening,
@@ -136,12 +136,11 @@ const SearchBar = ({
     }
     
     return (
-    <div style = {bg} >
     <Container style={{display: 'flex', justifyContent: 'center'}} >
-    
-    <div onKeyPress={onKey} style={{marginTop: '200px'}} >
-            <h1 style = {lbl}>Mini Search Engine</h1>
-            <Navbar  style = {nav} bg="light" >
+    <div onKeyPress={onKey} style={{marginTop: '1%',marginBottom: '1%' ,backgroundColor : "#F8FBFF"}} >
+            <Navbar style = {nav} fixed="top" className="navbar navbar-light bg-light"> 
+            
+            <span style = {lbl} className="navbar-brand mb-0 h1">Mini Search Engine</span>
             <form noValidate autoComplete="off" style={{ display: "flex" }}>
                 <Autocomplete
                     //INFO
@@ -150,7 +149,7 @@ const SearchBar = ({
                     disableClearable = {true}
                     autoSelect={true}
                     //Style
-                    style={{ width: 800 }}
+                    style={{ width: "800px" }}
                     //Methods
                     open={open}
                     onOpen={() => {
@@ -226,7 +225,6 @@ const SearchBar = ({
         </div>
         
     </Container>
-    </div>
     )
 }
 
@@ -236,39 +234,42 @@ const SearchBar = ({
     // When finished with all pages
     // will gather the common files into one App.css
     const lbl = {
-        textAlign:"center",
-        marginBottom: "50px",
+        textAlign:"left",
+        // marginBottom: "50px",
         fontFamily: 'Aguafina Script',
-        fontSize: "90px"
+        fontSize: "30px"
 
     }
 
     const nav = {
 
         display: "inline-flex",
-        position: "relative",
+        // position: "relative",
         overflow: "hidden",
-        maxWidth: "100%",
-        backgroundColor: "#fff",
+        maxWidth: "75%",
+        marginLeft: '10%',
+        
+        // backgroundColor: "#fff",
         padding: "10px",
         borderRadius: "35px",
-        boxShadow: "0 10px 40px rgba(18, 18, 19, 0.8)"
+        marginBottom: "10px"    
+        // boxShadow: "0 10px 40px rgba(18, 18, 19, 0.8)"
     }
 
-    const bg = {
-        backgroundImage: `url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg")`,
-        // backgroundImage: `url("http://mdbootstrap.com/img/Photos/Others/images/91.jpg")`,
-        height: "100vh",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover"
-    }
+    // const bg = {
+    //     backgroundImage: `url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg")`,
+    //     // backgroundImage: `url("http://mdbootstrap.com/img/Photos/Others/images/91.jpg")`,
+    //     height: "100vh",
+    //     backgroundPosition: "center",
+    //     backgroundRepeat: "no-repeat",
+    //     backgroundSize: "cover"
+    // }
     const voiceOptions = {
         autoStart: false,
-        continuous: true
-
+        continuous: true,
+        // lang: "es"
       }
     
 
-    SearchBar.propTypes = propTypes;
-export default SpeechRecognition(voiceOptions)(SearchBar)
+      CommonSearchBar.propTypes = propTypes;
+export default SpeechRecognition(voiceOptions)(CommonSearchBar)
