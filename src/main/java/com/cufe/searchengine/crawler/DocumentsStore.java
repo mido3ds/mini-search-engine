@@ -4,6 +4,7 @@ import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.StringUtils;
+import com.cufe.searchengine.util.Patterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class DocumentsStore {
 	}
 
 	private void storeToDB(Document document) throws Exception {
-		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), document.getCounter());
+		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), document.getCounter(), document.getPubDate());
 	}
 
 	public void add(String url, String doc) {
@@ -47,8 +48,9 @@ public class DocumentsStore {
 			return;
 		}
 
+		String content = DocumentFilterer.textFromHtml(doc);
 		Document document = new Document(
-			DocumentFilterer.textFromHtml(doc), url, System.currentTimeMillis(), 0, 1
+			content, url, System.currentTimeMillis(), 0, 1, Patterns.extractHTMLPubDate(content)
 		).counter(urlsStore.getCounter());
 
 		try {

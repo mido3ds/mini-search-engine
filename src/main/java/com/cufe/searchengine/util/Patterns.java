@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 public class Patterns {
 	private static final Pattern HTML_TITLE = Pattern.compile("<title>(.+)</title>",
 		Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+	private static final Pattern HTML_PUBDATE = Pattern.compile("\"datePublished\":\"(.+)T",
+		Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 	private static final Pattern URL_PATTERN = Pattern.compile("(((https?|ftp):)//)(\\S+(:\\S*)?@)?((?!(10|127)(\\.\\d{1,3}){3})(?!(169\\.254|192\\.168)(\\.\\d{1,3}){2})(?!172\\.(1[6-9]|2\\d|3[0-1])(\\.\\d{1,3}){2})([1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(\\.(1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(\\.([1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(([a-z0-9\\u00a1-\\uffff][a-z0-9\\u00a1-\\uffff_-]{0,62})?[a-z0-9\\u00a1-\\uffff]\\.)+([a-z\\u00a1-\\uffff]{2,}\\.?))(:\\d{2,5})?([/?#]\\S*)?", Pattern.CASE_INSENSITIVE);
 	private static final Pattern HREF_PATTERN = Pattern.compile("href *= *\"([^\"]+)\"",
 		Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
@@ -51,6 +53,11 @@ public class Patterns {
 	public static String extractHtmlTitle(String html) {
 		List<String> collect = HTML_TITLE.matcher(html).results().map(s -> s.group(1)).collect(Collectors.toList());
 		return collect.size() > 0 ? collect.get(0) : "";
+	}
+
+	public static String extractHTMLPubDate(String html) {
+		List<String> collect = HTML_PUBDATE.matcher(html).results().map(s -> s.group(1)).collect(Collectors.toList());
+		return collect.size() > 0 ? collect.get(0).substring(0, 10) : "";
 	}
 
 	public static boolean couldBeHtml(String url) {

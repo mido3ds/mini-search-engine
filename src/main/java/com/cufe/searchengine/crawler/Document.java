@@ -14,14 +14,16 @@ public class Document {
 	private int counter;
 	private float rank;
 	private int wordCount;
+	private String pubDate;
 
-	public Document(String content, String url, long timeMillis, float rank, int wordCount) {
+	public Document(String content, String url, long timeMillis, float rank, int wordCount, String pubDate) {
 		this.content = content;
 		this.url = url;
 		this.timeMillis = timeMillis;
 		this.counter = -1;
 		this.rank = rank;
 		this.wordCount = wordCount;
+		this.pubDate = pubDate;
 	}
 
 	public Document rowID(long rowID) {
@@ -93,6 +95,14 @@ public class Document {
 
 	public void setRank(float rank) {
 		this.rank = rank;
+	}
+
+	public String getPubDate() {
+		return pubDate;
+	}
+
+	public void setPubDate(String pubDate) {
+		this.pubDate = pubDate;
 	}
 
 	public String getTitle() {
