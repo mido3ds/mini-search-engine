@@ -36,7 +36,7 @@ const CommonSearchBar = ({
     stopListening,
     browserSupportsSpeechRecognition,
     startListening,
-    listening
+    oldQuery
     }) => {
     const [disabled, setDisabled] = useState(true)
     const [searchCursor, setSearchCursor] = useState("not-allowed")
@@ -49,6 +49,8 @@ const CommonSearchBar = ({
     if (!browserSupportsSpeechRecognition) {
         return null;
       }
+
+    
     
     useEffect(() => {
         let active = true
@@ -73,6 +75,22 @@ const CommonSearchBar = ({
             setOptions([])
         }
     }, [open])
+
+    
+    useEffect(() => {
+        //This effect is run once..and never again
+        if (oldQuery !== "") {
+            //removing "?q="
+            let val = oldQuery.slice(3, oldQuery.length)
+            val.replace("%20", " ");
+            val.replace("%27", "'");
+            val.replace("%22", '"');            
+            setQuery(val)
+            oldQuery = ""
+            // console.log(oldQuery)
+        }
+       
+    }, [oldQuery])
     
 
     const onClick = () => {
@@ -113,7 +131,6 @@ const CommonSearchBar = ({
                     setQuery (newQ)
                     setMicDisabled("disabled")
                     stopListening();
-                    console.log("World!"); 
                 }, 250);
                 
             } 
@@ -235,39 +252,24 @@ const CommonSearchBar = ({
     // will gather the common files into one App.css
     const lbl = {
         textAlign:"left",
-        // marginBottom: "50px",
         fontFamily: 'Aguafina Script',
         fontSize: "30px"
 
     }
 
     const nav = {
-
         display: "inline-flex",
-        // position: "relative",
         overflow: "hidden",
         maxWidth: "75%",
         marginLeft: '10%',
-        
-        // backgroundColor: "#fff",
         padding: "10px",
         borderRadius: "35px",
         marginBottom: "10px"    
-        // boxShadow: "0 10px 40px rgba(18, 18, 19, 0.8)"
     }
 
-    // const bg = {
-    //     backgroundImage: `url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg")`,
-    //     // backgroundImage: `url("http://mdbootstrap.com/img/Photos/Others/images/91.jpg")`,
-    //     height: "100vh",
-    //     backgroundPosition: "center",
-    //     backgroundRepeat: "no-repeat",
-    //     backgroundSize: "cover"
-    // }
     const voiceOptions = {
         autoStart: false,
         continuous: true,
-        // lang: "es"
       }
     
 

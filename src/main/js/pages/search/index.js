@@ -9,6 +9,12 @@ import SearchResult from '../../search-result'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 
+// This page shows:
+//     common search bar (sticks on the top)
+//     results of regular queries
+
+//To be developed:
+    // receiving the query that was called
 const API = new DefaultApi()
 
 const Results = () => {
@@ -83,8 +89,9 @@ const pageStyle = {
 
 const Index = () => (
     <div style={{backgroundColor : "#F8FBFF"}}>
-        {/* <SearchBar /> */}
-        <CommonSearchBar />
+        <CommonSearchBar 
+            oldQuery = {window.location.search}
+        />
         <Results 
         />
     </div>
