@@ -160,4 +160,9 @@ public class DocumentsTable {
 		String query = "SELECT wordCount FROM documents WHERE url = ?;";
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class, url));
 	}
+
+	public String selectURLPubDate(String url) throws Exception {
+		String query = "SELECT pubDate FROM documents WHERE url = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, String.class, url));
+	}
 }
