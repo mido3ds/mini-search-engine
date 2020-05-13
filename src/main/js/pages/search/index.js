@@ -14,7 +14,8 @@ import Container from 'react-bootstrap/Container';
 //     results of regular queries
 
 //To be developed:
-    // receiving the query that was called
+    //styling the background color of the nav
+
 const API = new DefaultApi()
 
 const Results = () => {
@@ -64,7 +65,7 @@ const Results = () => {
     } else {
         return (
             <div >
-                {results.map((r, i) => <SearchResult r={r} key={i} />)}
+                {results.map((r, i) => <SearchResult r={r} image = {false} key={i} />)}
                 <Pagination
                     count={allPages}
                     color="primary"  

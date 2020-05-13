@@ -152,7 +152,7 @@ const SearchBar = ({
 
     //navigates us to the image search
     const onImageClick = ()=>{
-        window.location = `/image?q=${query}`
+        window.location = `/images?q=${query}`
     }
     
     //Main style returned
