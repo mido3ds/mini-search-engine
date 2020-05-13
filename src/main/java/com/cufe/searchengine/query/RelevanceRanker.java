@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.lang.Math;
+import java.text.*;
 
 @Component
 public class RelevanceRanker {
@@ -26,6 +27,9 @@ public class RelevanceRanker {
         log.info("started query results ranking");
 
 		List<Float> ranks = new ArrayList<Float>();
+		List<Float> tfidfs = new ArrayList<Float>();
+		List<String> dates = new ArrayList<String>();
+
 		List<Float> idfs = new ArrayList<Float>();
 		int docNum = documentsTable.size();
 
@@ -38,33 +42,94 @@ public class RelevanceRanker {
 
 		for(int i=0; i<queryResults.size(); i++) {
 			String url = queryResults.get(i).getLink();
-			float rank = 0;
+			float tfidf = 0;
 			for(int j=0; j<keywords.size(); j++) {
 				float tf = (float)keywordsTable.selectWordCount(url, keywords.get(j)) / documentsTable.selectWordCount(url);
-				rank += (tf * idfs.get(j));
+				tfidf += (tf * idfs.get(j));
 			}
-			rank += documentsTable.selectURLRank(url);
-			ranks.add(rank);
+			tfidfs.add(tfidf);
+			ranks.add(documentsTable.selectURLRank(url));
+			dates.add(documentsTable.selectURLPubDate(url));
+		}
+
+		log.info("computing individual scores");
+		List<Integer> rankScores = computeScores(ranks);
+		List<Integer> tfidfScores = computeScores(tfidfs);
+		List<Integer> dateScores = computeDateScores(dates);
+
+		log.info("computing overall scores");
+		List<Integer> overallScores = new ArrayList<Integer>();
+		for(int i=0; i<rankScores.size(); i++) {
+			overallScores.add(rankScores.get(i) + tfidfScores.get(i) + dateScores.get(i));
 		}
 
 		log.info("sorting query results");
-		return sortResults(queryResults, ranks);
+		return sortResults(queryResults, overallScores);
 	}
 
-	private ArrayList<QueryResult> sortResults(ArrayList<QueryResult> queryResults, List<Float> ranks) {
-		ArrayList<QueryResult> sortedQueryResults = new ArrayList<>();
-		Integer size = queryResults.size();
+	private ArrayList<QueryResult> sortResults(ArrayList<QueryResult> queryResults, List<Integer> scores) {
+		ArrayList<QueryResult> sortedQueryResults = new ArrayList<QueryResult>();
+		int size = queryResults.size();
 		for(int i=0; i<size; i++) {
-			Integer maxIdx = getMaxIndex(ranks);
+			int maxIdx = getMaxIndex(scores);
 			sortedQueryResults.add(queryResults.get(maxIdx));
 			queryResults.remove(maxIdx);
-			ranks.remove(maxIdx);
+			scores.remove(maxIdx);
 		}
 		return sortedQueryResults;
 	}
 
-	private Integer getMaxIndex(List<Float> list) {
-		Float maxVal = Collections.max(list);
+	private List<Integer> computeScores(List<Float> list) {
+		int size = list.size(); 
+		List<Integer> scores = new ArrayList<Integer>(Collections.nCopies(list.size(), 0));
+		for(int i=0; i<size; i++) {
+			int minIdx = getMinIndex(list);
+			scores.set(minIdx, i);
+			list.remove(minIdx);
+		}
+		return scores;
+	}
+
+	private List<Integer> computeDateScores(List<String> list) {
+		List<Date> dates = new ArrayList<Date>();
+		for(String date : list) {
+			try {
+				if (date.isEmpty()) {
+					dates.add(stringToDate("0000-00-00"));
+				} else {
+					dates.add(stringToDate(date));
+				}
+			} catch (ParseException e) {
+				log.error("date parsing failed");
+			}
+		}
+		int size = dates.size(); 
+		List<Integer> scores = new ArrayList<Integer>(Collections.nCopies(list.size(), 0));
+		for(int i=0; i<size; i++) {
+			int minIdx = getMinDateIndex(dates);
+			scores.set(minIdx, i);
+			list.remove(minIdx);
+		}
+		return scores;
+	}
+
+	private Integer getMinIndex(List<Float> list) {
+		Float minVal = Collections.min(list);
+		return list.indexOf(minVal);
+	}
+
+	private Integer getMaxIndex(List<Integer> list) {
+		int maxVal = Collections.max(list);
 		return list.indexOf(maxVal);
+	}
+
+	private Date stringToDate(String date) throws ParseException {
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");;
+		return formatter.parse(date);
+	}
+
+	private Integer getMinDateIndex(List<Date> list) {
+		Date minVal = Collections.min(list);
+		return list.indexOf(minVal);
 	}
 }
