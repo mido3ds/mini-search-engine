@@ -37,7 +37,7 @@ const Results = () => {
 
     useEffect(() => {
         if (q !== "") {
-            API.query(q, p)
+            API.imageQuery(q, p)
                 .then(resp => {
                     if (resp.status === 200) {
                         setResults(resp.data.results)
