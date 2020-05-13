@@ -20,6 +20,11 @@ public class WebController {
 		return "images.html";
 	}
 
+	@RequestMapping("/trends")
+	public String trends() {
+		return "trends.html";
+	}
+
 	@RequestMapping("/doc")
 	public String doc() {
 		return "redirect:swagger-ui.html";
