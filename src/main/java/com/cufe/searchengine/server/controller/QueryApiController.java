@@ -53,7 +53,8 @@ public class QueryApiController {
 		@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q",
 			required = true) String q,
 		@ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page",
-			required = false) Integer page
+			required = false) Integer page,
+			@ApiParam(value = "country alpha-3 code (ISO 3166) all capital") @Valid @RequestParam(value = "country", required = false) String country
 	) {
 		page = page == null ? 1 : page;
 
