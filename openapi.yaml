@@ -20,12 +20,6 @@ paths:
           description: page of results to fetch, default 1
           schema:
             type: integer
-        - name: country 
-          in: query
-          description: country alpha-3 code (ISO 3166) all capital
-          required: false
-          schema:
-            type: string
       responses:
         "200":
           description: successful operation, result mustn't be empty
@@ -74,12 +68,6 @@ paths:
           description: page of results to fetch, default 1
           schema:
             type: integer
-        - name: country 
-          in: query
-          description: country alpha-3 code (ISO 3166) all capital
-          required: false
-          schema:
-            type: string
       responses:
         "200":
           description: successful operation, result mustn't be empty
