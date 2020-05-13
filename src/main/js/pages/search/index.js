@@ -56,21 +56,23 @@ const Results = () => {
 
     if (err) {
         return (
-            <h2>{err}</h2>
+            <div style = {errStyle} >
+                 <h2>{err}</h2>
+            </div>
+           
         )
     } else {
         return (
             <div >
-                    
-                    {results.map((r, i) => <SearchResult r={r} key={i} />)}
-                    <Pagination
+                {results.map((r, i) => <SearchResult r={r} key={i} />)}
+                <Pagination
                     count={allPages}
                     color="primary"  
                     shape="rounded" 
                     page={currPage} 
                     onChange={(_, page) => setP(page)} 
                     style = {pageStyle}
-                    />
+                />
                 
             </div>
         )
@@ -78,10 +80,15 @@ const Results = () => {
 }
 
 const pageStyle = {
-    // marginRight: "600px",
     marginTop: "30px",
     marginBottom: "20px",
-    // marginLeft: "200px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+}
+
+const errStyle = {
+    marginTop: "100px",
     display: "flex",
     justifyContent: "center",
     alignItems: "center"

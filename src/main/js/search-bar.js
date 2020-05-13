@@ -1,4 +1,3 @@
-// import Button from '@material-ui/core/Button'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
@@ -11,8 +10,7 @@ import { DefaultApi } from './api'
 // Bootstrap
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-// import {Button, Form, FormControl, Navbar} from 'react-bootstrap';
-import '../App.css';
+// import '../App.css';
 import SpeechRecognition from 'react-speech-recognition'
 import PropTypes from "prop-types";
 
@@ -31,25 +29,44 @@ const propTypes = {
 
 
 const SearchBar = ({
+    //Props used in speech recognition
     transcript,
     resetTranscript,
     stopListening,
     browserSupportsSpeechRecognition,
-    startListening,
-    listening
+    startListening
     }) => {
+    /**
+     * States used in main search bar
+     */
+    
+    //disabled: bool to know if search/image icons are available or not
     const [disabled, setDisabled] = useState(true)
+    //the current state of search cursor
     const [searchCursor, setSearchCursor] = useState("not-allowed")
+    //the current state of mic
     const [micDisabled, setMicDisabled] = useState("disabled")
+    //main query, also the data value on the main search bar text field
     const [query, setQuery] = useState("")
+    //state of the autocomplete
     const [open, setOpen] = useState(false)
+    //options to be displayed
     const [options, setOptions] = useState([])
+    //the state of the text field
     const [loading, setLoading] = useState(false)
 
+    //before anything, ig the browser does not support speech recognition
+    //it won't work
     if (!browserSupportsSpeechRecognition) {
-        return null;
+        return (
+            <div>
+                <h1>Sorry, you must use Google Chrome, otherwise spech recognition will not work</h1>
+                <p>Sorry in smaller font</p>
+            </div>
+        );
       }
     
+    //this Hook is used to get options available
     useEffect(() => {
         let active = true
         if (query !== "") {
@@ -67,20 +84,20 @@ const SearchBar = ({
             active = false
         }
     }, [query])
-
     useEffect(() => {
         if (!open) {
             setOptions([])
         }
     }, [open])
     
-
+    //function used to act when search icon is clicked
     const onClick = () => {
         if (query) {
             window.location = `/search?q=${query}`
         }
     }
     
+    //a Hook function used to enable/disable the search icon and image icon as well
     useEffect(() => {
         if (query === "") {
             setDisabled(true)
@@ -93,8 +110,8 @@ const SearchBar = ({
     }, [query])
 
 
+    //function used to control the spech recognition
     const onVoiceClick = (e) => {
-
         if (micDisabled === "disabled")
             //Recording
             {
@@ -120,6 +137,7 @@ const SearchBar = ({
 
     }
 
+    //when a key is hit, check if it's an Enter
     const onKey = (e) => {
         if (e.key === 'Enter') {
             onClick()
@@ -127,18 +145,20 @@ const SearchBar = ({
         }
     }
 
+    //when an input occur, update the query
     const onInputChange = (event) => {
         setQuery(event.target.value)
     }
 
-    const showQ = ()=>{
-        console.log(query)
+    //navigates us to the image search
+    const onImageClick = ()=>{
+        window.location = `/image?q=${query}`
     }
     
+    //Main style returned
     return (
     <div style = {bg} >
     <Container style={{display: 'flex', justifyContent: 'center'}} >
-    
     <div onKeyPress={onKey} style={{marginTop: '200px'}} >
             <h1 style = {lbl}>Mini Search Engine</h1>
             <Navbar  style = {nav} bg="light" >
@@ -209,7 +229,7 @@ const SearchBar = ({
                 <PhotoLibraryRoundedIcon
                     color="primary" 
                     fontSize = "large" 
-                    onClick = {showQ}
+                    onClick = {onImageClick}
                     style = {{cursor: searchCursor}}
                 />
                 

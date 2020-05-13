@@ -81,15 +81,45 @@ const CommonSearchBar = ({
         //This effect is run once..and never again
         if (oldQuery !== "") {
             //removing "?q="
-            let val = oldQuery.slice(3, oldQuery.length)
-            val.replace("%20", " ");
-            val.replace("%27", "'");
-            val.replace("%22", '"');            
-            setQuery(val)
+            let val = oldQuery.slice(3, oldQuery.length);
+            console.log(val)
+            let newVal = "";
+            for (var i=0; i<val.length; i++){
+                console.log(val[i])
+                if (val[i] === "%"){
+                    const numb = val[i+1] + val[i+2];
+                    console.log(numb)
+                    switch(numb) {
+                        case '20':
+                            newVal += " ";
+                            i += 2;
+                            break;
+                        case '3C':
+                            newVal += "<";
+                            i += 2;
+                            break;
+                        case '3E':
+                            newVal += ">";
+                            i += 2;
+                            break;
+                        case '27':
+                            newVal += "'";
+                            i += 2;
+                            break;
+                        case '22':
+                            newVal += '"';
+                            i += 2;
+                            break;
+                      }
+                }else if (val[i] === "#"){
+                    console.log("got it!")
+                }else{
+                    newVal +=  val[i];
+                }
+            }
+            setQuery(newVal)
             oldQuery = ""
-            // console.log(oldQuery)
         }
-       
     }, [oldQuery])
     
 
@@ -148,16 +178,16 @@ const CommonSearchBar = ({
         setQuery(event.target.value)
     }
 
-    const showQ = ()=>{
-        console.log(query)
+    const onImageClick = ()=>{
+        window.location = `/images?q=${query}`
     }
+
     
     return (
     <Container style={{display: 'flex', justifyContent: 'center'}} >
     <div onKeyPress={onKey} style={{marginTop: '1%',marginBottom: '1%' ,backgroundColor : "#F8FBFF"}} >
             <Navbar style = {nav} fixed="top" className="navbar navbar-light bg-light"> 
-            
-            <span style = {lbl} className="navbar-brand mb-0 h1">Mini Search Engine</span>
+            <span style = {lbl} className="navbar-brand mb-0 h1" >Mini Search Engine</span>
             <form noValidate autoComplete="off" style={{ display: "flex" }}>
                 <Autocomplete
                     //INFO
@@ -225,7 +255,7 @@ const CommonSearchBar = ({
                 <PhotoLibraryRoundedIcon
                     color="primary" 
                     fontSize = "large" 
-                    onClick = {showQ}
+                    onClick = {onImageClick}
                     style = {{cursor: searchCursor}}
                 />
                 
