@@ -19,8 +19,11 @@ import SpeechRecognition from 'react-speech-recognition'
 import PropTypes from "prop-types";
 import { makeStyles } from '@material-ui/core/styles';
 import countries from '../js/countries.js';
+import { withRouter } from 'react-router';
+
 
 const API = new DefaultApi()
+
 
 const propTypes = {
     // Props injected by SpeechRecognition
@@ -82,7 +85,7 @@ const SearchBar = ({
 
     //For country selector
     const classes = useStyles();
-
+    
     //before anything, ig the browser does not support speech recognition
     //it won't work
     if (!browserSupportsSpeechRecognition) {
@@ -196,6 +199,12 @@ const SearchBar = ({
         setQuery(event.target.value)
     }
 
+    // let history = useHistory();
+    const navigateHome = () => {
+        window.location = window.location.origin;
+    }
+    
+
     const onTrendChange = (event, newValue) => {
         // console.log(newValue)
         setTrendValue (newValue.label)
@@ -217,7 +226,7 @@ const SearchBar = ({
     <div style = {bg} >
     <Container style={{display: 'flex', justifyContent: 'center'}} >
     <div onKeyPress={onKey} style={{marginTop: '200px'}} >
-            <h1 style = {lbl}>Mini Search Engine</h1>
+            <h1 onClick = {navigateHome} style = {lbl}>Mini Search Engine</h1>
             <Nav  style = {nav} bg="light" className="flex-column">
             <Nav.Item>
             <Form noValidate autoComplete="off" style={{ display: "flex" }}>
@@ -375,7 +384,8 @@ const SearchBar = ({
         textAlign:"center",
         marginBottom: "50px",
         fontFamily: 'Aguafina Script',
-        fontSize: "90px"
+        fontSize: "90px",
+        cursor: "pointer"
     }
 
     const nav = {
@@ -417,4 +427,5 @@ const SearchBar = ({
 
     
     SearchBar.propTypes = propTypes;
+    
 export default SpeechRecognition(voiceOptions)(SearchBar)

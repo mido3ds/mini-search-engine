@@ -182,12 +182,16 @@ const CommonSearchBar = ({
         window.location = `/images?q=${query}`
     }
 
-    
+     // let history = useHistory();
+     const navigateHome = () => {
+        window.location = window.location.origin;
+    }
+
     return (
     <Container style={{display: 'flex', justifyContent: 'center'}} >
     <div onKeyPress={onKey} style={{marginTop: '1%',marginBottom: '1%' ,backgroundColor : "#F8FBFF"}} >
             <Navbar style = {nav} fixed="top" className="navbar navbar-light bg-light"> 
-            <span style = {lbl} className="navbar-brand mb-0 h1" >Mini Search Engine</span>
+            <span onClick = {navigateHome} style = {lbl} className="navbar-brand mb-0 h1" >Mini Search Engine</span>
             <form noValidate autoComplete="off" style={{ display: "flex" }}>
                 <Autocomplete
                     //INFO
@@ -283,7 +287,8 @@ const CommonSearchBar = ({
     const lbl = {
         textAlign:"left",
         fontFamily: 'Aguafina Script',
-        fontSize: "30px"
+        fontSize: "30px",
+        cursor: "pointer"
 
     }
 
