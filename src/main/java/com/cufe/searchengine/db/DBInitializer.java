@@ -33,6 +33,11 @@ public class DBInitializer implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws SQLException {
+		if ("1".equals(System.getenv("MOCK"))) {
+			log.info("mock server, not initializing db");
+			return;
+		}
+
 		create();
 
 		if (populateDB) {

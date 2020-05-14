@@ -13,3 +13,5 @@ built
 *.log
 
 *.db-journal
+
+package-lock.json
