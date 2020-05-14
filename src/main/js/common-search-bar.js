@@ -12,7 +12,6 @@ import { DefaultApi } from './api'
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 // import {Button, Form, FormControl, Navbar} from 'react-bootstrap';
-import '../App.css';
 import SpeechRecognition from 'react-speech-recognition'
 import PropTypes from "prop-types";
 

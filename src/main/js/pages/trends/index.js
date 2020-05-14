@@ -1,23 +1,26 @@
-import Pagination from '@material-ui/lab/Pagination'
+// import Pagination from '@material-ui/lab/Pagination'
 import qs from 'qs'
 import React, { useEffect, useState } from 'react'
 import { render } from 'react-dom'
 import { useLocation } from "../../use-location"
 import { DefaultApi } from '../../api'
-import CommonSearchBar from '../../common-search-bar'
-import SearchResult from '../../search-result'
+// import CommonSearchBar from '../../common-search-bar'
+// import SearchResult from '../../search-result'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Container from 'react-bootstrap/Container';
+import Table from 'react-bootstrap/Table';
+import { Container } from '@material-ui/core'
+import CommonSearchBar from '../../common-search-bar'
 
-    // ["Mahmoud Adas",
-    // "Mahmoud Othman Adas",
-    // "Shrek",
-    // "Mahmoud Adas Again",
-    // "Maybe Mahmoud Osman Adas",
-    // "Adas Adas","Yup, it's 3ds ᕕ( ᐛ )ᕗ",
-    // "Of course adas is the most trndy, what did you expect?",
-    // "No not adas again",
-    // "Adas (✿⁠´ ꒳ ` )"]
+
+    const ev = ["Mahmoud Adas",
+    "Mahmoud Othman Adas",
+    "Shrek",
+    "Mahmoud Adas Again",
+    "Maybe Mahmoud Osman Adas",
+    "Adas Adas","Yup, it's 3ds ᕕ( ᐛ )ᕗ",
+    "Of course adas is the most trndy, what did you expect?",
+    "No not adas again",
+    "Adas (✿⁠´ ꒳ ` )"]
 
     
     // This page shows:
@@ -28,13 +31,16 @@ import Container from 'react-bootstrap/Container';
         //styling the background color of the nav
     
     const API = new DefaultApi()
-    
+    const iso31661 = require('iso-3166')
+
+
+
     const Results = () => {
         const [results, setResults] = useState([])
         const [country, setQ] = useState("")
         const [err, setErr] = useState("")
         const { search } = useLocation()
-        
+        const [countryName, setCountryName] = useState("")
         //I don't know the usage of this code!
         useEffect(() => {
             const parsed = qs.parse(search, { ignoreQueryPrefix: true })
@@ -46,7 +52,7 @@ import Container from 'react-bootstrap/Container';
                 API.trends(country)
                     .then(resp => {
                         if (resp.status === 200) {
-                            setResults(resp.data.results)
+                            setResults(resp.data)
                             setErr("")
                         } else {
                             setErr("No Trending Results")
@@ -56,13 +62,29 @@ import Container from 'react-bootstrap/Container';
                         setErr("No Trending Results")
                     })
             }
+
+            if (country !== ""){
+                let i = 0
+                // console.log(country)
+                while (i < iso31661.length)
+                {
+                    if (iso31661[i].alpha3 === country)
+                    {
+                        // console.log(iso31661[i].name)
+                        setCountryName(iso31661[i].name)
+                    }
+                    i += 1
+                }
+            }
+
         }, [country])
         
 
-        console.log(country)
-        console.log(results)
+        // console.log(country)
+        // console.log(ev)
 
-        if (err) {
+        //not error for now
+        if (!err) {
             return (
                 <div style = {errStyle} >
                      <h2>{err}</h2>
@@ -70,21 +92,40 @@ import Container from 'react-bootstrap/Container';
             )
         } else {
             return (
-                <div >
-                    <h1>ev</h1>
-                    {/* {results.map((r, i) => <SearchResult r={r} image = {false} key={i} />)}
-                     */}
-                </div>
+                <>
+                    <Container maxWidth="sm" style = {tableStyle}>
+                        <h1 style = {lbl}>Trending in {countryName}</h1>
+                    </Container>
+                    <Container maxWidth="sm" style = {tableStyle}>
+                    <Table striped bordered hover >
+                        <thead>
+                            <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ev.map((r, i) => <TrendResult r={r} ind={i+1} key={i} />)}
+                        </tbody>
+                    </Table>
+                    </Container>
+                </>
             )
         }
     }
     
-    const pageStyle = {
-        marginTop: "30px",
-        marginBottom: "20px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center"
+    const lbl = {
+        textAlign:"center",
+        fontFamily: 'Aclonica',
+        fontSize: "60px",
+        marginTop: "40px"
+        }
+
+    const tableStyle = {
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop : "15px"
+        
     }
     
     const errStyle = {
@@ -94,8 +135,21 @@ import Container from 'react-bootstrap/Container';
         alignItems: "center"
     }
     
+    const TrendResult = ({r,ind}) => {
+        return (
+            <tr>
+            <td>{ind}</td>
+            <td>{r}</td>
+            </tr>
+        );
+    }
+
+
     const Index = () => (
+        <>
+        <CommonSearchBar oldQuery = ""/>
         <Results />
+        </>
     )
     
     render(
