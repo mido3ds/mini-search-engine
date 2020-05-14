@@ -34,15 +34,6 @@ const propTypes = {
     browserSupportsSpeechRecognition: PropTypes.bool
   }
 
-// ISO 3166-1 alpha-2
-// ⚠️ No support for IE 11
-function countryToFlag(isoCode) {
-    return typeof String.fromCodePoint !== 'undefined'
-      ? isoCode
-          .toUpperCase()
-          .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397))
-      : isoCode;
-  }
 
 const SearchBar = ({
     //Props used in speech recognition
@@ -149,13 +140,6 @@ const SearchBar = ({
             // setTrendsCursor("pointer")
         }
     }, [trend,trendValue])
-
-    // Listener
-    // useEffect(() => {
-    //     console.log(trend)
-    //     console.log(trendValue)
-    //     console.log(trendFixedValue)
-    // }, [trend, trendValue])
 
     
     //function used to control the spech recognition
