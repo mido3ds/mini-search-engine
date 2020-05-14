@@ -67,6 +67,7 @@ const SearchResult = ({ r, image }) => {
           <CardActionArea >
             <CardContent >
             <a href={r.link}>
+                <img src={r.link} width="120px"/>
                 <Typography gutterBottom variant="h5" component="h2">
                     {r.title.length < 60 ? r.title : r.title.slice(0,55) +"....."}
                     </Typography>   
