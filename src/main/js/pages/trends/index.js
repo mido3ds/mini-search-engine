@@ -46,7 +46,7 @@ import Container from 'react-bootstrap/Container';
                 API.trends(country)
                     .then(resp => {
                         if (resp.status === 200) {
-                            setResults(resp.data.results)
+                            setResults(resp.data)
                             setErr("")
                         } else {
                             setErr("No Trending Results")
@@ -72,8 +72,9 @@ import Container from 'react-bootstrap/Container';
             return (
                 <div >
                     <h1>ev</h1>
-                    {/* {results.map((r, i) => <SearchResult r={r} image = {false} key={i} />)}
-                     */}
+                    <ol>
+                        {results.map((res, i) => <li key={i}>{res}</li>)}
+                    </ol>
                 </div>
             )
         }
