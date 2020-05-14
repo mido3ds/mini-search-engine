@@ -88,15 +88,23 @@ const errStyle = {
     alignItems: "center"
 }
 
-const Index = () => (
+const Index = () => {
+    const { search } = useLocation()
+    const [q, setQ] = useState("")
+    useEffect(() => {
+        const parsed = qs.parse(search, { ignoreQueryPrefix: true })
+        setQ(parsed.q)
+    }, [search])
+    return(
     <div style={{backgroundColor : "#F8FBFF"}}>
         <CommonSearchBar 
-            oldQuery = {window.location.search}
+            oldQuery = {q}
         />
         <Results 
         />
     </div>
-)
+    )
+    }
 
 render(
     <Index />,

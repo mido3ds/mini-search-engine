@@ -31,10 +31,8 @@ import Container from 'react-bootstrap/Container';
     
     const Results = () => {
         const [results, setResults] = useState([])
-        
         const [country, setQ] = useState("")
         const [err, setErr] = useState("")
-    
         const { search } = useLocation()
         
         //I don't know the usage of this code!
@@ -60,9 +58,9 @@ import Container from 'react-bootstrap/Container';
             }
         }, [country])
         
-        
 
-
+        console.log(country)
+        console.log(results)
 
         if (err) {
             return (

@@ -43,7 +43,7 @@ const cardStyle2 = {
 
 const SearchResult = ({ r, image }) => {
 
-    if (image){
+    if (!image){
       return (  
         <Card style = {cardStyle} >
           <CardActionArea >
