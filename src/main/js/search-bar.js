@@ -58,16 +58,27 @@ const SearchBar = ({
     const [disabled, setDisabled] = useState(true)
     //the current state of search cursor
     const [searchCursor, setSearchCursor] = useState("not-allowed")
+    //the current state of sow trends cursor
+    //Current state of TrendButton
+    const [trendDisabled, setTrendDisabled] = useState(true)
+    //modified value of the Trend Input field
+    const [trendValue, setTrendValue] = useState("")
+    //comparable value
+    const [trendFixedValue, setTrendFixedValue] = useState("")
     //the current state of mic
     const [micDisabled, setMicDisabled] = useState("disabled")
     //main query, also the data value on the main search bar text field
     const [query, setQuery] = useState("")
+    //currently selected Trend
+    const [trend, setTrend] = useState("")
     //state of the autocomplete
     const [open, setOpen] = useState(false)
     //options to be displayed
     const [options, setOptions] = useState([])
     //the state of the text field
     const [loading, setLoading] = useState(false)
+    
+
 
     //For country selector
     const classes = useStyles();
@@ -126,7 +137,25 @@ const SearchBar = ({
         }
     }, [query])
 
+    //a Hook used to decide the current state of the trendsButton
+    useEffect(() => {
+        if (trend === "" || trend === undefined || trendValue !== trendFixedValue) {
+            setTrendDisabled (true)
+            // setTrendsCursor ("not-allowed")
+        } else {
+            setTrendDisabled (false)
+            // setTrendsCursor("pointer")
+        }
+    }, [trend,trendValue])
 
+    //Listener
+    // useEffect(() => {
+    //     console.log(trend)
+    //     console.log(trendValue)
+    //     console.log(trendFixedValue)
+    // }, [trend, trendValue])
+
+    
     //function used to control the spech recognition
     const onVoiceClick = (e) => {
         if (micDisabled === "disabled")
@@ -167,11 +196,22 @@ const SearchBar = ({
         setQuery(event.target.value)
     }
 
+    const onTrendChange = (event, newValue) => {
+        // console.log(newValue)
+        setTrendValue (newValue.label)
+        setTrendFixedValue (newValue.label)
+        setTrend (newValue.code)
+    }
     //navigates us to the image search
     const onImageClick = ()=>{
         window.location = `/images?q=${query}`
     }
     
+    //navigates to the trends page
+    const trendsClick = ()=>{
+        window.location = `/trends?country=${trend}`
+    }
+
     //Main style returned
     return (
     <div style = {bg} >
@@ -275,6 +315,15 @@ const SearchBar = ({
                     classes={{
                         option: classes.option,
                     }}
+
+                    inputValue={trendValue}
+                    onInputChange={(event, newInputValue) => {
+                    setTrendValue(newInputValue);
+                    }}
+
+                    onChange={onTrendChange}
+
+
                     autoHighlight
                     getOptionLabel={(option) => option.label}
                     renderOption={(option) => (
@@ -299,8 +348,11 @@ const SearchBar = ({
                 <Button size="small" 
                         variant="contained" 
                         color="primary" 
-                        style = {{ marginTop: "10px"}}
-                        startIcon={<WhatshotIcon />}>
+                        disabled = {trendDisabled}
+                        style = {{marginTop: "10px"}}
+                        startIcon={<WhatshotIcon />}
+                        onClick = {trendsClick}
+                        >
                     Show Trends
                 </Button>
                 </Form>
