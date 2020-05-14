@@ -78,48 +78,50 @@ const CommonSearchBar = ({
 
     
     useEffect(() => {
+        setQuery(oldQuery)
         //This effect is run once..and never again
-        if (oldQuery !== "") {
-            //removing "?q="
-            let val = oldQuery.slice(3, oldQuery.length);
-            console.log(val)
-            let newVal = "";
-            for (var i=0; i<val.length; i++){
-                console.log(val[i])
-                if (val[i] === "%"){
-                    const numb = val[i+1] + val[i+2];
-                    console.log(numb)
-                    switch(numb) {
-                        case '20':
-                            newVal += " ";
-                            i += 2;
-                            break;
-                        case '3C':
-                            newVal += "<";
-                            i += 2;
-                            break;
-                        case '3E':
-                            newVal += ">";
-                            i += 2;
-                            break;
-                        case '27':
-                            newVal += "'";
-                            i += 2;
-                            break;
-                        case '22':
-                            newVal += '"';
-                            i += 2;
-                            break;
-                      }
-                }else if (val[i] === "#"){
-                    console.log("got it!")
-                }else{
-                    newVal +=  val[i];
-                }
-            }
-            setQuery(newVal)
-            oldQuery = ""
-        }
+        // if (oldQuery !== "") {
+        //     //removing "?q="
+        //     console.log(oldQuery)
+        //     let val = oldQuery.slice(3, oldQuery.length);
+        //     // console.log(val)
+        //     let newVal = "";
+        //     for (var i=0; i<val.length; i++){
+        //         // console.log(val[i])
+        //         if (val[i] === "%"){
+        //             const numb = val[i+1] + val[i+2];
+        //             // console.log(numb)
+        //             switch(numb) {
+        //                 case '20':
+        //                     newVal += " ";
+        //                     i += 2;
+        //                     break;
+        //                 case '3C':
+        //                     newVal += "<";
+        //                     i += 2;
+        //                     break;
+        //                 case '3E':
+        //                     newVal += ">";
+        //                     i += 2;
+        //                     break;
+        //                 case '27':
+        //                     newVal += "'";
+        //                     i += 2;
+        //                     break;
+        //                 case '22':
+        //                     newVal += '"';
+        //                     i += 2;
+        //                     break;
+        //               }
+        //         }else if (val[i] === "#"){
+        //             console.log("got it!")
+        //         }else{
+        //             newVal +=  val[i];
+        //         }
+        //     }
+        //     setQuery(newVal)
+        //     oldQuery = ""
+        
     }, [oldQuery])
     
 

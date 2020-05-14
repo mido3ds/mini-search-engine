@@ -60,6 +60,10 @@ import Container from 'react-bootstrap/Container';
             }
         }, [country])
         
+        
+
+
+
         if (err) {
             return (
                 <div style = {errStyle} >
@@ -71,14 +75,6 @@ import Container from 'react-bootstrap/Container';
                 <div >
                     <h1>ev</h1>
                     {/* {results.map((r, i) => <SearchResult r={r} image = {false} key={i} />)}
-                    <Pagination
-                        count={allPages}
-                        color="primary"  
-                        shape="rounded" 
-                        page={currPage} 
-                        onChange={(_, page) => setP(page)} 
-                        style = {pageStyle}
-                    />
                      */}
                 </div>
             )
@@ -101,8 +97,7 @@ import Container from 'react-bootstrap/Container';
     }
     
     const Index = () => (
-        
-            <Results />
+        <Results />
     )
     
     render(
