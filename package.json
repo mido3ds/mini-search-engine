@@ -20,6 +20,7 @@
     "bootstrap": "^4.4.1",
     "css-loader": "^3.5.3",
     "fs-extra": "^9.0.0",
+    "iso-3166": "^3.0.1",
     "match-sorter": "^4.0.2",
     "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",

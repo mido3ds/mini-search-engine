@@ -18,8 +18,7 @@ import Form from 'react-bootstrap/Form';
 import SpeechRecognition from 'react-speech-recognition'
 import PropTypes from "prop-types";
 import { makeStyles } from '@material-ui/core/styles';
-import countries from '../js/countries.js';
-import { withRouter } from 'react-router';
+// import Tooltip from '@material-ui/core/Tooltip';
 
 
 const API = new DefaultApi()
@@ -151,7 +150,7 @@ const SearchBar = ({
         }
     }, [trend,trendValue])
 
-    //Listener
+    // Listener
     // useEffect(() => {
     //     console.log(trend)
     //     console.log(trendValue)
@@ -207,9 +206,9 @@ const SearchBar = ({
 
     const onTrendChange = (event, newValue) => {
         // console.log(newValue)
-        setTrendValue (newValue.label)
-        setTrendFixedValue (newValue.label)
-        setTrend (newValue.code)
+        setTrendValue (newValue.name)
+        setTrendFixedValue (newValue.name)
+        setTrend (newValue.alpha3)
     }
     //navigates us to the image search
     const onImageClick = ()=>{
@@ -221,6 +220,8 @@ const SearchBar = ({
         window.location = `/trends?country=${trend}`
     }
 
+    const iso31661 = require('iso-3166')
+ 
     //Main style returned
     return (
     <div style = {bg} >
@@ -320,7 +321,7 @@ const SearchBar = ({
                             marginLeft: "1%",
                             marginTop: "10px"
                         }}
-                    options={countries}
+                    options={iso31661}
                     classes={{
                         option: classes.option,
                     }}
@@ -331,14 +332,13 @@ const SearchBar = ({
                     }}
 
                     onChange={onTrendChange}
-
-
                     autoHighlight
-                    getOptionLabel={(option) => option.label}
-                    renderOption={(option) => (
+
+                    getOptionLabel={(options) => options.name}
+                    renderOption={(options) => (
                         <React.Fragment>
-                        <span>{countryToFlag(option.code)}</span>
-                        {option.label} ({option.code}) +{option.phone}
+                            <span>{options.alpha3}</span>
+                            {options.name} ({options.alpha3})
                         </React.Fragment>
                     )}
                     renderInput={(params) => (
@@ -354,6 +354,7 @@ const SearchBar = ({
                         />
                     )}
                 />
+                {/* <Tooltip title="Select a Country" placement="bottom-end"> */}
                 <Button size="small" 
                         variant="contained" 
                         color="primary" 
@@ -364,6 +365,7 @@ const SearchBar = ({
                         >
                     Show Trends
                 </Button>
+                {/* </Tooltip> */}
                 </Form>
                 </Nav.Item>
             </Nav>
