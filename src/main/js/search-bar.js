@@ -1,9 +1,11 @@
 import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
+import Button from '@material-ui/core/Button';
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import matchSorter from 'match-sorter'
 import SettingsVoiceRoundedIcon from '@material-ui/icons/SettingsVoiceRounded';
 import SearchRoundedIcon from '@material-ui/icons/SearchRounded';
+import WhatshotIcon from '@material-ui/icons/Whatshot';
 import PhotoLibraryRoundedIcon from '@material-ui/icons/PhotoLibraryRounded';
 import React, { useEffect, useState } from 'react'
 import { DefaultApi } from './api'
@@ -262,13 +264,12 @@ const SearchBar = ({
                 <Form noValidate autoComplete="off" style={{ display: "flex" }}>
                 <Autocomplete
                     id="country-select-demo"
-                    style={{ width: 280, 
+                    style={{ width: 270, 
                             display: 'flex', 
                             justifyContent: 'center',
-                            // marginRight: "50%",
-                            marginLeft: "33%",
-                            marginTop: "10px",
-
+                            marginRight: "5%",
+                            marginLeft: "1%",
+                            marginTop: "10px"
                         }}
                     options={countries}
                     classes={{
@@ -295,6 +296,13 @@ const SearchBar = ({
                         />
                     )}
                 />
+                <Button size="small" 
+                        variant="contained" 
+                        color="primary" 
+                        style = {{ marginTop: "10px"}}
+                        startIcon={<WhatshotIcon />}>
+                    Show Trends
+                </Button>
                 </Form>
                 </Nav.Item>
             </Nav>
