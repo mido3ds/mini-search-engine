@@ -64,7 +64,13 @@ public class RelevanceRanker {
 		}
 
 		log.info("sorting query results");
-		return sortResults(queryResults, overallScores);
+		ArrayList<QueryResult> results = sortResults(queryResults, overallScores);
+
+		if (clientAlpha3.isEmpty()) {
+			return results;
+		}
+
+		return sortByCountry(results, clientAlpha3);
 	}
 
 	private ArrayList<QueryResult> sortResults(ArrayList<QueryResult> queryResults, List<Integer> scores) {
@@ -77,6 +83,22 @@ public class RelevanceRanker {
 			scores.remove(maxIdx);
 		}
 		return sortedQueryResults;
+	}
+
+	private ArrayList<QueryResult> sortByCountry(ArrayList<QueryResult> queryResults, String clientAlpha3) throws Exception {
+		ArrayList<QueryResult> countryResults = new ArrayList<QueryResult>();
+		ArrayList<QueryResult> otherResults = new ArrayList<QueryResult>();
+		for(QueryResult result : queryResults) {
+			String url = result.getLink();
+			String countryCode = documentsTable.selectURLCountryCode(url);
+			if (countryCode.equals(clientAlpha3)) {
+				countryResults.add(result);
+			} else {
+				otherResults.add(result);
+			}
+		}
+		countryResults.addAll(otherResults);
+		return countryResults;
 	}
 
 	private List<Integer> computeScores(List<Float> list) {
