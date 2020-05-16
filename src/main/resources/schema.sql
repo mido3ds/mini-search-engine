@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS documents(
 	counter INT NOT NULL,
 	wordCount INT NOT NULL DEFAULT 1,
 	rank FLOAT NOT NULL DEFAULT 0,
-	pubDate DATE NOT NULL
+	pubDate DATE NOT NULL,
+	countryCode STRING NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS keywords(

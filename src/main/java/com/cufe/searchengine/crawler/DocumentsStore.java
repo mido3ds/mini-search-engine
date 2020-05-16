@@ -39,8 +39,15 @@ public class DocumentsStore {
 	}
 
 	private void storeToDB(Document document) throws Exception {
-		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), document.getCounter(), document.getPubDate());
+		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), 
+								document.getCounter(), document.getPubDate(), document.getCountryCode());
 	}
+
+	// private String countryFromURL(String url) {
+	// 	InetAddress address = InetAddress.getByName(new URL(url).getHost());
+	// 	String ip = address.getHostAddress();
+	// 	return ip;
+	// }
 
 	public void add(String url, String doc) {
 		if (!StringUtils.isHtml(doc)) {
@@ -50,7 +57,7 @@ public class DocumentsStore {
 
 		String content = DocumentFilterer.textFromHtml(doc);
 		Document document = new Document(
-			content, url, System.currentTimeMillis(), 0, 1, Patterns.extractHTMLPubDate(content)
+			content, url, System.currentTimeMillis(), 0, 1, Patterns.extractHTMLPubDate(content), "TBD"
 		).counter(urlsStore.getCounter());
 
 		try {

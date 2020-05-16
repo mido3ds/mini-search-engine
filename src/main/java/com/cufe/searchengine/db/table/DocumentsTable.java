@@ -25,10 +25,10 @@ public class DocumentsTable {
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class));
 	}
 
-	public void replace(String url, String content, long timeMillis, int counter, String pubDate) throws Exception {
+	public void replace(String url, String content, long timeMillis, int counter, String pubDate, String countryCode) throws Exception {
 		Integer rows = DBUtils.waitLock(100,
-			() -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis, counter, pubDate) " +
-				"VALUES(?, ?, ?, ?, ?);", url, content, timeMillis, counter, pubDate)
+			() -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis, counter, pubDate, countryCode) " +
+				"VALUES(?, ?, ?, ?, ?, ?);", url, content, timeMillis, counter, pubDate, countryCode)
 		);
 
 		if (rows == null || rows != 1) {
@@ -79,9 +79,9 @@ public class DocumentsTable {
 
 	public List<Document> selectAll(int maxDocumentsPerIteration) throws Exception {
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(String.format("SELECT content, url, timeMillis, rank, wordCount, indexTimeMillis, ROWID, " +
-				"pubDate FROM documents WHERE indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration),
+				"pubDate, countryCode FROM documents WHERE indexTimeMillis < timeMillis LIMIT %d;", maxDocumentsPerIteration),
 			(row, i) -> new Document(row.getString(1), row
-				.getString(2), row.getLong(3), row.getFloat(4), row.getInt(5), row.getString(8)).indexTimeMillis(row.getLong(6))
+				.getString(2), row.getLong(3), row.getFloat(4), row.getInt(5), row.getString(8), row.getString(9)).indexTimeMillis(row.getLong(6))
 				.rowID(row.getLong(7))));
 	}
 
@@ -96,10 +96,10 @@ public class DocumentsTable {
 			return new ArrayList<>();
 		}
 
-		String query = "SELECT content, url rank, wordCount, pubDate FROM documents WHERE " + reducedLikes.get() + ";";
+		String query = "SELECT content, url rank, wordCount, pubDate, countryCode FROM documents WHERE " + reducedLikes.get() + ";";
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(query, (row, i) -> new Document(row.getString(1),
-			row.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5)))
+			row.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)))
 			.stream()
 			.map(d -> new QueryResult().title(d.getTitle())
 				.snippet(d.getSnippet(phrases))
@@ -108,7 +108,7 @@ public class DocumentsTable {
 	}
 
 	public List<Document> selectContentUrlSorted(List<String> keywords) throws Exception {
-		StringBuilder builder = new StringBuilder("SELECT content, url, rank, wordCount, pubDate FROM documents d " + "INNER JOIN " +
+		StringBuilder builder = new StringBuilder("SELECT content, url, rank, wordCount, pubDate, countryCode FROM documents d " + "INNER JOIN " +
 			"keywords_documents kd ON d.ROWID = kd.docID " + "INNER JOIN " + "keywords k ON k.ROWID = kd.wordID AND k.word in (");
 		for (int i = 0; i < keywords.size(); i++) {
 			builder.append("?");
@@ -120,7 +120,7 @@ public class DocumentsTable {
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(builder.toString(),
 			(row, i) -> new Document(row.getString(1), row
-				.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5)), keywords.toArray()));
+				.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)), keywords.toArray()));
 	}
 
 	public Float selectURLRank(String url) throws Exception {
@@ -163,6 +163,11 @@ public class DocumentsTable {
 
 	public String selectURLPubDate(String url) throws Exception {
 		String query = "SELECT pubDate FROM documents WHERE url = ?;";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, String.class, url));
+	}
+
+	public String selectURLCountryCode(String url) throws Exception {
+		String query = "SELECT countryCode FROM documents WHERE url = ?;";
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, String.class, url));
 	}
 }

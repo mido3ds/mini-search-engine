@@ -15,8 +15,9 @@ public class Document {
 	private float rank;
 	private int wordCount;
 	private String pubDate;
+	private String countryCode;
 
-	public Document(String content, String url, long timeMillis, float rank, int wordCount, String pubDate) {
+	public Document(String content, String url, long timeMillis, float rank, int wordCount, String pubDate, String countryCode) {
 		this.content = content;
 		this.url = url;
 		this.timeMillis = timeMillis;
@@ -24,6 +25,7 @@ public class Document {
 		this.rank = rank;
 		this.wordCount = wordCount;
 		this.pubDate = pubDate;
+		this.countryCode = countryCode;
 	}
 
 	public Document rowID(long rowID) {
@@ -103,6 +105,14 @@ public class Document {
 
 	public void setPubDate(String pubDate) {
 		this.pubDate = pubDate;
+	}
+
+	public String getCountryCode() {
+		return countryCode;
+	}
+
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
 	}
 
 	public String getTitle() {
