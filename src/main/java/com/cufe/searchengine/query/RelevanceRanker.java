@@ -23,7 +23,7 @@ public class RelevanceRanker {
 	@Autowired
 	private KeywordsTable keywordsTable;
 
-	public ArrayList<QueryResult> rank(ArrayList<QueryResult> queryResults, List<String> keywords) throws Exception {
+	public ArrayList<QueryResult> rank(ArrayList<QueryResult> queryResults, List<String> keywords, String clientAlpha3) throws Exception {
         log.info("started query results ranking");
 
 		List<Float> ranks = new ArrayList<Float>();

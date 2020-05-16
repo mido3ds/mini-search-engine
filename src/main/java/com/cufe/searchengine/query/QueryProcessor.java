@@ -4,6 +4,7 @@ import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.server.model.QueryResult;
 import com.cufe.searchengine.util.DocumentFilterer;
+import com.cufe.searchengine.util.GeoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class QueryProcessor {
 	/**
 	 * @return all search results, ranked
 	 */
-	public List<QueryResult> search(String query) {
+	public List<QueryResult> search(String query, String ipAddress) {
 		//		log.info("received query = {}", query);
 
 		ArrayList<QueryResult> queryResults = new ArrayList<>(phraseProcessor.search(query));
@@ -42,9 +43,17 @@ public class QueryProcessor {
 
 		//		log.info("extracted keywords = {}", keywords);
 
+		String clientAlpha3 = new String("");
+		try {
+			clientAlpha3 = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(ipAddress));	
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("failed to get client country");
+		}
+
 		if (keywords.size() == 0) {
 			try {
-				return relevanceRanker.rank(queryResults, keywords);
+				return relevanceRanker.rank(queryResults, keywords, clientAlpha3);
 			} catch (Exception e) {
 				e.printStackTrace();
 				log.error("query ranking failed");
@@ -70,7 +79,7 @@ public class QueryProcessor {
 			.collect(Collectors.toList()));
 
 		try {
-			return relevanceRanker.rank(queryResults, keywords);
+			return relevanceRanker.rank(queryResults, keywords, clientAlpha3);
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("query ranking failed");

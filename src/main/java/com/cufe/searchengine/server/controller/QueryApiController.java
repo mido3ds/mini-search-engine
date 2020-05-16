@@ -16,6 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +54,8 @@ public class QueryApiController {
 		@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q",
 			required = true) String q,
 		@ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page",
-			required = false) Integer page
+			required = false) Integer page, 
+		HttpServletRequest request
 	) {
 		page = page == null ? 1 : page;
 
@@ -75,7 +77,7 @@ public class QueryApiController {
 
 			return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(queryResults));
 		} else {
-			List<QueryResult> queryResults = queryProcessor.search(q);
+			List<QueryResult> queryResults = queryProcessor.search(q, request.getRemoteAddr());
 
 			int pages = (int) Math.ceil(queryResults.size() / 10.0d);
 
