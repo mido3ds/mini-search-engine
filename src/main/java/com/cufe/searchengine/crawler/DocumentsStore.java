@@ -4,6 +4,7 @@ import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.StringUtils;
+import com.cufe.searchengine.util.GeoUtils;
 import com.cufe.searchengine.util.Patterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +44,6 @@ public class DocumentsStore {
 								document.getCounter(), document.getPubDate(), document.getCountryCode());
 	}
 
-	// private String countryFromURL(String url) {
-	// 	InetAddress address = InetAddress.getByName(new URL(url).getHost());
-	// 	String ip = address.getHostAddress();
-	// 	return ip;
-	// }
-
 	public void add(String url, String doc) {
 		if (!StringUtils.isHtml(doc)) {
 			log.info("doc at url {} is probably not html, ignore it", url);
@@ -56,8 +51,16 @@ public class DocumentsStore {
 		}
 
 		String content = DocumentFilterer.textFromHtml(doc);
+
+		String countryCode = new String("");
+		try {
+			countryCode = GeoUtils.countryCodeFromName(GeoUtils.countryFromIP(GeoUtils.ipFromURL(url)));
+		} catch (Exception e) {
+			log.error("failed to get country code, error: " + e.getMessage());
+		}
+
 		Document document = new Document(
-			content, url, System.currentTimeMillis(), 0, 1, Patterns.extractHTMLPubDate(content), "TBD"
+			content, url, System.currentTimeMillis(), 0, 1, Patterns.extractHTMLPubDate(content), countryCode
 		).counter(urlsStore.getCounter());
 
 		try {
