@@ -54,7 +54,7 @@ public class DocumentsStore {
 
 		String countryCode = new String("");
 		try {
-			countryCode = GeoUtils.countryCodeFromName(GeoUtils.countryFromIP(GeoUtils.ipFromURL(url)));
+			countryCode = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(GeoUtils.ipFromURL(url)));
 		} catch (Exception e) {
 			log.error("failed to get country code, error: " + e.getMessage());
 		}

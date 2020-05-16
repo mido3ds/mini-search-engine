@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import com.maxmind.geoip2.*;
 import com.maxmind.geoip2.model.*;
 import com.maxmind.geoip2.record.*;
+import com.neovisionaries.i18n.*;
 
 import java.io.*;
 import java.net.*;
@@ -19,7 +20,7 @@ public class GeoUtils {
 		return ip;
 	}
 
-    public static String countryFromIP(String ip) throws Exception {
+    public static String countryAlpha2FromIP(String ip) throws Exception {
         File dbfile = new File(codesDatabasePath);
         DatabaseReader reader = new DatabaseReader.Builder(dbfile).build();
         InetAddress ipAddress = InetAddress.getByName(ip);
@@ -28,7 +29,8 @@ public class GeoUtils {
         return country.getIsoCode();
     }
 
-    public static String countryCodeFromName(String countryName) throws Exception {
-        return countryName;
+    public static String countryAlpha3FromAlpha2(String countryAlpha2) throws Exception {
+        CountryCode cc = CountryCode.getByCode(countryAlpha2);
+        return cc.getAlpha3();
     }
 }
