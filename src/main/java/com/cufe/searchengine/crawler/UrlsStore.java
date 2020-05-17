@@ -169,7 +169,7 @@ public class UrlsStore {
 
 		// no duplicates
 		if (store.contains(comparableUrl) || allUrls.contains(url)) {
-			log.warn("duplicate url {}", url);
+			log.debug("duplicate url {}", url);
 			return;
 		}
 
