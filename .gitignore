@@ -15,5 +15,3 @@ built
 *.db-journal
 
 package-lock.json
-
-src/main/resources/GeoLite2-City.mmdb
