@@ -114,7 +114,7 @@ const SearchBar = ({
     //function used to act when search icon is clicked
     const onClick = () => {
         if (query) {
-            window.location = `/search?q=${query}`
+            window.location = `/search?q=${encodeURI(query)}`
         }
     }
     
@@ -196,12 +196,12 @@ const SearchBar = ({
     }
     //navigates us to the image search
     const onImageClick = ()=>{
-        window.location = `/images?q=${query}`
+        window.location = `/images?q=${encodeURI(query)}`
     }
     
     //navigates to the trends page
     const trendsClick = ()=>{
-        window.location = `/trends?country=${trend}`
+        window.location = `/trends?country=${encodeURI(trend)}`
     }
 
     const iso31661 = require('iso-3166')

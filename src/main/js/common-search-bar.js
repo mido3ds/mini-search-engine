@@ -126,7 +126,7 @@ const CommonSearchBar = ({
 
     const onClick = () => {
         if (query) {
-            window.location = `/search?q=${query}`
+            window.location = `/search?q=${encodeURI(query)}`
         }
     }
     
@@ -180,7 +180,7 @@ const CommonSearchBar = ({
     }
 
     const onImageClick = ()=>{
-        window.location = `/images?q=${query}`
+        window.location = `/images?q=${encodeURI(query)}`
     }
 
      // let history = useHistory();
