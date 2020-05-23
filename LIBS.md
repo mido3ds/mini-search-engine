@@ -12,3 +12,8 @@ RobotsTxt : parse robots.txt
 
 # Indexer, QueryProcessor, PhraseProcessor
 Stemmer from [https://tartarus.org/martin/PorterStemmer/java.txt](https://tartarus.org/martin/PorterStemmer/java.txt) : stem
+
+# RelevanceRanker, QueryProcessor
+[Maxmind GeoIP2](https://dev.maxmind.com/geoip/) : get location from public IP
+
+[Neo Visionaries i18n](https://mvnrepository.com/artifact/com.neovisionaries/nv-i18n/1.4) : ISO country codes
