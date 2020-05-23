@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.net.*;
-import java.io.*;
 
 @Controller
 @Validated
@@ -79,27 +77,7 @@ public class QueryApiController {
 
 			return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(queryResults));
 		} else {
-			String ipAddr = request.getRemoteAddr();
-			String[] ipAddrCodes = ipAddr.split("\\.");
-
-			if (ipAddrCodes[0].equals("127") || ipAddrCodes[0].equals("192") || ipAddrCodes[0].equals("0")) {
-				// get external IP address in case of localhost
-				try {
-					URL whatismyip = new URL("http://checkip.amazonaws.com/");
-					URLConnection connection = whatismyip.openConnection();
-					connection.addRequestProperty("Protocol", "Http/1.1");
-					connection.addRequestProperty("Connection", "keep-alive");
-					connection.addRequestProperty("Keep-Alive", "1000");
-					connection.addRequestProperty("User-Agent", "Web-Agent");
-					BufferedReader in = 
-						new BufferedReader(new InputStreamReader(connection.getInputStream()));
-					ipAddr = in.readLine();
-				} catch (Exception e) {
-					return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-				}
-			}
-
-			List<QueryResult> queryResults = queryProcessor.search(q, ipAddr);
+			List<QueryResult> queryResults = queryProcessor.search(q, request.getRemoteAddr());
 
 			int pages = (int) Math.ceil(queryResults.size() / 10.0d);
 

@@ -45,7 +45,7 @@ public class QueryProcessor {
 
 		String clientAlpha3 = new String("");
 		try {
-			clientAlpha3 = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(ipAddress));	
+			clientAlpha3 = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(GeoUtils.getPublicIPAddr(ipAddress)));	
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("failed to get client country");
