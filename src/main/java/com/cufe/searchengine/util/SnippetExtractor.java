@@ -1,5 +1,8 @@
 package com.cufe.searchengine.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -51,7 +54,7 @@ public class SnippetExtractor {
 		Match last = matches.get(matches.size() - 1);
 
 		if (getSize(first, last) < MAX_SIZE) {
-			last.end = Math.min(MAX_SIZE - getSize(first, last), text.length());
+			last.end = Math.min(first.start + MAX_SIZE - getSize(first, last), text.length());
 		}
 
 		if (getSize(first, last) > MAX_SIZE) {
