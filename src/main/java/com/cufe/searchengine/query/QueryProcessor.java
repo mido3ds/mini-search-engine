@@ -2,6 +2,7 @@ package com.cufe.searchengine.query;
 
 import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.db.table.DocumentsTable;
+import com.cufe.searchengine.db.table.KeywordsTable;
 import com.cufe.searchengine.server.model.QueryResult;
 import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.GeoUtils;
@@ -20,6 +21,8 @@ public class QueryProcessor {
 
 	@Autowired
 	private DocumentsTable documentsTable;
+	@Autowired
+	private KeywordsTable keywordsTable;
 	@Autowired
 	private PhraseProcessor phraseProcessor;
 	@Autowired
@@ -96,13 +99,12 @@ public class QueryProcessor {
 	 * @return list of suggestions to appear before hitting enter in the search bar
 	 */
 	public List<String> suggest(String query) {
-		// TODO: autocomplete
-		ArrayList<String> strings = new ArrayList<>();
-		strings.add("Did you mean this?");
-		strings.add("no, you probably meant this");
-		strings.add("no?");
-		strings.add("then what did you mean? i can't figure out");
-
-		return strings;
+		try {
+			return keywordsTable.selectWordStartWith(query);
+		} catch(Exception e) {
+			e.printStackTrace();
+			log.error("suggestion loading failed");
+			return new ArrayList<String>();
+		}
 	}
 }

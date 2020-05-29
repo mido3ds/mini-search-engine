@@ -70,4 +70,10 @@ public class KeywordsTable {
 					"INNER JOIN keywords k ON k.ROWID = kd.wordID WHERE url = ? AND word = ?;";
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject(query, Integer.class, url, keyword));
 	}
+
+	public List<String> selectWordStartWith(String initString) throws Exception {
+		String startString = initString + "%";
+		String query = "SELECT word FROM keywords WHERE WORD LIKE ? LIMIT 10";
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class, startString));
+	}
 }
