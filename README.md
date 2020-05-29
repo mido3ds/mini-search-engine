@@ -1,6 +1,15 @@
 # mini-search-engine
 Mini Search Engine - Advanced Programming Techniques Course Project - Cairo Uni.
 
+# Team #2
+
+| Name                  | Section | B. N |
+|-----------------------|---------|------|
+| Evram Youssef         | 1       | 9    |
+| Remonda Talaat        | 1       | 20   |
+| Mahmoud Adas          | 2       | 21   |
+| Mohamed Shawky        | 2       | 16   |
+
 # Requirements
 
 | Binary | Version  |
