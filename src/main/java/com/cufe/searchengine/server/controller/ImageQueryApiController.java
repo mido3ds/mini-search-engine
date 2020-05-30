@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class ImageQueryApiController {
     @RequestMapping(value = "/api/image/query",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<ResultPage> imageQuery(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q,@ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page) {
+    ResponseEntity<ResultPage> imageQuery(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q,@ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page, HttpServletRequest request) {
 		if ("1".equals(System.getenv("MOCK"))) {
 			ArrayList<QueryResult> queryResults = new ArrayList<>();
 			queryResults.add(new QueryResult()
@@ -98,8 +99,18 @@ public class ImageQueryApiController {
 
 			return ResponseEntity.ok(new ResultPage().currentPage(1).totalPages(10).results(queryResults));
 		} else {
-			// TODO
-			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+			// TODO: add isImage
+			List<QueryResult> queryResults = queryProcessor.search(q, request.getRemoteAddr());
+
+			int pages = (int) Math.ceil(queryResults.size() / 10.0d);
+
+			if (page > pages) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			}
+
+			List<QueryResult> subList = queryResults.subList((page - 1) * 10, Math.min(page * 10, queryResults.size()));
+
+			return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(subList));
 		}
     }
 }

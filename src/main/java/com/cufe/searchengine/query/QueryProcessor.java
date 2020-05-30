@@ -31,9 +31,11 @@ public class QueryProcessor {
 	/**
 	 * @return all search results, ranked
 	 */
+	// TODO: add isImage
 	public List<QueryResult> search(String query, String ipAddress) {
 		//		log.info("received query = {}", query);
 
+		// TODO: add isImage
 		ArrayList<QueryResult> queryResults = new ArrayList<>(phraseProcessor.search(query));
 
 		//		log.info("queryResults from phraseProcessor .size() = {}", queryResults.size());
@@ -66,6 +68,7 @@ public class QueryProcessor {
 
 		List<Document> documents;
 		try {
+			// TODO: add isImage
 			documents = queryDocuments(keywords);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -74,7 +77,7 @@ public class QueryProcessor {
 		}
 
 		//		log.info("queried documents size = {}", documents.size());
-
+		// TODO: remove snippet for images
 		queryResults.addAll(documents.stream()
 			.map(document -> new QueryResult().title(document.getTitle())
 				.link(document.getUrl())

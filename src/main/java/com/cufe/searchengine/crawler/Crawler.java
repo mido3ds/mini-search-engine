@@ -55,9 +55,12 @@ public class Crawler implements Runnable {
 				continue;
 			}
 
+			// TODO: extractUrls should include images urls
+			// TODO: be able to detect if url image
 			String[] urls = Patterns.extractUrls(document, url);
 			log.info("extracted " + urls.length + " urls from " + url + ", document.length=" + document.length());
 			for (String u : urls) {
+				// TODO: don't urlsStore.add image urls, rather documentsStore.addImage it
 				try {
 					urlsStore.add(u);
 				} catch (InterruptedException ignored) {

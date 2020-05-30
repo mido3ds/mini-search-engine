@@ -43,7 +43,7 @@ public class DocumentsStore {
 		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), 
 								document.getCounter(), document.getPubDate(), document.getCountryCode());
 	}
-
+	// TODO: add addImage method
 	public void add(String url, String doc) {
 		if (!StringUtils.isHtml(doc)) {
 			log.info("doc at url {} is probably not html, ignore it", url);

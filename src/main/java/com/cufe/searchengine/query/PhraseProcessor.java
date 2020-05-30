@@ -32,6 +32,7 @@ public class PhraseProcessor {
 		}
 	}
 
+	// TODO: add isImage
 	public List<QueryResult> search(String query) {
 		return search(QUOTES.matcher(query).results().map(MatchResult::group).collect(Collectors.toList()));
 	}
