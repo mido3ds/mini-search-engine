@@ -25,10 +25,10 @@ public class DocumentsTable {
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject("SELECT COUNT(*) FROM documents;", Integer.class));
 	}
 
-	public void replace(String url, String content, long timeMillis, int counter, String pubDate, String countryCode) throws Exception {
+	public void replace(String url, String content, long timeMillis, int counter, String pubDate, String countryCode, boolean isImage) throws Exception {
 		Integer rows = DBUtils.waitLock(100,
-			() -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis, counter, pubDate, countryCode) " +
-				"VALUES(?, ?, ?, ?, ?, ?);", url, content, timeMillis, counter, pubDate, countryCode)
+			() -> jdbcTemplate.update("REPLACE INTO documents(url, content, timeMillis, counter, pubDate, countryCode, isImage) " +
+				"VALUES(?, ?, ?, ?, ?, ?, ?);", url, content, timeMillis, counter, pubDate, countryCode, isImage? 1:0)
 		);
 
 		if (rows == null || rows != 1) {

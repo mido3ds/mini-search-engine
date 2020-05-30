@@ -80,6 +80,26 @@ public class Patterns {
 		return Pattern.compile(".*\\.(html|asp|htm|php)$").matcher(url).matches();
 	}
 
+	public static boolean isImage(String url) {
+		Matcher matcher = URL_PATTERN.matcher(url);
+		if (!matcher.matches()) {
+			return false;
+		}
+
+		url = matcher.group(22);
+		if (url == null || url.equals("")) {
+			return false;
+		}
+
+		boolean hasFormat = Pattern.compile(".*\\.\\w+$").matcher(url).matches();
+		if (!hasFormat) {
+			return false;
+		}
+
+		// has some image file format
+		return Pattern.compile("/.+\\.(png|jpg|jpeg|gif|tiff|webp)$").matcher(url).matches();
+	}
+
 	private static String websiteStringFromMatch(MatchResult s) {
 		String port = s.group(21);
 		String protocol = s.group(1);

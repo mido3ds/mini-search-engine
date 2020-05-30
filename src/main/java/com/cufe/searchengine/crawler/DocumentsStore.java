@@ -41,18 +41,11 @@ public class DocumentsStore {
 
 	private void storeToDB(Document document) throws Exception {
 		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), 
-								document.getCounter(), document.getPubDate(), document.getCountryCode());
+								document.getCounter(), document.getPubDate(), document.getCountryCode(), document.isImage());
 	}
-	// TODO: add addImage method
-	public void add(String url, String doc) {
-		if (!StringUtils.isHtml(doc)) {
-			log.info("doc at url {} is probably not html, ignore it", url);
-			return;
-		}
 
-		String content = DocumentFilterer.textFromHtml(doc);
-
-		String countryCode = new String("");
+	public void add(String url, String content, String pubDate, boolean isImage) {
+		String countryCode = "";
 		try {
 			countryCode = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(GeoUtils.ipFromURL(url)));
 		} catch (Exception e) {
@@ -60,8 +53,8 @@ public class DocumentsStore {
 		}
 
 		Document document = new Document(
-			content, url, System.currentTimeMillis(), 0, 1, Patterns.extractHTMLPubDate(content), countryCode
-		).counter(urlsStore.getCounter());
+			content, url, System.currentTimeMillis(), 0, 1, pubDate, countryCode
+		).counter(urlsStore.getCounter()).isImage(isImage);
 
 		try {
 			storeToDB(document);

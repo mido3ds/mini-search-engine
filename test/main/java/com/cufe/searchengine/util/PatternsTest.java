@@ -65,6 +65,25 @@ public class PatternsTest {
 	}
 
 	@Test
+	public void isImage() {
+		assertTrue(Patterns.isImage("http://www.git.com/adasd.png"));
+		assertTrue(Patterns.isImage("http://www.git.com/adasd.gif"));
+		assertTrue(Patterns.isImage("http://www.git.com/aa.tiff"));
+		assertTrue(Patterns.isImage("http://www.git.com/adasd.jpeg"));
+		assertTrue(Patterns.isImage("http://www.git.com/*.png"));
+
+		assertFalse(Patterns.isImage("http://www.git.com/https://www.github.com/"));
+		assertFalse(Patterns.isImage("http://www.git.com/*"));
+		assertFalse(Patterns.isImage("http://www.git.com"));
+		assertFalse(Patterns.isImage("adasd.jpg"));
+		assertFalse(Patterns.isImage("http://www.git.com/adasd"));
+		assertFalse(Patterns.isImage("https://example.com/.gif"));
+		assertFalse(Patterns.isImage("https://example.com/adasd.habal"));
+		assertFalse(Patterns.isImage("https://example.com/adasd.mp4"));
+		assertFalse(Patterns.isImage("https://example.com/om/dasd/adasd.css"));
+	}
+
+	@Test
 	public void testExtractURLsSimple() {
 		String test = "<li id=\"footer-places-privacy\">" +
 			"<a href=\"https://foundation.wikimedia.org/wiki/Privacy_policy\" class=\"extiw\" " +

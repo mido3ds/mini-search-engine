@@ -1,6 +1,7 @@
 package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
+import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.Patterns;
 import com.cufe.searchengine.util.StringUtils;
 import com.cufe.searchengine.db.table.OutgoingURLsTable;
@@ -46,23 +47,31 @@ public class Crawler implements Runnable {
 
 			try {
 				document = loadURL(url);
+				if (!StringUtils.isHtml(document)) {
+					log.warn("doc at url {} is probably not html, ignore it", url);
+					continue;
+				}
 			} catch (Exception e) {
 				log.error("url=" + url + ",error=" + e.getMessage());
 				continue;
 			}
 
+			String content = DocumentFilterer.textFromHtml(document);
+			String pubDate = Patterns.extractHTMLPubDate(content);
+
 			if (document.length() == 0) {
 				continue;
 			}
 
-			// TODO: extractUrls should include images urls
-			// TODO: be able to detect if url image
 			String[] urls = Patterns.extractUrls(document, url);
 			log.info("extracted " + urls.length + " urls from " + url + ", document.length=" + document.length());
 			for (String u : urls) {
-				// TODO: don't urlsStore.add image urls, rather documentsStore.addImage it
 				try {
-					urlsStore.add(u);
+					if (Patterns.isImage(u)) {
+						documentsStore.add(u, content, pubDate, true);
+					} else {
+						urlsStore.add(u);
+					}
 				} catch (InterruptedException ignored) {
 					Thread.currentThread().interrupt();
 					log.warn("interrupted, ignore it");
@@ -74,7 +83,7 @@ public class Crawler implements Runnable {
 				}
 			}
 
-			documentsStore.add(url, document);
+			documentsStore.add(url, content, pubDate, false);
 		}
 	}
 

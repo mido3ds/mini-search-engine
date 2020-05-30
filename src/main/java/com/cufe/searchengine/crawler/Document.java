@@ -16,6 +16,7 @@ public class Document {
 	private int wordCount;
 	private String pubDate;
 	private String countryCode;
+	private boolean isImage = false;
 
 	public Document(String content, String url, long timeMillis, float rank, int wordCount, String pubDate, String countryCode) {
 		this.content = content;
@@ -130,5 +131,14 @@ public class Document {
 
 	public void setCounter(int counter) {
 		this.counter = counter;
+	}
+
+	public Document isImage(boolean b) {
+		this.isImage = b;
+		return this;
+	}
+
+	public boolean isImage() {
+		return isImage;
 	}
 }
