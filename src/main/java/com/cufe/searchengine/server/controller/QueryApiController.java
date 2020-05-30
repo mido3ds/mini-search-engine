@@ -77,8 +77,7 @@ public class QueryApiController {
 
 			return ResponseEntity.ok(new ResultPage().currentPage(page).totalPages(pages).results(queryResults));
 		} else {
-			// TODO: select only non images
-			List<QueryResult> queryResults = queryProcessor.search(q, request.getRemoteAddr());
+			List<QueryResult> queryResults = queryProcessor.search(q, request.getRemoteAddr(), false);
 
 			int pages = (int) Math.ceil(queryResults.size() / 10.0d);
 

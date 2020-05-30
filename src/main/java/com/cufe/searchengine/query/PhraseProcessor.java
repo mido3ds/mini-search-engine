@@ -21,9 +21,9 @@ public class PhraseProcessor {
 	@Autowired
 	private DocumentsTable documentsTable;
 
-	private List<QueryResult> search(List<String> phrases) {
+	private List<QueryResult> search(List<String> phrases, boolean isImage) {
 		try {
-			return documentsTable.selectContentUrlLikePhrases(phrases);
+			return documentsTable.selectContentUrlLikePhrases(phrases, isImage);
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("returning empty results");
@@ -32,9 +32,8 @@ public class PhraseProcessor {
 		}
 	}
 
-	// TODO: add isImage
-	public List<QueryResult> search(String query) {
-		return search(QUOTES.matcher(query).results().map(MatchResult::group).collect(Collectors.toList()));
+	public List<QueryResult> search(String query, boolean isImage) {
+		return search(QUOTES.matcher(query).results().map(MatchResult::group).collect(Collectors.toList()), isImage);
 	}
 
 	public String removePhrases(String query) {

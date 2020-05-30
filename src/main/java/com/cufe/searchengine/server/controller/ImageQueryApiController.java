@@ -99,8 +99,7 @@ public class ImageQueryApiController {
 
 			return ResponseEntity.ok(new ResultPage().currentPage(1).totalPages(10).results(queryResults));
 		} else {
-			// TODO: add isImage
-			List<QueryResult> queryResults = queryProcessor.search(q, request.getRemoteAddr());
+			List<QueryResult> queryResults = queryProcessor.search(q, request.getRemoteAddr(), true);
 
 			int pages = (int) Math.ceil(queryResults.size() / 10.0d);
 

@@ -31,12 +31,10 @@ public class QueryProcessor {
 	/**
 	 * @return all search results, ranked
 	 */
-	// TODO: add isImage
-	public List<QueryResult> search(String query, String ipAddress) {
+	public List<QueryResult> search(String query, String ipAddress, boolean isImage) {
 		//		log.info("received query = {}", query);
 
-		// TODO: add isImage
-		ArrayList<QueryResult> queryResults = new ArrayList<>(phraseProcessor.search(query));
+		ArrayList<QueryResult> queryResults = new ArrayList<>(phraseProcessor.search(query, isImage));
 
 		//		log.info("queryResults from phraseProcessor .size() = {}", queryResults.size());
 
@@ -48,7 +46,7 @@ public class QueryProcessor {
 
 		//		log.info("extracted keywords = {}", keywords);
 
-		String clientAlpha3 = new String("");
+		String clientAlpha3 = "";
 		try {
 			clientAlpha3 = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(GeoUtils.getPublicIPAddr(ipAddress)));	
 		} catch (Exception e) {
@@ -68,8 +66,7 @@ public class QueryProcessor {
 
 		List<Document> documents;
 		try {
-			// TODO: add isImage
-			documents = queryDocuments(keywords);
+			documents = queryDocuments(keywords, isImage);
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("returning empty results");
@@ -77,11 +74,10 @@ public class QueryProcessor {
 		}
 
 		//		log.info("queried documents size = {}", documents.size());
-		// TODO: remove snippet for images
 		queryResults.addAll(documents.stream()
 			.map(document -> new QueryResult().title(document.getTitle())
 				.link(document.getUrl())
-				.snippet(document.getSnippet(keywords)))
+				.snippet(isImage? null : document.getSnippet(keywords)))
 			.collect(Collectors.toList()));
 
 		try {
@@ -93,8 +89,8 @@ public class QueryProcessor {
 		}
 	}
 
-	private List<Document> queryDocuments(List<String> keywords) throws Exception {
-		return documentsTable.selectContentUrlSorted(keywords);
+	private List<Document> queryDocuments(List<String> keywords, boolean isImage) throws Exception {
+		return documentsTable.selectContentUrlSorted(keywords, isImage);
 	}
 
 	/**
@@ -107,7 +103,7 @@ public class QueryProcessor {
 		} catch(Exception e) {
 			e.printStackTrace();
 			log.error("suggestion loading failed");
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 	}
 }

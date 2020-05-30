@@ -85,7 +85,7 @@ public class DocumentsTable {
 				.rowID(row.getLong(7))));
 	}
 
-	public List<QueryResult> selectContentUrlLikePhrases(List<String> phrases) throws Exception {
+	public List<QueryResult> selectContentUrlLikePhrases(List<String> phrases, boolean isImage) throws Exception {
 		Optional<String> reducedLikes = phrases.stream()
 			.map(String::toLowerCase)
 			.distinct()
@@ -96,10 +96,10 @@ public class DocumentsTable {
 			return new ArrayList<>();
 		}
 
-		String query = "SELECT content, url rank, wordCount, pubDate, countryCode FROM documents WHERE " + reducedLikes.get() + ";";
+		String query = "SELECT content, url rank, wordCount, pubDate, countryCode FROM documents WHERE isImage = ? AND (" + reducedLikes.get() + ");";
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(query, (row, i) -> new Document(row.getString(1),
-			row.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)))
+			row.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)), isImage? 1:0)
 			.stream()
 			.map(d -> new QueryResult().title(d.getTitle())
 				.snippet(d.getSnippet(phrases))
@@ -107,7 +107,7 @@ public class DocumentsTable {
 			.collect(Collectors.toList()));
 	}
 
-	public List<Document> selectContentUrlSorted(List<String> keywords) throws Exception {
+	public List<Document> selectContentUrlSorted(List<String> keywords, boolean isImage) throws Exception {
 		StringBuilder builder = new StringBuilder("SELECT content, url, rank, wordCount, pubDate, countryCode FROM documents d " + "INNER JOIN " +
 			"keywords_documents kd ON d.ROWID = kd.docID " + "INNER JOIN " + "keywords k ON k.ROWID = kd.wordID AND k.word in (");
 		for (int i = 0; i < keywords.size(); i++) {
@@ -116,11 +116,11 @@ public class DocumentsTable {
 				builder.append(",");
 			}
 		}
-		builder.append(");");
+		builder.append(") WHERE isImage = ?;");
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(builder.toString(),
 			(row, i) -> new Document(row.getString(1), row
-				.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)), keywords.toArray()));
+				.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)), keywords.toArray(), isImage?1:0));
 	}
 
 	public Float selectURLRank(String url) throws Exception {
