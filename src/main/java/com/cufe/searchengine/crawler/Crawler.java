@@ -34,13 +34,12 @@ public class Crawler implements Runnable {
 	public void run() {
 		log.info("started");
 
-		while (true) {
+		while (!Thread.interrupted()) {
 			String url = null;
 			try {
 				url = urlsStore.poll();
 			} catch (InterruptedException ignored) {
 				Thread.currentThread().interrupt();
-				log.warn("interrupted, ignore it");
 			}
 
 			String document;
@@ -70,7 +69,6 @@ public class Crawler implements Runnable {
 					urlsStore.add(u);
 				} catch (InterruptedException ignored) {
 					Thread.currentThread().interrupt();
-					log.warn("interrupted, ignore it");
 				}
 				try {
 					outgoingURLsTable.insertLink(url, u);
@@ -82,7 +80,11 @@ public class Crawler implements Runnable {
 			String[] images = Patterns.extractImages(document, url);
 			log.info("extracted " + images.length + " images from " + url + ", document.length=" + document.length());
 			for (String u : images) {
-				documentsStore.add(u, content, pubDate, true);
+				try {
+					documentsStore.add(u, content, pubDate, true);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 
 				try {
 					outgoingURLsTable.insertLink(url, u);
@@ -91,8 +93,14 @@ public class Crawler implements Runnable {
 				}
 			}
 
-			documentsStore.add(url, content, pubDate, false);
+			try {
+				documentsStore.add(url, content, pubDate, false);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
+
+		log.error("interrupted");
 	}
 
 	private String loadURL(String link) throws IOException {

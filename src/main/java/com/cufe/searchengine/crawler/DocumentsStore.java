@@ -2,10 +2,7 @@ package com.cufe.searchengine.crawler;
 
 import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.db.table.DocumentsTable;
-import com.cufe.searchengine.util.DocumentFilterer;
-import com.cufe.searchengine.util.StringUtils;
 import com.cufe.searchengine.util.GeoUtils;
-import com.cufe.searchengine.util.Patterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +12,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
-public class DocumentsStore {
+public class DocumentsStore implements Runnable {
 	private final Logger log = LoggerFactory.getLogger(DocumentsStore.class);
 	private final AtomicLong docsCount = new AtomicLong();
 	@Autowired
@@ -30,21 +31,14 @@ public class DocumentsStore {
 	@Autowired
 	private UrlsStore urlsStore;
 
-	@EventListener
-	private void onDBInitialized(DBInitializer.DBInitializedEvent event) throws Exception {
-		Integer size = documentsTable.size();
-		if (size == null) {
-			throw new IllegalStateException("`documents` count shouldn't be null");
-		}
-		docsCount.set(size);
-	}
+	private final BlockingQueue<Document> queue = new LinkedBlockingQueue<>();
 
 	private void storeToDB(Document document) throws Exception {
 		documentsTable.replace(document.getUrl(), document.getContent(), document.getTimeMillis(), 
 								document.getCounter(), document.getPubDate(), document.getCountryCode(), document.isImage());
 	}
 
-	public void add(String url, String content, String pubDate, boolean isImage) {
+	public void add(String url, String content, String pubDate, boolean isImage) throws InterruptedException {
 		String countryCode = "";
 		try {
 			countryCode = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(GeoUtils.ipFromURL(url)));
@@ -56,23 +50,54 @@ public class DocumentsStore {
 			content, url, System.currentTimeMillis(), 0, 1, pubDate, countryCode
 		).counter(urlsStore.getCounter()).isImage(isImage);
 
-		try {
-			storeToDB(document);
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			return;
-		}
-
-		docsCount.getAndIncrement();
-		publisher.publishEvent(new DocumentStoredEvent(this, document.getUrl(), document.getTimeMillis()));
-
-		if (isFull()) {
-			publisher.publishEvent(new CrawlingFinishedEvent(this));
-		}
+		queue.put(document);
 	}
 
 	private boolean isFull() {
 		return docsCount.getAndUpdate(l -> l >= maxDocuments ? 0 : l) >= maxDocuments;
+	}
+
+	@Override
+	public void run() {
+		log.info("started");
+
+		Integer size;
+		try {
+			size = documentsTable.size();
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("closing");
+			return;
+		}
+		if (size == null) {
+			throw new IllegalStateException("`documents` count shouldn't be null");
+		}
+		docsCount.set(size);
+
+		while (!Thread.interrupted()) {
+			Document document = null;
+			try {
+				document = queue.take();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+
+			try {
+				storeToDB(Objects.requireNonNull(document));
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				return;
+			}
+
+			docsCount.getAndIncrement();
+			publisher.publishEvent(new DocumentStoredEvent(this, document.getUrl(), document.getTimeMillis()));
+
+			if (isFull()) {
+				publisher.publishEvent(new CrawlingFinishedEvent(this));
+			}
+		}
+
+		log.error("interrupted");
 	}
 
 	public static class CrawlingFinishedEvent extends ApplicationEvent {
@@ -102,6 +127,21 @@ public class DocumentsStore {
 
 		public String getUrl() {
 			return url;
+		}
+	}
+
+	@Component
+	private static class DocumentsStoreRunner {
+		private static final Logger log = LoggerFactory.getLogger(DocumentsStoreRunner.class);
+
+		@Autowired
+		private DocumentsStore documentsStore;
+
+		@EventListener
+		public void onDBInitialized(DBInitializer.DBInitializedEvent event) {
+			log.info("received DBInitializedEvent");
+
+			new Thread(documentsStore, "docstore").start();
 		}
 	}
 }
