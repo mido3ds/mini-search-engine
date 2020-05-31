@@ -54,6 +54,8 @@ public class ImageQueryApiController {
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<ResultPage> imageQuery(@NotNull @ApiParam(value = "string to search for", required = true) @Valid @RequestParam(value = "q", required = true) String q,@ApiParam(value = "page of results to fetch, default 1") @Valid @RequestParam(value = "page", required = false) Integer page, HttpServletRequest request) {
+        page = page == null ? 1 : page;
+
 		if ("1".equals(System.getenv("MOCK"))) {
 			ArrayList<QueryResult> queryResults = new ArrayList<>();
 			queryResults.add(new QueryResult()
