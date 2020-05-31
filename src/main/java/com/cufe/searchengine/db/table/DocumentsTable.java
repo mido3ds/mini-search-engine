@@ -96,7 +96,7 @@ public class DocumentsTable {
 			return new ArrayList<>();
 		}
 
-		String query = "SELECT content, url rank, wordCount, pubDate, countryCode FROM documents WHERE isImage = ? AND (" + reducedLikes.get() + ");";
+		String query = "SELECT content, url, rank, wordCount, pubDate, countryCode FROM documents WHERE isImage = ? AND (" + reducedLikes.get() + ");";
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(query, (row, i) -> new Document(row.getString(1),
 			row.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)), isImage? 1:0)

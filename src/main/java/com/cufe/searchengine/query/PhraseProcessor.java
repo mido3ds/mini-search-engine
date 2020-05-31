@@ -33,7 +33,7 @@ public class PhraseProcessor {
 	}
 
 	public List<QueryResult> search(String query, boolean isImage) {
-		return search(QUOTES.matcher(query).results().map(MatchResult::group).collect(Collectors.toList()), isImage);
+		return search(QUOTES.matcher(query).results().map(s -> s.group(2)).collect(Collectors.toList()), isImage);
 	}
 
 	public String removePhrases(String query) {
