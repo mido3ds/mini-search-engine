@@ -67,15 +67,23 @@ public class Crawler implements Runnable {
 			log.info("extracted " + urls.length + " urls from " + url + ", document.length=" + document.length());
 			for (String u : urls) {
 				try {
-					if (Patterns.isImage(u)) {
-						documentsStore.add(u, content, pubDate, true);
-					} else {
-						urlsStore.add(u);
-					}
+					urlsStore.add(u);
 				} catch (InterruptedException ignored) {
 					Thread.currentThread().interrupt();
 					log.warn("interrupted, ignore it");
 				}
+				try {
+					outgoingURLsTable.insertLink(url, u);
+				} catch (Exception e) {
+					log.error("can't add url link [" + e.getMessage() + "]");
+				}
+			}
+
+			String[] images = Patterns.extractImages(document, url);
+			log.info("extracted " + images.length + " images from " + url + ", document.length=" + document.length());
+			for (String u : images) {
+				documentsStore.add(u, content, pubDate, true);
+
 				try {
 					outgoingURLsTable.insertLink(url, u);
 				} catch (Exception e) {
