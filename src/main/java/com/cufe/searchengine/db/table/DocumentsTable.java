@@ -116,11 +116,11 @@ public class DocumentsTable {
 				builder.append(",");
 			}
 		}
-		builder.append(") WHERE isImage = ?;");
+		builder.append(") WHERE d.isImage = ").append(isImage? 1:0).append(";");
 
 		return DBUtils.waitLock(100, () -> jdbcTemplate.query(builder.toString(),
 			(row, i) -> new Document(row.getString(1), row
-				.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)), keywords.toArray(), isImage?1:0));
+				.getString(2), 0, row.getFloat(3), row.getInt(4), row.getString(5), row.getString(6)), keywords.toArray()));
 	}
 
 	public Float selectURLRank(String url) throws Exception {
