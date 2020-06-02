@@ -49,6 +49,9 @@ Default port `server.port` is set in `src/main/resources/application.properties`
 > To run server as mock (results are fixed and are not real) for frontend experimenting, run:
 > `$ env MOCK=1 mvn`
 
+# Run Performance Analysis Module (PAM)
+`$ env PAM=1 mvn`
+
 # Run Tests
 
 `$ mvn test` 
