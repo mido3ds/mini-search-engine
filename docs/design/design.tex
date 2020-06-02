@@ -1,4 +1,4 @@
-\documentclass[12pt]{report}
+\documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{cite}
 \usepackage[hidelinks]{hyperref}
@@ -42,13 +42,78 @@
 
 \maketitle
 \tableofcontents
-\listoffigures
-\listoftables
-\clearpage
+% \listoffigures
+% \listoftables
+% \clearpage
 
 \pagenumbering{arabic}
 
-\part{Introduction}
-\input{core/introduction}
+\section{Introduction}
+This document gives you a slight walk through the code and introduces you briefly to the used techniques and algorithms.
+
+The backend uses Java-Spring framework, which requires the classes that want to access a component (e.g. database) to be a component itself, this is why you will notice the annotation \texttt{@Component} used in many classes around.
+
+\section{Algorithms}
+This section describes briefly some techniques and methods used along the project.
+
+\subsection{Crawling}
+Crawling is composed of the following classes:
+\begin{itemize}
+  \item \texttt{UrlsStore}: Signleton, has a priority queue full of links. 
+  
+  If the server closes, \texttt{UrlsStore} will save the queue in db and load them the next time it starts. 
+  
+  It loads the crawling seed if the db is empty.
+
+  The priority of a url is inversely propotional to its url based last access time.
+  The more you visit some website, the less priority any links of it gets. The goal is to favour new websites, instead of going deeper into one website.
+
+  \item \texttt{DocumentsStore}: Signleton in a seperate thread.
+  Has a queue of documents to store at the db when the db is not locked.
+
+  \item \texttt{Cralwer}: Has many threads, each pulls \texttt{UrlsStore}'s queue for a url.
+  
+  Once it has a url, it fetches the document, ignores the document if not html, otherwise extract all urls and image links in it.
+
+  Stores the image links in db, puts the urls into \texttt{UrlsStore}'s queue and puts the fetched document into \texttt{DocumentsStore}'s queue.
+
+  It goes like that foreever.
+\end{itemize}
+
+\subsection{Indexing}
+There is only one indexer thread. 
+Simply it repats the following forever:
+\begin{enumerate}
+  \item Sleeps for couple of seconds.
+  \item Fetches all non-indexed documents.
+  \item Extracts unique and most important keywords from their contents.
+  \item Insert the keywords into \texttt{keywords} table in db.
+  \item Store the relationship between each keyword and the fetched document in \texttt{keyword\_document} table in db.
+\end{enumerate}
+
+\subsection{Queries Handling}
+\subsubsection{Phrase Processor}
+\begin{enumerate}
+  \item Parses the phrases in quotes.
+  \item Remove them from the original query.
+  \item Execute simple SQL query using "LIKE" syntax to match the keywords in any content in all files.
+  \item Return the files.
+\end{enumerate}
+
+\subsubsection{Query Processor}
+Works after phrases are removed by \texttt{PhraseProcessor}.
+\begin{enumerate}
+  \item Extract the keywords.
+  \item Stem them.
+  \item Search for the keywords in \texttt{keywords} table.
+  \item Apply SQL joins with \texttt{keyword\_document} and \texttt{documents} table to get the matching documents.
+  \item Send results to relevance ranking.
+\end{enumerate}
+
+\subsection{Ranking}
+\subsubsection{Popularity Ranking}
+%TODO
+\subsubsection{Relevance Ranking}
+%TODO
 
 \end{document}
