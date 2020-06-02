@@ -20,7 +20,7 @@
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
-\title{\textbf{Mini Search Engine Design}\\Team \#2}
+\title{\textbf{Mini Search Engine Design}\\Team \#2\\ Semester}
 \author{
   Mohamed Shawky\\
   \small\texttt{SEC:2, BN:16}
@@ -44,7 +44,7 @@
 \tableofcontents
 % \listoffigures
 % \listoftables
-% \clearpage
+\clearpage
 
 \pagenumbering{arabic}
 
@@ -59,30 +59,30 @@ This section describes briefly some techniques and methods used along the projec
 \subsection{Crawling}
 Crawling is composed of the following classes:
 \begin{itemize}
-  \item \texttt{UrlsStore}: Signleton, has a priority queue full of links. 
+  \item \texttt{UrlsStore}: Singleton, has a priority queue full of links. 
   
   If the server closes, \texttt{UrlsStore} will save the queue in db and load them the next time it starts. 
   
   It loads the crawling seed if the db is empty.
 
-  The priority of a url is inversely propotional to its url based last access time.
+  The priority of a url is inversely proportional to its url based last access time.
   The more you visit some website, the less priority any links of it gets. The goal is to favour new websites, instead of going deeper into one website.
 
-  \item \texttt{DocumentsStore}: Signleton in a seperate thread.
+  \item \texttt{DocumentsStore}: Singleton in a separate thread.
   Has a queue of documents to store at the db when the db is not locked.
 
-  \item \texttt{Cralwer}: Has many threads, each pulls \texttt{UrlsStore}'s queue for a url.
+  \item \texttt{Crawler}: Has many threads, each pulls \texttt{UrlsStore}'s queue for a url.
   
   Once it has a url, it fetches the document, ignores the document if not html, otherwise extract all urls and image links in it.
 
   Stores the image links in db, puts the urls into \texttt{UrlsStore}'s queue and puts the fetched document into \texttt{DocumentsStore}'s queue.
 
-  It goes like that foreever.
+  It goes like that forever.
 \end{itemize}
 
 \subsection{Indexing}
 There is only one indexer thread. 
-Simply it repats the following forever:
+Simply it repeats the following forever:
 \begin{enumerate}
   \item Sleeps for couple of seconds.
   \item Fetches all non-indexed documents.
@@ -112,8 +112,32 @@ Works after phrases are removed by \texttt{PhraseProcessor}.
 
 \subsection{Ranking}
 \subsubsection{Popularity Ranking}
-%TODO
+A separate thread that calculate popularity ranking for crawled urls in the database and stores it back in the database. The used ranking algorithm is \texttt{PageRank}. It recursively does the following:
+\begin{itemize}
+    \item Read urls from database.
+    \item Reset all ranks to $1$/$\#urls$.
+    \item Do the following for $5$ iterations, for each url:
+    \begin{itemize}
+        \item Calculate the incoming rank of the url.
+        \item Calculate the outgoing rank of each incoming url.
+        \item Compute PageRank.
+    \end{itemize}
+\end{itemize}
+
 \subsubsection{Relevance Ranking}
-%TODO
+Called by Query Processor to sort the query results. Depends on four criteria:
+\begin{itemize}
+    \item Popularity Rank (from database).
+    \item Term Frequency - Inverse Document Frequency \emph{(TF-IDF)}.
+    \item Geographic Location of client.
+    \item Recent Publish Dates.
+\end{itemize}
+The following procedure happens:
+\begin{itemize}
+    \item query results are sorted according to each criterion, independently.
+    \item based on each order, each result is given a score of $0$, $1$, ... etc.
+    \item these scores are added up to form the final score of each result.
+    \item results are then sorted descendingly according to the final score.
+\end{itemize}
 
 \end{document}
