@@ -10,24 +10,30 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
+import java.util.Random;
 @Component
 public class PerfAnalyser implements ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(PerfAnalyser.class);
     private ApplicationContext context;
     @Autowired
     private QueryProcessor queryProcessor;
-
+    private Random random = new Random();
+    private String[] data = {"deep learning", "advanced programming techniques", "maths", "science", "psychology", "Ahmed Zewail",
+                            "image processing", "Sherlock Holmes", "animation movies", "COVID-19"};
     @EventListener
-    public void onDBInitializedEvent(DBInitializer.DBInitializedEvent event) {
+    public void onDBInitializedEvent(final DBInitializer.DBInitializedEvent event) throws InterruptedException {
         log.info("received DBInitializedEvent");
         if ("1".equals(System.getenv("PAM"))) {
             log.info("in PAM mode");
 
-            // TODO: all PAM logic here
-//            queryProcessor.search("<TODO>", "123.123.123.123", false); // Do multiple times in parallel
-            // To access db see src/main/java/com/cufe/searchengine/db/table
-
+                for(int i=0; i<20; ++i) {
+                    int index = random.nextInt(9);
+                    log.info(data[index]);
+                    final long start_time = System.currentTimeMillis();
+                    queryProcessor.search(data[index], "0.0.0.0", false);
+                    final long end_time = System.currentTimeMillis();
+                    log.info("searching for : " + data[index] + "  takes Time  = " + (end_time-start_time) + " ms.");
+                }
             close();
         }
     }
