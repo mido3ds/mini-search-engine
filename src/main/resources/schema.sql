@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS keywords_documents(
 );
 
 CREATE TABLE IF NOT EXISTS urlstore_queue(
-	url STRING PRIMARY KEY NOT NULL
+	url STRING NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS outgoing_urls(
