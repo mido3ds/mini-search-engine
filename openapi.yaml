@@ -99,17 +99,6 @@ paths:
                   type: string
         "404":
           description: invalid country code
-  /api/stats:
-    get:
-      summary: performance analysis and statistics
-      operationId: performanceStats
-      responses:
-        "200":
-          description: statistics and analysis
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Stats'
 components:
   schemas:
     ResultPage:
@@ -134,8 +123,3 @@ components:
           type: string
         snippet:
           type: string
-    Stats:
-      type: object
-      title: Stats
-    #   properties:
-        # TODO: add properties
