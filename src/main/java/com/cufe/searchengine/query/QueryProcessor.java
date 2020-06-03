@@ -34,6 +34,13 @@ public class QueryProcessor {
 	 * @return all search results, ranked
 	 */
 	public List<QueryResult> search(String query, String ipAddress, boolean isImage) {
+		return search(query, ipAddress, isImage, true);
+	}
+
+	/**
+	 * @return all search results, with ranking controlled
+	 */
+	public List<QueryResult> search(String query, String ipAddress, boolean isImage, boolean enableRanking) {
 		log.info("received query = {}", query);
 
 		log.info("processing query");
@@ -62,11 +69,15 @@ public class QueryProcessor {
 
 		log.info("preparing query results");
 		if (keywords.size() == 0) {
-			try {
-				return relevanceRanker.rank(queryResults, keywords, clientAlpha3);
-			} catch (Exception e) {
-				e.printStackTrace();
-				log.error("query ranking failed");
+			if (enableRanking) {
+				try {
+					return relevanceRanker.rank(queryResults, keywords, clientAlpha3);
+				} catch (Exception e) {
+					e.printStackTrace();
+					log.error("query ranking failed");
+					return queryResults;
+				}
+			} else {
 				return queryResults;
 			}
 		}
@@ -86,11 +97,15 @@ public class QueryProcessor {
 				.snippet(isImage? null : document.getSnippet(keywords)))
 			.collect(Collectors.toList()));
 
-		try {
-			return relevanceRanker.rank(queryResults, keywords, clientAlpha3);
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error("query ranking failed");
+		if (enableRanking) {
+			try {
+				return relevanceRanker.rank(queryResults, keywords, clientAlpha3);
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.error("query ranking failed");
+				return queryResults;
+			}
+		} else {
 			return queryResults;
 		}
 	}

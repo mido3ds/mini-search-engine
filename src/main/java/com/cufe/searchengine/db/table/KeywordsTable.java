@@ -72,4 +72,8 @@ public class KeywordsTable {
 		String query = "SELECT word FROM keywords WHERE WORD LIKE ? LIMIT 10";
 		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class, startString));
 	}
+
+	public Integer size() throws Exception {
+		return DBUtils.waitLock(100, () -> jdbcTemplate.queryForObject("SELECT COUNT(*) FROM keywords;", Integer.class));
+	}
 }
