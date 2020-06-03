@@ -29,6 +29,7 @@
     "react-bootstrap": "^1.0.1",
     "react-bootstrap-icons": "^1.0.1-alpha3",
     "react-bootstrap-validation": "^0.1.11",
+    "react-chart-histogram": "^0.2.4",
     "react-dom": "^16.13.0",
     "react-router-dom": "^5.1.2",
     "react-speech-recognition": "^2.0.4",

@@ -10,6 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Table from 'react-bootstrap/Table';
 import { Container } from '@material-ui/core'
 import CommonSearchBar from '../../common-search-bar'
+import Histogram from 'react-chart-histogram';
 
 
     const ev = ["Mahmoud Adas",
@@ -33,7 +34,12 @@ import CommonSearchBar from '../../common-search-bar'
     const API = new DefaultApi()
     const iso31661 = require('iso-3166')
 
-
+    function cutName(name) {
+        if (name.length > 5) {
+            return name.slice(0, 5) + "...";
+        }
+        return name;
+    }
 
     const Results = () => {
         const [results, setResults] = useState([])
@@ -95,6 +101,15 @@ import CommonSearchBar from '../../common-search-bar'
                 <>
                     <Container maxWidth="sm" style = {tableStyle}>
                         <h1 style = {lbl}>Trending in {countryName}</h1>
+                    </Container>
+                    <Container maxWidth="sm" style = {tableStyle}>
+                        <Histogram
+                              xLabels={results.map((r, i) => cutName(r.name))}
+                              yValues={results.map((r, i) => r.number)}
+                              width='850'
+                              height='400'
+                              options={{ fillColor: '#FFFFFF', strokeColor: '#0000FF' }}
+                          />
                     </Container>
                     <Container maxWidth="sm" style = {tableStyle}>
                     <Table striped bordered hover >

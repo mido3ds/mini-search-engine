@@ -52,7 +52,7 @@ public class TrendsApiController {
     ResponseEntity<List<Person>> trends(@NotNull @ApiParam(value = "country alpha-3 code (ISO 3166) all capital", required = true) @Valid @RequestParam(value = "country", required = true) String country) {
 		if ("1".equals(System.getenv("MOCK"))) {
 			ArrayList<Person> persons = new ArrayList<>();
-			persons.add(new Person().name("Mahmoud Adas").number(6000000));
+			persons.add(new Person().name("Mahmoud Adas").number(99));
 			persons.add(new Person().name("Mahmoud Othman Adas").number(90));
 			persons.add(new Person().name("Shrek").number(80));
 			persons.add(new Person().name("Mahmoud Adas Again").number(7));
