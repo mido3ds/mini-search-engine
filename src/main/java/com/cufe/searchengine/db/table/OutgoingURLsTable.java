@@ -12,9 +12,20 @@ public class OutgoingURLsTable {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-    public void insertLink(String srcURL, String outURL) throws Exception {
-        String query = "INSERT OR IGNORE INTO outgoing_urls (srcURL,outURL) VALUES (?,?);";
-        DBUtils.waitLock(100, () -> jdbcTemplate.update(query, srcURL, outURL));
+    public void insertLinks(String srcURL, List<String> outURLs) throws Exception {
+        if (outURLs.size() == 0) return;
+        LinkedList<String> params = new LinkedList<>();
+        StringBuilder builder = new StringBuilder("INSERT OR IGNORE INTO outgoing_urls (srcURL,outURL) VALUES");
+        for (int i = 0; i < outURLs.size()-1; i++) {
+            params.add(srcURL);
+            params.add(outURLs.get(i));
+            builder.append("(?,?),");
+        }
+        params.add(srcURL);
+        params.add(outURLs.get(outURLs.size()-1));
+        builder.append("(?,?);");
+
+        DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), params.toArray()));
     }
 
     public List<String> selectUrls() throws Exception {

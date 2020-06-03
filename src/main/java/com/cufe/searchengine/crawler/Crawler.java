@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 @Component
 public class Crawler implements Runnable {
@@ -70,11 +73,6 @@ public class Crawler implements Runnable {
 				} catch (InterruptedException ignored) {
 					Thread.currentThread().interrupt();
 				}
-				try {
-					outgoingURLsTable.insertLink(url, u);
-				} catch (Exception e) {
-					log.error("can't add url link [" + e.getMessage() + "]");
-				}
 			}
 
 			String[] images = Patterns.extractImages(document, url);
@@ -85,12 +83,14 @@ public class Crawler implements Runnable {
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}
+			}
 
-				try {
-					outgoingURLsTable.insertLink(url, u);
-				} catch (Exception e) {
-					log.error("can't add url link [" + e.getMessage() + "]");
-				}
+			List<String> allOutUrls = new LinkedList<>(Arrays.asList(urls));
+			allOutUrls.addAll(Arrays.asList(images));
+			try {
+				outgoingURLsTable.insertLinks(url, allOutUrls);
+			} catch (Exception e) {
+				log.error("outgoingURLsTable: can't add urls [" + e.getMessage() + "]");
 			}
 
 			try {
