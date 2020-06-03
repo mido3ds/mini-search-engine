@@ -84,7 +84,7 @@ import CommonSearchBar from '../../common-search-bar'
         // console.log(ev)
 
         //not error for now
-        if (!err) {
+        if (err) {
             return (
                 <div style = {errStyle} >
                      <h2>{err}</h2>
@@ -105,7 +105,7 @@ import CommonSearchBar from '../../common-search-bar'
                             </tr>
                         </thead>
                         <tbody>
-                            {ev.map((r, i) => <TrendResult r={r} ind={i+1} key={i} />)}
+                            {results.map((r, i) => <TrendResult r={r} ind={i+1} key={i} />)}
                         </tbody>
                     </Table>
                     </Container>
