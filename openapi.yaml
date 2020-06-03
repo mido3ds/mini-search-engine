@@ -96,7 +96,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: "#/components/schemas/Person"
         "404":
           description: invalid country code
 components:
@@ -123,3 +123,11 @@ components:
           type: string
         snippet:
           type: string
+    Person:
+      type: object
+      title: Person
+      properties:
+        name:
+          type: string
+        number:
+          type: integer

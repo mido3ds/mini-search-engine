@@ -6,50 +6,69 @@ import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
- * 
+ *
+ * @export
+ * @interface Person
+ */
+export interface Person {
+    /**
+     *
+     * @type {string}
+     * @memberof Person
+     */
+    name?: string;
+    /**
+     *
+     * @type {number}
+     * @memberof Person
+     */
+    number?: number;
+}
+/**
+ *
  * @export
  * @interface QueryResult
  */
 export interface QueryResult {
     /**
-     * 
+     *
      * @type {string}
      * @memberof QueryResult
      */
     title?: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof QueryResult
      */
     link?: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof QueryResult
      */
     snippet?: string;
 }
 /**
- * 
+ *
  * @export
  * @interface ResultPage
  */
 export interface ResultPage {
     /**
-     * 
+     *
      * @type {number}
      * @memberof ResultPage
      */
     currentPage?: number;
     /**
-     * 
+     *
      * @type {number}
      * @memberof ResultPage
      */
     totalPages?: number;
     /**
-     * 
+     *
      * @type {Array<QueryResult>}
      * @memberof ResultPage
      */
@@ -63,7 +82,7 @@ export interface ResultPage {
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * 
+         *
          * @summary get list of completions
          * @param {string} q string to search for
          * @param {*} [options] Override http request option.
@@ -101,7 +120,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
+         *
          * @summary get list of urls to images that are associated with given search terms
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -144,36 +163,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
-         * @summary performance analysis and statistics
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        performanceStats(options: any = {}): RequestArgs {
-            const localVarPath = `/api/stats`;
-            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-
-            localVarUrlObj.query = { ...localVarUrlObj.query, ...localVarQueryParameter, ...options.query };
-            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
-            delete localVarUrlObj.search;
-            localVarRequestOptions.headers = { ...localVarHeaderParameter, ...options.headers };
-
-            return {
-                url: globalImportUrl.format(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
+         *
          * @summary submit a query
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -216,7 +206,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
+         *
          * @summary get list of 10 most searched persons of given country.
          * @param {string} country country alpha-3 code (ISO 3166) all capital
          * @param {*} [options] Override http request option.
@@ -263,7 +253,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 export const DefaultApiFp = function (configuration?: Configuration) {
     return {
         /**
-         * 
+         *
          * @summary get list of completions
          * @param {string} q string to search for
          * @param {*} [options] Override http request option.
@@ -277,7 +267,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
             };
         },
         /**
-         * 
+         *
          * @summary get list of urls to images that are associated with given search terms
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -292,20 +282,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
             };
         },
         /**
-         * 
-         * @summary performance analysis and statistics
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        performanceStats(options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<object> {
-            const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).performanceStats(options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
+         *
          * @summary submit a query
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -320,13 +297,13 @@ export const DefaultApiFp = function (configuration?: Configuration) {
             };
         },
         /**
-         * 
+         *
          * @summary get list of 10 most searched persons of given country.
          * @param {string} country country alpha-3 code (ISO 3166) all capital
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        trends(country: string, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>> {
+        trends(country: string, options?: any): (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Person>> {
             const localVarAxiosArgs = DefaultApiAxiosParamCreator(configuration).trends(country, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = { ...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url };
@@ -343,7 +320,7 @@ export const DefaultApiFp = function (configuration?: Configuration) {
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
-         * 
+         *
          * @summary get list of completions
          * @param {string} q string to search for
          * @param {*} [options] Override http request option.
@@ -353,7 +330,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return DefaultApiFp(configuration).complete(q, options)(axios, basePath);
         },
         /**
-         * 
+         *
          * @summary get list of urls to images that are associated with given search terms
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -364,16 +341,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return DefaultApiFp(configuration).imageQuery(q, page, options)(axios, basePath);
         },
         /**
-         * 
-         * @summary performance analysis and statistics
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        performanceStats(options?: any): AxiosPromise<object> {
-            return DefaultApiFp(configuration).performanceStats(options)(axios, basePath);
-        },
-        /**
-         * 
+         *
          * @summary submit a query
          * @param {string} q string to search for
          * @param {number} [page] page of results to fetch, default 1
@@ -384,13 +352,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return DefaultApiFp(configuration).query(q, page, options)(axios, basePath);
         },
         /**
-         * 
+         *
          * @summary get list of 10 most searched persons of given country.
          * @param {string} country country alpha-3 code (ISO 3166) all capital
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        trends(country: string, options?: any): AxiosPromise<Array<string>> {
+        trends(country: string, options?: any): AxiosPromise<Array<Person>> {
             return DefaultApiFp(configuration).trends(country, options)(axios, basePath);
         },
     };
@@ -404,7 +372,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
-     * 
+     *
      * @summary get list of completions
      * @param {string} q string to search for
      * @param {*} [options] Override http request option.
@@ -416,7 +384,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary get list of urls to images that are associated with given search terms
      * @param {string} q string to search for
      * @param {number} [page] page of results to fetch, default 1
@@ -429,18 +397,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * 
-     * @summary performance analysis and statistics
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public performanceStats(options?: any) {
-        return DefaultApiFp(this.configuration).performanceStats(options)(this.axios, this.basePath);
-    }
-
-    /**
-     * 
+     *
      * @summary submit a query
      * @param {string} q string to search for
      * @param {number} [page] page of results to fetch, default 1
@@ -453,7 +410,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary get list of 10 most searched persons of given country.
      * @param {string} country country alpha-3 code (ISO 3166) all capital
      * @param {*} [options] Override http request option.

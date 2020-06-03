@@ -46,7 +46,7 @@ import CommonSearchBar from '../../common-search-bar'
             const parsed = qs.parse(search, { ignoreQueryPrefix: true })
             setQ(parsed.country)
         }, [search])
-    
+
         useEffect(() => {
             if (country !== "") {
                 API.trends(country)
@@ -102,6 +102,7 @@ import CommonSearchBar from '../../common-search-bar'
                             <tr>
                             <th>#</th>
                             <th>Name</th>
+                            <th>Number Of Searches</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -139,7 +140,8 @@ import CommonSearchBar from '../../common-search-bar'
         return (
             <tr>
             <td>{ind}</td>
-            <td>{r}</td>
+            <td>{r.name}</td>
+            <td>{r.number}</td>
             </tr>
         );
     }
