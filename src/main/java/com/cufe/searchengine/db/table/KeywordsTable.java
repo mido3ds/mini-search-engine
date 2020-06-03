@@ -9,7 +9,6 @@ import java.util.*;
 
 @Component
 public class KeywordsTable {
-//	private static final Logger log = LoggerFactory.getLogger(KeywordsTable.class);
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
@@ -26,7 +25,6 @@ public class KeywordsTable {
 		builder.append(";");
 
 		Integer numRows = DBUtils.waitLock(100, () -> jdbcTemplate.update(builder.toString(), words.toArray()));
-//		log.info("numRows = " + numRows);
 
 		final StringBuilder builder2 = new StringBuilder("SELECT ROWID FROM keywords WHERE word in (");
 		for (int i = 0; i < words.size(); i++) {
@@ -42,7 +40,6 @@ public class KeywordsTable {
 				100, () -> jdbcTemplate.query(builder2.toString(),
 						(row, i) -> row.getInt(1), words.toArray())
 		);
-//		log.info("rowids.size() = " + rowids.size());
 
 		final StringBuilder builder3 = new StringBuilder();
 		builder3.append("REPLACE INTO keywords_documents(docID, wordID, count) VALUES");
@@ -56,7 +53,6 @@ public class KeywordsTable {
 		builder3.append(";");
 
 		numRows = DBUtils.waitLock(100, () -> jdbcTemplate.update(builder3.toString()));
-//		log.info("numRows = " + numRows);
 	}
 
 	public Integer selectCountbyWord(String keyword) throws Exception {
