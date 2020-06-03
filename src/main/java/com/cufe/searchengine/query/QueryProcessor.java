@@ -27,25 +27,23 @@ public class QueryProcessor {
 	private PhraseProcessor phraseProcessor;
 	@Autowired
 	private RelevanceRanker relevanceRanker;
+	@Autowired
+	private TrendsHandler trendsHandler;
 
 	/**
 	 * @return all search results, ranked
 	 */
 	public List<QueryResult> search(String query, String ipAddress, boolean isImage) {
-		//		log.info("received query = {}", query);
+		log.info("received query = {}", query);
 
+		log.info("processing query");
 		ArrayList<QueryResult> queryResults = new ArrayList<>(phraseProcessor.search(query, isImage));
-
-		//		log.info("queryResults from phraseProcessor .size() = {}", queryResults.size());
 
 		query = phraseProcessor.removePhrases(query);
 
-		//		log.info("query after removing phrases = {}", query);
-
 		List<String> keywords = DocumentFilterer.keywordsFromQuery(query);
 
-		//		log.info("extracted keywords = {}", keywords);
-
+		log.info("getting client geographic location");
 		String clientAlpha3 = "";
 		try {
 			clientAlpha3 = GeoUtils.countryAlpha3FromAlpha2(GeoUtils.countryAlpha2FromIP(GeoUtils.getPublicIPAddr(ipAddress)));	
@@ -54,6 +52,15 @@ public class QueryProcessor {
 			log.error("failed to get client country");
 		}
 
+		log.info("updating country trends");
+		try {
+			trendsHandler.updateTrends(query, clientAlpha3);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("trends update failed");
+		}
+
+		log.info("preparing query results");
 		if (keywords.size() == 0) {
 			try {
 				return relevanceRanker.rank(queryResults, keywords, clientAlpha3);
@@ -73,7 +80,6 @@ public class QueryProcessor {
 			return new ArrayList<>();
 		}
 
-		//		log.info("queried documents size = {}", documents.size());
 		queryResults.addAll(documents.stream()
 			.map(document -> new QueryResult().title(document.getTitle())
 				.link(document.getUrl())

@@ -136,7 +136,7 @@ public class UrlsStore {
 	}
 
 	@PreDestroy
-	private void onDestroy() throws Exception {
+	private void onDestroy() {
 		String[] storeCopy = store.stream()
 			.distinct()
 			.filter(Objects::nonNull)
@@ -144,7 +144,13 @@ public class UrlsStore {
 			.toArray(String[]::new);
 
 		// flush
-		urlStoreQueueTable.clean();
+		try {
+			urlStoreQueueTable.clean();
+		} catch (Exception e) {
+			log.error("failed to flush urlStoreQueueTable");
+			e.printStackTrace();
+			return;
+		}
 
 		log.info("flushed urlstore_queue table");
 
@@ -155,7 +161,13 @@ public class UrlsStore {
 		}
 		log.info("save my state before closing");
 
-		urlStoreQueueTable.insert(storeCopy);
+		try {
+			urlStoreQueueTable.insert(storeCopy);
+		} catch (Exception e) {
+			log.error("failed to save my state before closing");
+			e.printStackTrace();
+			return;
+		}
 
 		log.info("saved {} urls", storeCopy.length);
 	}

@@ -5,6 +5,8 @@ React : reactive coding
 
 Material-UI : ui components
 
+Bootstrap: ui components
+
 match-sorter : fuzzy searching in completion results
 
 # Crawler
@@ -17,3 +19,6 @@ Stemmer from [https://tartarus.org/martin/PorterStemmer/java.txt](https://tartar
 [Maxmind GeoIP2](https://dev.maxmind.com/geoip/) : get location from public IP
 
 [Neo Visionaries i18n](https://mvnrepository.com/artifact/com.neovisionaries/nv-i18n/1.4) : ISO country codes
+
+# Trends
+[Stanford CoreNLP](https://stanfordnlp.github.io/CoreNLP/) : Detect human names in search queries

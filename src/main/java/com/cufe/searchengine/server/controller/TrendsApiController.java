@@ -1,11 +1,9 @@
 package com.cufe.searchengine.server.controller;
 
-import com.cufe.searchengine.query.QueryProcessor;
-import com.cufe.searchengine.server.model.QueryResult;
-import com.cufe.searchengine.server.model.ResultPage;
+import com.cufe.searchengine.query.TrendsHandler;
+import com.cufe.searchengine.server.model.Person;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -25,12 +23,12 @@ import java.util.Optional;
 @Api(value = "trends", description = "the trends API")
 public class TrendsApiController {
 	private final NativeWebRequest request;
-	private final QueryProcessor queryProcessor;
+	private final TrendsHandler trendsHandler;
 
 	@Autowired
-	public TrendsApiController(NativeWebRequest request, QueryProcessor queryProcessor) {
+	public TrendsApiController(NativeWebRequest request, TrendsHandler trendsHandler) {
 		this.request = request;
-		this.queryProcessor = queryProcessor;
+		this.trendsHandler = trendsHandler;
 	}
 
 	public Optional<NativeWebRequest> getRequest() {
@@ -38,37 +36,36 @@ public class TrendsApiController {
 	}
 
 	/**
-     * GET /api/trends : get list of 10 most searched persons of given country.
-     *
-     * @param country country alpha-3 code (ISO 3166) all capital (required)
-     * @return successful operation, result mustn&#39;t be empty (status code 200)
-     *         or invalid country code (status code 404)
-     */
-    @ApiOperation(value = "get list of 10 most searched persons of given country.", nickname = "trends", notes = "", response = String.class, responseContainer = "List", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "successful operation, result mustn't be empty", response = String.class, responseContainer = "List"),
-        @ApiResponse(code = 404, message = "invalid country code") })
-    @RequestMapping(value = "/api/trends",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<String>> trends(@NotNull @ApiParam(value = "country alpha-3 code (ISO 3166) all capital", required = true) @Valid @RequestParam(value = "country", required = true) String country) {
+	 * GET /api/trends : get list of 10 most searched persons of given country.
+	 *
+	 * @param country country alpha-3 code (ISO 3166) all capital (required)
+	 * @return successful operation, result mustn&#39;t be empty (status code 200)
+	 *         or invalid country code (status code 404)
+	 */
+	@ApiOperation(value = "get list of 10 most searched persons of given country.", nickname = "trends", notes = "", response = Person.class, responseContainer = "List", tags={  })
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "successful operation, result mustn't be empty", response = Person.class, responseContainer = "List"),
+			@ApiResponse(code = 404, message = "invalid country code") })
+	@RequestMapping(value = "/api/trends",
+			produces = { "application/json" },
+			method = RequestMethod.GET)
+    ResponseEntity<List<Person>> trends(@NotNull @ApiParam(value = "country alpha-3 code (ISO 3166) all capital", required = true) @Valid @RequestParam(value = "country", required = true) String country) {
 		if ("1".equals(System.getenv("MOCK"))) {
-			ArrayList<String> persons = new ArrayList<>();
-			persons.add("Mahmoud Adas");
-			persons.add("Mahmoud Othman Adas");
-			persons.add("Shrek");
-			persons.add("Mahmoud Adas Again");
-			persons.add("Maybe Mahmoud Osman Adas");
-			persons.add("Adas Adas");
-			persons.add("Yup, it's 3ds ᕕ( ᐛ )ᕗ");
-			persons.add("Of course adas is the most trndy, what did you expect?");
-			persons.add("No not adas again");
-			persons.add("Adas (✿\u2060´ ꒳ ` )");
+			ArrayList<Person> persons = new ArrayList<>();
+			persons.add(new Person().name("Mahmoud Adas").number(99));
+			persons.add(new Person().name("Mahmoud Othman Adas").number(90));
+			persons.add(new Person().name("Shrek").number(80));
+			persons.add(new Person().name("Mahmoud Adas Again").number(7));
+			persons.add(new Person().name("Maybe Mahmoud Osman Adas").number(6));
+			persons.add(new Person().name("Adas Adas").number(5));
+			persons.add(new Person().name("Yup, it's 3ds ᕕ( ᐛ )ᕗ").number(4));
+			persons.add(new Person().name("Of course adas is the most trndy, what did you expect?").number(4));
+			persons.add(new Person().name("No not adas again").number(4));
+			persons.add(new Person().name("Adas (✿\u2060´ ꒳ ` )").number(1));
 
 			return ResponseEntity.ok(persons);
 		} else {
-			// TODO
-			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+			return ResponseEntity.ok(trendsHandler.getTrends(country));
 		}
     }
 }

@@ -35,7 +35,7 @@ public class GeoUtils {
     }
 
     public static String getPublicIPAddr(String ipAddr) throws Exception {
-        String[] ipAddrCodes = ipAddr.split("\\.");
+        String[] ipAddrCodes = ipAddr.split(":|\\.");
         String publicIPAddr = ipAddr;
 
 		if (ipAddrCodes[0].equals("127") || ipAddrCodes[0].equals("192") || ipAddrCodes[0].equals("0")) {

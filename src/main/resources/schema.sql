@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS keywords_documents(
 );
 
 CREATE TABLE IF NOT EXISTS urlstore_queue(
-	url STRING PRIMARY KEY NOT NULL
+	url STRING NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS outgoing_urls(
@@ -42,4 +42,11 @@ CREATE TABLE IF NOT EXISTS outgoing_urls(
 	FOREIGN KEY (outURL) REFERENCES documents(url)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS persons(
+	name STRING NOT NULL,
+	countryCode STRING NOT NULL,
+	count INT NOT NULL DEFAULT 1,
+	PRIMARY KEY (name, countryCode)
 );
