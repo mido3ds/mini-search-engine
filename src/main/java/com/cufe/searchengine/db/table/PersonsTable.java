@@ -27,7 +27,7 @@ public class PersonsTable {
     }
 
     public List<String> getTopPersons(String country) throws Exception {
-        String query = "SELECT name FROM persons WHERE countryCode = (?) ORDER BY count DESC LIMIT 10";
-        return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class));
+        String query = "SELECT name FROM persons WHERE countryCode = ? ORDER BY count DESC LIMIT 10";
+        return DBUtils.waitLock(100, () -> jdbcTemplate.queryForList(query, String.class, country));
     }
 }

@@ -27,6 +27,8 @@ public class QueryProcessor {
 	private PhraseProcessor phraseProcessor;
 	@Autowired
 	private RelevanceRanker relevanceRanker;
+	@Autowired
+	private TrendsHandler trendsHandler;
 
 	/**
 	 * @return all search results, ranked
@@ -52,6 +54,13 @@ public class QueryProcessor {
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("failed to get client country");
+		}
+
+		try {
+			trendsHandler.updateTrends(query, clientAlpha3);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("trends update failed");
 		}
 
 		if (keywords.size() == 0) {

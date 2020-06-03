@@ -26,7 +26,13 @@ public class TrendsHandler {
     /**
 	 * @return list of top 10 trending persons names
 	 */
-    public List<String> getTrends(String countryCode) throws Exception {
-        return personsTable.getTopPersons(countryCode);
+    public List<String> getTrends(String countryCode) {
+        log.info("getting top 10 trending persons");
+        try {
+            return personsTable.getTopPersons(countryCode);
+        } catch (Exception e) {
+            log.error("failed to get trends");
+            return new ArrayList<String>();
+        }
     }
 }

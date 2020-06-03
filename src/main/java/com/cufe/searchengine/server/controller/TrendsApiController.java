@@ -1,6 +1,6 @@
 package com.cufe.searchengine.server.controller;
 
-import com.cufe.searchengine.query.QueryProcessor;
+import com.cufe.searchengine.query.TrendsHandler;
 import com.cufe.searchengine.server.model.QueryResult;
 import com.cufe.searchengine.server.model.ResultPage;
 import io.swagger.annotations.*;
@@ -25,12 +25,12 @@ import java.util.Optional;
 @Api(value = "trends", description = "the trends API")
 public class TrendsApiController {
 	private final NativeWebRequest request;
-	private final QueryProcessor queryProcessor;
+	private final TrendsHandler trendsHandler;
 
 	@Autowired
-	public TrendsApiController(NativeWebRequest request, QueryProcessor queryProcessor) {
+	public TrendsApiController(NativeWebRequest request, TrendsHandler trendsHandler) {
 		this.request = request;
-		this.queryProcessor = queryProcessor;
+		this.trendsHandler = trendsHandler;
 	}
 
 	public Optional<NativeWebRequest> getRequest() {
@@ -67,8 +67,7 @@ public class TrendsApiController {
 
 			return ResponseEntity.ok(persons);
 		} else {
-			// TODO
-			return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+			return ResponseEntity.ok(trendsHandler.getTrends(country));
 		}
     }
 }
