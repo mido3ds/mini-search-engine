@@ -1,3 +1,4 @@
+*.jar
 target
 performance-analysis-*.json
 out
