@@ -1,8 +1,9 @@
-package com.cufe.searchengine.query;
+package com.cufe.searchengine.analysis;
 
 import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.db.table.KeywordsTable;
+import com.cufe.searchengine.query.QueryProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
