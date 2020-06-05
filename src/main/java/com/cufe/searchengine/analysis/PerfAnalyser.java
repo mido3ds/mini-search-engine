@@ -30,7 +30,7 @@ public class PerfAnalyser {
     private final Random RAND = new Random();
     private final String[] DATA = {"deep learning", "advanced programming techniques", "maths", "science", "psychology", "Ahmed Zewail",
             "image processing", "Sherlock Holmes", "animation movies", "COVID-19"};
-    private static final int TOTAL_THREADS = 100;
+    private static final int TOTAL_THREADS = 200;
     private static final int TIMEOUT_MS = 2 * 60 * 1000;
 
     @EventListener

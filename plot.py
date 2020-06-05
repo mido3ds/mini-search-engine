@@ -71,9 +71,9 @@ def plot(w, wt, xs, xs2, xlabel, xlabel2, ylabel, f):
     ax1.set_ylabel(ylabel)
     ax1.legend()
 
-    ax1.set_xticks(xs)
+    ax1.set_xlim(xs[0]-10, xs[-1]+10)
     ax1.set_xlabel(xlabel)
-    ax2.set_xticks(xs2)
+    ax2.set_xlim(xs2[0]-10, xs2[-1]+10)
     ax2.set_xlabel(xlabel2)
 
     ax1.grid()
