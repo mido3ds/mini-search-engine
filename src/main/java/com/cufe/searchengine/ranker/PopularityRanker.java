@@ -1,4 +1,4 @@
-package com.cufe.searchengine.query;
+package com.cufe.searchengine.ranker;
 
 import com.cufe.searchengine.db.DBInitializer;
 import com.cufe.searchengine.db.table.DocumentsTable;

@@ -3,6 +3,7 @@ package com.cufe.searchengine.query;
 import com.cufe.searchengine.crawler.Document;
 import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.db.table.KeywordsTable;
+import com.cufe.searchengine.ranker.RelevanceRanker;
 import com.cufe.searchengine.server.model.QueryResult;
 import com.cufe.searchengine.util.DocumentFilterer;
 import com.cufe.searchengine.util.GeoUtils;

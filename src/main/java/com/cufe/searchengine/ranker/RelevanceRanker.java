@@ -1,4 +1,4 @@
-package com.cufe.searchengine.query;
+package com.cufe.searchengine.ranker;
 
 import com.cufe.searchengine.db.table.DocumentsTable;
 import com.cufe.searchengine.db.table.KeywordsTable;
@@ -6,8 +6,6 @@ import com.cufe.searchengine.server.model.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
