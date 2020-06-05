@@ -1,0 +1,106 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{float}
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Search Engine Analysis}
+\lhead{\thesection}
+\rfoot{\thepage}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\title{\textbf{Search Engine Analysis}\\Team \#2\\ Semester}
+\author{
+  Mohamed Shawky\\
+  \small\texttt{SEC:2, BN:16}
+  \and
+  Remonda Talaat\\
+  \small\texttt{SEC:1, BN:20}
+  \and
+  Evram Youssef\\
+  \small\texttt{SEC:1, BN:9}
+  \and
+  Mahmoud Adas\\
+  \small\texttt{SEC:2, BN:21}
+}
+\date{\today}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\maketitle
+\tableofcontents
+% \listoffigures
+% \listoftables
+\clearpage
+
+\pagenumbering{arabic}
+
+\section{Introduction}
+This document shows our analysis of the performance of our Search Engine and how we performed those analysis.
+
+\section{The Experiment}
+\subsection{Running One Experiment}
+This command runs the whole server in analysis mode and closes it after finishing the experiment.
+\begin{verbatim}
+  $ env PAM=1 mvn
+\end{verbatim}
+
+\subsection{PerfAnalyser}
+\texttt{PerfAnalyser.java} is the java class responsible for conducting one experiment and closing the server afterward. 
+It does the following:
+\begin{enumerate}
+  \item Launches \texttt{\$TOTAL\_THREADS} of threads, each calls \texttt{Query Processor} with a random query.
+  \item After timeout of \texttt{\$TIMEOUT\_MS}, \texttt{PerfAnalyser.java} interrupts threads that didn't finish, then collects the time of the rest of the threads.
+  \item Calculates the average time of all threads, and calculates the number of timeouted threads.
+  \item Repeats this experiment one time again with the ranker disabled.
+  \item Queries the size of all crawled documents and the number of indexed keywords.
+  \item Serializes all the collected data into json file whose name follows the pattern \{\texttt{performance-analysis-\$\{TIME\}.json}\} and saves it into current working directory.
+\end{enumerate}
+
+\subsection{JSON Outupt Example}
+\begin{verbatim}
+  {
+    "avgTimeWithRanking" : 20000, // in ms (ranking=on)
+
+    // % non timeouted requests (ranking=on)
+    "successPercentageWithRanking" : 0.8, 
+
+    "totalParallelRequests" : 100, // =$TOTAL_THREADS
+    "numCrawledPages" : 900,
+    "numIndexedKeywords" : 4309,
+    "avgTimeWithoutRanking" : 10000, // in ms (ranking=off)
+
+    // % non timeouted requests (ranking=off)
+    "successPercentageWithoutRanking" : 0.98 
+  }
+\end{verbatim}
+
+\subsection{Repeating}
+You need to conduct this experiment multiple times during different stages of search engine running. Then plot the results to be able to answer the performance questions.
+
+\subsection{Plotting}
+To plot the results with the python script:
+\begin{verbatim}
+  $ python3 plot.py $PWD perf*.json
+\end{verbatim}
+
+\section{Results}
+% TODO: add plots
+
+\section{Conclusion}
+% TODO
+
+\end{document}
