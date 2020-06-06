@@ -1,1 +1,9 @@
-{"avgTimeWithRanking": 2810, "successPercentageWithRanking": 0.3772932296296786, "totalParallelRequests": 200, "numCrawledPages": 410, "numIndexedKeywords": 4069, "avgTimeWithoutRanking": 2064, "successPercentageWithoutRanking": 0.9432330740741964}
+{
+  "totalParallelRequests" : 200,
+  "avgTimeWithRanking" : 32829.18,
+  "successPercentageWithRanking" : 1.0,
+  "avgTimeWithoutRanking" : 22779.235,
+  "successPercentageWithoutRanking" : 1.0,
+  "numCrawledPages" : 846,
+  "numIndexedKeywords" : 32296
+}
