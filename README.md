@@ -11,6 +11,9 @@ Mini Search Engine - Advanced Programming Techniques Course Project - Cairo Uni.
 | Mohamed Shawky        | 2       | 16   |
 
 # Requirements
+Versions listed here are the versions we worked with. 
+Sometimes, it's possible to use lower versions (except jdk, it must be 9+), but we don't gurantee this.
+In case of running/compiling issues, try to match those versions.
 
 | Binary | Version  |
 |--------|----------|
