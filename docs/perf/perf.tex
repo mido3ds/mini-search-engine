@@ -35,7 +35,7 @@ breaklines=true
 \maketitle
 
 \begin{abstract}
-  This document shows our analysis of the performance of our Search Engine and how we performed those analysis.
+  This document shows our analysis of the performance of our Search Engine and how we performed them.
 \end{abstract}
 
 \section{The Experiment}
@@ -66,7 +66,7 @@ To plot the results with the python script:
 
 \section{Results}
 Setting \small\texttt{\$TOTAL\_THREADS} = 200, \small\texttt{\$TIMEOUT\_MS} = 2 Minutes and running \small\texttt{PerfAnalyser.java} 10 times at different stages of database building.
-We got the figures \ref{fig:avgtime} and \ref{fig:secPrec}.
+We got 2 figures, Fig. \ref{fig:avgtime}, and a flat line at $1$ for the 'Success Precentage vs. Crawled Pages and Indexed keywords.'
 
 \begin{figure}
   \centering
@@ -75,20 +75,21 @@ We got the figures \ref{fig:avgtime} and \ref{fig:secPrec}.
   \label{fig:avgtime}
 \end{figure}
 
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{secPrec.png}
-  \caption{Success Percentage vs. Num. Crawled Pages and Indexed keywords}
-  \label{fig:secPrec}
-\end{figure}
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=\linewidth]{secPrec.png}
+%   \caption{Success Percentage vs. Num. Crawled Pages and Indexed keywords}
+%   \label{fig:secPrec}
+% \end{figure}
 
-\section{Discussion and Conclusion}
+\section{Discussion}
 After experimenting with query processor through a range of crawled pages up to $4000$ and indexed words up to $80000+$, we notice that the speed of query processor both with and without ranking is affected by the database size. However, the success rate is always one, as the query processor never fails with up to $200$ simultaneous requests. This is due to the following:
 \begin{itemize}
     \item In our implementation, There are multiple threads that run in parallel for crawler, indexer, popularity ranker and query processor. This results in a huge amount of database queries from all parallel threads. Consequently, by increasing the size of database, the size of query results increases, which, in return, increases the number of database access in both query processor and ranker slowing down the query response.
     \item We use \emph{CoreNLP} library in the query processor, which consumes a lot of time performing \texttt{NER} \emph{(Named-Entity Recognition)} on each query string.
 \end{itemize}
 
+\section{Conclusion}
 In conclusion, we can state that the main downsides about the performance of our implementation are \emph{excess number of database access from all components at the same time} and \emph{the usage of external libraries for some specialized tasks.}
 
 \end{document}
