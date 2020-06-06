@@ -20,7 +20,7 @@ Mini Search Engine - Advanced Programming Techniques Course Project - Cairo Uni.
 | nodejs | `8.11.4` |
 | yarn   | `1.21.1` |
 
-# Install Other Requirement
+# Install Other Requirements
 
 ``` 
 $ mvn clean compile
