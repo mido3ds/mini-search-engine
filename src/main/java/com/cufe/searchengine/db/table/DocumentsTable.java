@@ -89,7 +89,7 @@ public class DocumentsTable {
 		Optional<String> reducedLikes = phrases.stream()
 			.map(String::toLowerCase)
 			.distinct()
-			.map(p -> MessageFormat.format("content LIKE \"%{0}%\"", p))
+			.map(p -> MessageFormat.format("content LIKE \"%{0}%\" OR url LIKE \"%{0}%\"", p))
 			.reduce((s, s2) -> MessageFormat.format("{0} OR {1}", s, s2));
 
 		if (!reducedLikes.isPresent()) {

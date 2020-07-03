@@ -55,6 +55,17 @@ public class RelevanceRanker {
 		List<Integer> tfidfScores = computeScores(tfidfs);
 		List<Integer> dateScores = computeDateScores(dates);
 
+		log.info("adjusting scores based on keywords location");
+		for(int i=0; i<queryResults.size(); i++) {
+			for(int j=0; j<keywords.size(); j++) {
+				if (queryResults.get(i).getLink().contains(keywords.get(j))) {
+					tfidfScores.set(i, tfidfScores.get(i)+queryResults.size());
+				} else if (queryResults.get(i).getTitle().contains(keywords.get(j))) {
+					tfidfScores.set(i, tfidfScores.get(i)+queryResults.size()/2);
+				}
+			}
+		}
+
 		log.info("computing overall scores");
 		List<Integer> overallScores = new ArrayList<Integer>();
 		for(int i=0; i<rankScores.size(); i++) {
