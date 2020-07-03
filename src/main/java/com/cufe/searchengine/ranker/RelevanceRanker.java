@@ -69,7 +69,7 @@ public class RelevanceRanker {
 		log.info("computing overall scores");
 		List<Integer> overallScores = new ArrayList<Integer>();
 		for(int i=0; i<rankScores.size(); i++) {
-			overallScores.add(rankScores.get(i) + tfidfScores.get(i) + dateScores.get(i));
+			overallScores.add(5 * rankScores.get(i) + 10 * tfidfScores.get(i) + 1 * dateScores.get(i));
 		}
 
 		log.info("sorting query results");
